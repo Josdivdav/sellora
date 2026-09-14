@@ -1,0 +1,459 @@
+:root {
+    --blue: #2b6dff;
+    --purple: #7b2ff7;
+    --deep-navy: #0b1230;
+    --text-dark: #14142b;
+    --text-muted: #6b7280;
+    --border: #e5e7eb;
+    --bg-soft: #f5f6fb;
+}
+
+.page {
+    min-height: 100vh;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #eef1ff 0%, #f7f4ff 45%, #eef6ff 100%);
+    padding: 24px;
+    font-family: "Poppins", sans-serif;
+}
+
+.card {
+    width: 100%;
+    max-width: 960px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    background: #fff;
+    border-radius: 24px;
+    box-shadow: 0 30px 60px -20px rgba(43, 54, 116, 0.25);
+    overflow: hidden;
+}
+
+/* LEFT PANEL - Brand */
+.brandPanel {
+    background: linear-gradient(160deg, var(--blue) 0%, var(--purple) 100%);
+    padding: 48px 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    color: #fff;
+    position: relative;
+    overflow: hidden;
+}
+
+.brandPanel::before {
+    content: "";
+    position: absolute;
+    width: 320px;
+    height: 320px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+    top: -120px;
+    right: -100px;
+}
+
+.brandPanel::after {
+    content: "";
+    position: absolute;
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.07);
+    bottom: -80px;
+    left: -60px;
+}
+
+.logoWrap {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    z-index: 1;
+    position: relative;
+}
+
+.logoWrap img {
+    width: 54px;
+    height: 54px;
+    border-radius: 14px;
+    background: #fff;
+    padding: 6px;
+    object-fit: contain;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.logoWrap .name {
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+}
+
+.brandCopy {
+    z-index: 1;
+    position: relative;
+    margin-top: 40px;
+}
+
+.brandCopy h1 {
+    font-size: 34px;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: 14px;
+}
+
+.brandCopy p {
+    font-size: 15px;
+    line-height: 1.7;
+    color: rgba(255, 255, 255, 0.85);
+    max-width: 340px;
+}
+
+.featureList {
+    z-index: 1;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-top: 36px;
+}
+
+.featureItem {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.92);
+}
+
+.featureItem :global(.material-icons-round) {
+    background: rgba(255, 255, 255, 0.18);
+    padding: 8px;
+    border-radius: 10px;
+    font-size: 18px;
+}
+
+.tagline {
+    z-index: 1;
+    position: relative;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.7);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+/* RIGHT PANEL - Form */
+.formPanel {
+    padding: 56px 48px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.formHeader {
+    margin-bottom: 32px;
+}
+
+.formHeader h2 {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 8px;
+}
+
+.formHeader p {
+    font-size: 14px;
+    color: var(--text-muted);
+}
+
+.formHeader p a {
+    color: var(--blue);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.formHeader p a:hover {
+    text-decoration: underline;
+}
+
+.googleBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 13px 16px;
+    border-radius: 12px;
+    border: 1.5px solid var(--border);
+    background: #fff;
+    font-size: 14.5px;
+    font-weight: 600;
+    color: var(--text-dark);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-bottom: 22px;
+}
+
+.googleBtn:hover {
+    border-color: var(--blue);
+    background: #f8faff;
+    box-shadow: 0 6px 16px rgba(43, 109, 255, 0.12);
+}
+
+.googleBtn img {
+    width: 20px;
+    height: 20px;
+}
+
+.divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 22px;
+}
+
+.divider::before,
+.divider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+}
+
+.divider span {
+    font-size: 12.5px;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.fieldGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.fieldGroup label {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.fieldHint {
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.5;
+    margin-top: -2px;
+}
+
+.termsRow {
+    justify-content: flex-start;
+}
+
+.termsRow .remember {
+    align-items: flex-start;
+    line-height: 1.5;
+}
+
+.termsRow .remember input {
+    margin-top: 3px;
+    flex-shrink: 0;
+}
+
+.termsRow .remember a {
+    color: var(--blue);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.termsRow .remember a:hover {
+    text-decoration: underline;
+}
+
+.inputWrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.inputWrap :global(.material-icons-round) {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 20px;
+    color: #9aa1b5;
+    max-width: 20px;
+    transition: color 0.2s ease;
+    pointer-events: none;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+.inputWrap input {
+    width: 100%;
+    padding: 13px 16px 13px 44px;
+    border-radius: 12px;
+    border: 1.5px solid var(--border);
+    font-size: 14.5px;
+    color: var(--text-dark);
+    outline: none;
+    transition: all 0.2s ease;
+    background: var(--bg-soft);
+}
+
+.inputWrap input.passwordInput {
+    padding: 13px 44px 13px 44px;
+}
+
+.inputError {
+    border-color: red !important;
+}
+
+.warn {
+    text-align: center;
+    color: red;
+    font-size: 13px;
+}
+
+.hide {
+    display: none;
+}
+
+.inputWrap input::placeholder {
+    color: #a4abbd;
+}
+
+.inputWrap input:focus {
+    border-color: var(--blue);
+    background: #fff;
+    box-shadow: 0 0 0 4px rgba(43, 109, 255, 0.1);
+}
+
+.inputWrap:focus-within > :global(.material-icons-round) {
+    color: var(--blue);
+}
+
+.inputWrap .toggleVisibility,
+.inputWrap :global(.toggle-visibility) {
+    position: absolute;
+    left: auto;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 20px;
+    color: #9aa1b5;
+    user-select: none;
+    cursor: pointer;
+    z-index: 2;
+    pointer-events: auto;
+    transition: color 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+.inputWrap .toggleVisibility:hover,
+.inputWrap :global(.toggle-visibility:hover) {
+    color: var(--blue);
+}
+
+.formMeta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 13px;
+    margin-top: -4px;
+}
+
+.remember {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-muted);
+}
+
+.remember input {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--blue);
+    cursor: pointer;
+}
+
+.forgot {
+    color: var(--blue);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.forgot:hover {
+    text-decoration: underline;
+}
+
+.submitBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--blue), var(--purple));
+    color: #fff;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 6px;
+    box-shadow: 0 10px 24px -6px rgba(90, 60, 240, 0.45);
+    transition:
+        transform 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+.submitBtn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 28px -6px rgba(90, 60, 240, 0.55);
+}
+
+.submitBtn :global(.material-icons-round) {
+    font-size: 20px;
+}
+
+.signupLine {
+    text-align: center;
+    font-size: 13.5px;
+    color: var(--text-muted);
+    margin-top: 24px;
+}
+
+.signupLine a {
+    color: var(--blue);
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.signupLine a:hover {
+    text-decoration: underline;
+}
+
+@media (max-width: 820px) {
+    .card {
+        grid-template-columns: 1fr;
+    }
+    .brandPanel {
+        display: none;
+    }
+    .formPanel {
+        padding: 40px 28px;
+    }
+}
