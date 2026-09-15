@@ -1,33 +1,92 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import styles from "./register.module.css";
+import {
+  registerWithEmailAndPassword,
+  continueWithGoogle,
+  getRegistrationErrorMessage,
+} from "@/functions/register.func";
+
+import { getAuth, getRedirectResult, GoogleAuthProvider } from "firebase/auth";
 
 export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [emailError, setEmailError] = useState(false);
   const [warning, setWarning] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Form submit handler
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = e.currentTarget;
+    const email = (form.elements.namedItem("email") as HTMLInputElement)?.value;
+    const username = (form.elements.namedItem("username") as HTMLInputElement)?.value;
     const password = (form.elements.namedItem("password") as HTMLInputElement)?.value;
     const confirmPassword = (form.elements.namedItem("confirmPassword") as HTMLInputElement)?.value;
 
+    setWarning("");
+    setEmailError(false);
+
     if (password !== confirmPassword) {
       setWarning("Passwords do not match");
+      (form.elements.namedItem("confirmPassword") as HTMLInputElement)?.focus();
       return;
     }
-    // Placeholder sign-up logic
+
+    setIsSubmitting(true);
+    try {
+      await registerWithEmailAndPassword(email, password, username);
+    } catch (error) {
+      const message = getRegistrationErrorMessage(error);
+      setWarning(message);
+
+      const isEmailError =
+        typeof error === "object" &&
+        error !== null &&
+        "code" in error &&
+        (error.code === "auth/email-already-in-use" || error.code === "auth/invalid-email");
+
+      if (isEmailError) {
+        setEmailError(true);
+        (form.elements.namedItem("email") as HTMLInputElement)?.focus();
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
-  // Google sign-in handler
-  function handleGoogleSignIn() {
-    // Placeholder Google sign-in logic
+  async function handleGoogleSignIn() {
+    setWarning("");
+    setEmailError(false);
+    setIsSubmitting(true);
+    try {
+      await continueWithGoogle();
+    } catch (error) {
+      console.error("Error during Google sign-in:", error);
+      setWarning(getRegistrationErrorMessage(error));
+    } finally {
+      setIsSubmitting(false);
+    }
   }
+
+  useEffect(() => {
+    const auth = getAuth();
+    getRedirectResult(auth)
+      .then((result) => {
+        if (!result) return;
+        const credential = GoogleAuthProvider.credentialFromResult(result);
+        const token = credential?.accessToken;
+        const user = result.user;
+        console.log(user);
+      })
+      .catch((error) => {
+        console.error("Error completing Google sign-in:", error);
+        setWarning(getRegistrationErrorMessage(error));
+      });
+  }, []);
 
   return (
     <div className={styles.page}>
@@ -91,6 +150,7 @@ export default function RegisterPage() {
               className={styles.googleBtn}
               id="gmailBtn"
               onClick={handleGoogleSignIn}
+              disabled={isSubmitting}
             >
               <img src="/google.svg" alt="Google icon" />
               Continue with Gmail
@@ -127,6 +187,10 @@ export default function RegisterPage() {
                     placeholder="you@example.com"
                     autoComplete="email"
                     className={emailError ? styles.inputError : ""}
+                    onChange={() => {
+                      setEmailError(false);
+                      setWarning("");
+                    }}
                     required
                   />
                 </div>
@@ -194,12 +258,16 @@ export default function RegisterPage() {
                 </label>
               </div>
 
-              <p className={`${styles.warn} ${warning ? "" : styles.hide}`}>
-                {warning || "Email already exists"}
+              <p
+                className={`${styles.warn} ${warning ? "" : styles.hide}`}
+                role="alert"
+                aria-live="assertive"
+              >
+                {warning}
               </p>
 
-              <button type="submit" className={styles.submitBtn}>
-                Create Account
+              <button type="submit" className={styles.submitBtn} disabled={isSubmitting}>
+                {isSubmitting ? "Creating account..." : "Create Account"}
                 <span className="material-icons-round">arrow_forward</span>
               </button>
             </form>
