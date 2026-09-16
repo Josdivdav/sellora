@@ -4,6 +4,9 @@ import { useEffect, useMemo, useState } from "react";
 import styles from "./home.module.css";
 
 import { useAuth } from "@/context/AuthContext";
+import { SignOut } from "@/functions/home.func";
+import { useRouter } from "next/navigation";
+import SideButton from "@/components/SideButton";
 
 type Product = {
   id: string;
@@ -15,135 +18,110 @@ type Product = {
   image: string;
   author?: string;
 };
-const products: Product[] = [
-  {
-    id: "p1",
-    name: "Wireless Noise-Cancelling Headphones",
-    category: "Electronics",
-    price: 45000,
-    oldPrice: 58000,
-    rating: 4.7,
-    image:
-      "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&q=80",
-  },
-  {
-    id: "p2",
-    name: "Minimalist Analog Watch",
-    category: "Fashion",
-    price: 32000,
-    rating: 4.5,
-    image:
-      "https://images.unsplash.com/photo-1524805444758-089113d48a6d?w=500&q=80",
-  },
-  {
-    id: "p3",
-    name: "Everyday Canvas Backpack",
-    category: "Fashion",
-    price: 21500,
-    oldPrice: 27000,
-    rating: 4.6,
-    image:
-      "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500&q=80",
-  },
-  {
-    id: "p4",
-    name: "Ceramic Pour-Over Coffee Set",
-    category: "Home",
-    price: 18500,
-    rating: 4.8,
-    image:
-      "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=500&q=80",
-  },
-  {
-    id: "p5",
-    name: "Smart Fitness Tracker Band",
-    category: "Electronics",
-    price: 27500,
-    rating: 4.3,
-    image:
-      "https://images.unsplash.com/photo-1576243345690-4e4b79b63288?w=500&q=80",
-  },
-  {
-    id: "p6",
-    name: "Scented Soy Candle Trio",
-    category: "Home",
-    price: 12000,
-    oldPrice: 15000,
-    rating: 4.9,
-    image:
-      "https://images.unsplash.com/photo-1602874801007-bd36c65cd951?w=500&q=80",
-  },
-  {
-    id: "p7",
-    name: "Leather Bifold Wallet",
-    category: "Fashion",
-    price: 15800,
-    rating: 4.4,
-    image:
-      "https://images.unsplash.com/photo-1627123424574-724758594e93?w=500&q=80",
-  },
-  {
-    id: "p8",
-    name: "Portable Bluetooth Speaker",
-    category: "Electronics",
-    price: 22000,
-    rating: 4.6,
-    image:
-      "https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=500&q=80",
-  },
-  {
-    id: "p9",
-    name: "Cold-Pressed Skincare Oil",
-    category: "Beauty",
-    price: 9800,
-    rating: 4.7,
-    image:
-      "https://images.unsplash.com/photo-1571781926291-c477ebfd024b?w=500&q=80",
-  },
-  {
-    id: "p10",
-    name: "Woven Throw Blanket",
-    category: "Home",
-    price: 16500,
-    oldPrice: 21000,
-    rating: 4.5,
-    image:
-      "https://images.unsplash.com/photo-1580301762395-83c8f0d0e33a?w=500&q=80",
-  },
-  {
-    id: "p11",
-    name: "Matte Lip Tint Set",
-    category: "Beauty",
-    price: 8500,
-    rating: 4.2,
-    image:
-      "https://images.unsplash.com/photo-1631214524020-3c8c6c2b2d1e?w=500&q=80",
-  },
-  {
-    id: "p12",
-    name: "Mechanical Keyboard, 75%",
-    category: "Electronics",
-    price: 38000,
-    rating: 4.8,
-    image:
-      "https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=500&q=80",
-  },
-];
+
 const currency = new Intl.NumberFormat("en-NG", {
   style: "currency",
   currency: "NGN",
   maximumFractionDigits: 0,
 });
-const categories = [
-  "All",
-  ...new Set(products.map((product) => product.category)),
-];
+
 
 export default function Home() {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("All");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [cartCount, setCartCount] = useState(0);
+
+  const router = useRouter();
+
+  const [items, setItem] = useState([
+      {
+      id: "p1",
+      name: "Wireless Noise-Cancelling Headphones",
+      category: "Electronics",
+      price: 45000,
+      oldPrice: 58000,
+      rating: 4.7,
+      image:
+        "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&q=80",
+        author: "UV store"
+    },
+    {
+      id: "p2",
+      name: "Minimalist Analog Watch",
+      category: "Fashion",
+      price: 32000,
+      rating: 4.5,
+      image:
+        "https://images.unsplash.com/photo-1524805444758-089113d48a6d?w=500&q=80",
+    },
+    {
+      id: "p3",
+      name: "Everyday Canvas Backpack",
+      category: "Fashion",
+      price: 21500,
+      oldPrice: 27000,
+      rating: 4.6,
+      image:
+        "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500&q=80",
+    },
+    {
+      id: "p4",
+      name: "Ceramic Pour-Over Coffee Set",
+      category: "Home",
+      price: 18500,
+      rating: 4.8,
+      image:
+        "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=500&q=80",
+    },
+    {
+      id: "p5",
+      name: "Smart Fitness Tracker Band",
+      category: "Electronics",
+      price: 27500,
+      rating: 4.3,
+      image:
+        "https://images.unsplash.com/photo-1576243345690-4e4b79b63288?w=500&q=80",
+    },
+    {
+      id: "p6",
+      name: "Leather Bifold Wallet",
+      category: "Fashion",
+      price: 15800,
+      rating: 4.4,
+      image:
+        "https://images.unsplash.com/photo-1627123424574-724758594e93?w=500&q=80",
+    },
+    {
+      id: "p7",
+      name: "Portable Bluetooth Speaker",
+      category: "Electronics",
+      price: 22000,
+      rating: 4.6,
+      image:
+        "https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=500&q=80",
+    },
+    {
+      id: "p8",
+      name: "Cold-Pressed Skincare Oil",
+      category: "Beauty",
+      price: 9800,
+      rating: 4.7,
+      image:
+        "https://images.unsplash.com/photo-1571781926291-c477ebfd024b?w=500&q=80",
+    },
+    {
+      id: "p11",
+      name: "Mechanical Keyboard, 75%",
+      category: "Electronics",
+      price: 38000,
+      rating: 4.8,
+      image:
+        "https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=500&q=80",
+    },
+  ]);
+
+  const categories = ["All", ...new Set(items.map((product) => product.category))];
 
   const { user, loading } = useAuth();
 
@@ -166,7 +144,7 @@ export default function Home() {
 
   const visible = useMemo(
     () =>
-      products.filter(
+      items.filter(
         (product) =>
           (category === "All" || product.category === category) &&
           product.name.toLowerCase().includes(search.toLowerCase()),
@@ -189,6 +167,17 @@ export default function Home() {
       return next;
     });
     setToast(`Added “${product.name}” to cart`);
+  }
+
+  const HandleSignOut = async () => {
+    const r = await SignOut();
+    if(r) {
+      router.refresh();
+    }
+  }
+
+  const HandleSignIn = () => {
+    router.push("/login");
   }
 
   return (
@@ -240,7 +229,7 @@ export default function Home() {
           aria-label="Store menu"
         >
           {<div className={styles.sidebarTitle}>
-            <span>My store</span>
+            { user && <span>My store</span>}
             <button
               onClick={() => setSidebarOpen(false)}
               aria-label="Close menu"
@@ -262,20 +251,17 @@ export default function Home() {
             <button className={styles.sideActive}>
               <span className="material-icons-round">storefront</span>Storefront
             </button>
-            <button>
-              <span className="material-icons-round">inventory_2</span>Products{" "}
-              <em>12</em>
-            </button>
-            <button>
-              <span className="material-icons-round">receipt_long</span>Orders{" "}
-              <em>3</em>
-            </button>
-            <button>
-              <span className="material-icons-round">insights</span>Analytics
-            </button>
-            <button>
-              <span className="material-icons-round">campaign</span>Marketing
-            </button>
+            <SideButton label="My products" icon="inventory_2" n="12"/>
+            <SideButton label="Orders" icon="receipt_long" n="3"/>
+            <SideButton label="Analytics" icon="insights" n="0"/>
+            <SideButton label="Marketing" icon="campaign"/>
+            {
+              user ? (
+                <SideButton label="Logout" icon="exit_to_app" onClick={HandleSignOut}/>
+              ) : (
+                <SideButton label="Log in" icon="login" onClick={HandleSignIn}/>
+              )
+            }
           </nav>
           <div className={styles.upgradeCard}>
             <span className="material-icons-round">auto_awesome</span>
