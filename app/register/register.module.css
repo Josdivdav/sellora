@@ -386,6 +386,18 @@
     margin: 0;
 }
 
+.success {
+    text-align: center;
+    color: #067647;
+    background: #ecfdf3;
+    border: 1px solid #abefc6;
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1.5;
+    padding: 10px 12px;
+    margin: 0;
+}
+
 .hide {
     display: none;
 }

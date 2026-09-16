@@ -2,22 +2,57 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import styles from "./login.module.css";
+import {
+  continueWithGoogle,
+  getLoginErrorMessage,
+  loginWithEmailAndPassword,
+} from "@/functions/login.func";
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [emailError, setEmailError] = useState(false);
   const [warning, setWarning] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [remember, setRemember] = useState(false);
+  const router = useRouter();
 
-  // Form submit handler
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    // Placeholder sign-in logic
+    const form = e.currentTarget;
+    const email = (form.elements.namedItem("email") as HTMLInputElement).value;
+    const password = (form.elements.namedItem("password") as HTMLInputElement).value;
+    const rememberMe = (form.elements.namedItem("remember") as HTMLInputElement).checked;
+
+    setWarning("");
+    setEmailError(false);
+    setIsSubmitting(true);
+    try {
+      await loginWithEmailAndPassword(email, password, rememberMe);
+      router.replace("/");
+    } catch (error) {
+      setWarning(getLoginErrorMessage(error));
+      setEmailError(true);
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   // Google sign-in handler
-  function handleGoogleSignIn() {
-    // Placeholder Google sign-in logic
+  async function handleGoogleSignIn() {
+    setWarning("");
+    setEmailError(false);
+    setIsSubmitting(true);
+    try {
+      await continueWithGoogle(remember);
+      router.replace("/");
+    } catch (error) {
+      console.error("Error during Google sign-in:", error);
+      setWarning(getLoginErrorMessage(error));
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -82,6 +117,7 @@ export default function LoginPage() {
               className={styles.googleBtn}
               id="gmailBtn"
               onClick={handleGoogleSignIn}
+              disabled={isSubmitting}
             >
               <img src="/google.svg" alt="Google icon" />
               Continue with Gmail
@@ -102,6 +138,11 @@ export default function LoginPage() {
                     name="email"
                     placeholder="you@example.com"
                     className={emailError ? styles.inputError : ""}
+                    autoComplete="email"
+                    onChange={() => {
+                      setEmailError(false);
+                      setWarning("");
+                    }}
                     required
                   />
                 </div>
@@ -117,6 +158,7 @@ export default function LoginPage() {
                     name="password"
                     placeholder="Enter your password"
                     className={styles.passwordInput}
+                    autoComplete="current-password"
                     required
                   />
                   <span
@@ -131,7 +173,12 @@ export default function LoginPage() {
 
               <div className={styles.formMeta}>
                 <label className={styles.remember}>
-                  <input type="checkbox" name="remember" />
+                  <input
+                    type="checkbox"
+                    name="remember"
+                    checked={remember}
+                    onChange={(event) => setRemember(event.target.checked)}
+                  />
                   Remember me
                 </label>
                 <a href="#" className={styles.forgot}>
@@ -139,12 +186,16 @@ export default function LoginPage() {
                 </a>
               </div>
 
-              <p className={`${styles.warn} ${warning ? "" : styles.hide}`}>
-                {warning || "Email already exists"}
+              <p
+                className={`${styles.warn} ${warning ? "" : styles.hide}`}
+                role="alert"
+                aria-live="assertive"
+              >
+                {warning}
               </p>
 
-              <button type="submit" className={styles.submitBtn}>
-                Sign In
+              <button type="submit" className={styles.submitBtn} disabled={isSubmitting}>
+                {isSubmitting ? "Signing in..." : "Sign In"}
                 <span className="material-icons-round">arrow_forward</span>
               </button>
             </form>

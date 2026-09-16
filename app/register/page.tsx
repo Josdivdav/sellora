@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import styles from "./register.module.css";
 import {
@@ -8,14 +8,14 @@ import {
   continueWithGoogle,
   getRegistrationErrorMessage,
 } from "@/functions/register.func";
-
-import { getAuth, getRedirectResult, GoogleAuthProvider } from "firebase/auth";
+import router from "next/router";
 
 export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [emailError, setEmailError] = useState(false);
   const [warning, setWarning] = useState("");
+  const [success, setSuccess] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Form submit handler
@@ -28,6 +28,7 @@ export default function RegisterPage() {
     const confirmPassword = (form.elements.namedItem("confirmPassword") as HTMLInputElement)?.value;
 
     setWarning("");
+    setSuccess("");
     setEmailError(false);
 
     if (password !== confirmPassword) {
@@ -38,7 +39,13 @@ export default function RegisterPage() {
 
     setIsSubmitting(true);
     try {
-      await registerWithEmailAndPassword(email, password, username);
+      const result = await registerWithEmailAndPassword(email, password, username);
+      router.replace("/");
+      setSuccess(
+        result.linkedPassword
+          ? "Password added. You can now sign in with Google or your email and password."
+          : "Your account has been created successfully.",
+      );
     } catch (error) {
       const message = getRegistrationErrorMessage(error);
       setWarning(message);
@@ -60,10 +67,12 @@ export default function RegisterPage() {
 
   async function handleGoogleSignIn() {
     setWarning("");
+    setSuccess("");
     setEmailError(false);
     setIsSubmitting(true);
     try {
       await continueWithGoogle();
+      router.replace("/");
     } catch (error) {
       console.error("Error during Google sign-in:", error);
       setWarning(getRegistrationErrorMessage(error));
@@ -71,22 +80,6 @@ export default function RegisterPage() {
       setIsSubmitting(false);
     }
   }
-
-  useEffect(() => {
-    const auth = getAuth();
-    getRedirectResult(auth)
-      .then((result) => {
-        if (!result) return;
-        const credential = GoogleAuthProvider.credentialFromResult(result);
-        const token = credential?.accessToken;
-        const user = result.user;
-        console.log(user);
-      })
-      .catch((error) => {
-        console.error("Error completing Google sign-in:", error);
-        setWarning(getRegistrationErrorMessage(error));
-      });
-  }, []);
 
   return (
     <div className={styles.page}>
@@ -264,6 +257,10 @@ export default function RegisterPage() {
                 aria-live="assertive"
               >
                 {warning}
+              </p>
+
+              <p className={`${styles.success} ${success ? "" : styles.hide}`} aria-live="polite">
+                {success}
               </p>
 
               <button type="submit" className={styles.submitBtn} disabled={isSubmitting}>

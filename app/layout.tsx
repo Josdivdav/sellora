@@ -1,5 +1,6 @@
 import { Poppins } from "next/font/google";
 import "./globals.css";
+import { AuthProvider } from "@/context/AuthContext";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -15,10 +16,10 @@ export default function RootLayout({ children }: React.PropsWithChildren) {
           rel="stylesheet"
           href="https://fonts.googleapis.com/icon?family=Material+Icons+Round"
         />
-        <link href="/favico.png" rel="icon" type="image" />
+        <title>Sellora</title>
       </head>
-      <body style={{ fontFamily: "var(--font-poppins), sans-serif" }}>
-        {children}
+      <body>
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );
