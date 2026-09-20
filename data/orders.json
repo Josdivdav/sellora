@@ -1,0 +1,578 @@
+[
+  {
+    "id": "ord-001",
+    "orderNumber": "SEL-2026-89421",
+    "status": "IN_TRANSIT",
+    "createdAt": "2026-09-18T10:15:00.000Z",
+    "estimatedDelivery": "Tomorrow, Sep 21, 2026 by 4:00 PM",
+    "store": {
+      "id": "store-uv",
+      "name": "UV Store",
+      "slug": "uv-store",
+      "avatar": "https://images.unsplash.com/photo-1546435770-a3e426bf472b?w=200&q=80",
+      "isVerified": true
+    },
+    "items": [
+      {
+        "productId": "p1",
+        "name": "Wireless Noise-Cancelling Headphones",
+        "slug": "wireless-noise-cancelling-headphones",
+        "image": "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&q=80",
+        "price": 45000,
+        "originalPrice": 58000,
+        "quantity": 1,
+        "variant": "Space Black • Over-Ear",
+        "storeName": "UV Store",
+        "category": "Electronics"
+      },
+      {
+        "productId": "p17",
+        "name": "Hi-Res Studio Monitor Earbuds",
+        "slug": "hi-res-studio-monitor-earbuds",
+        "image": "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=800&q=80",
+        "price": 28000,
+        "originalPrice": 35000,
+        "quantity": 1,
+        "variant": "Matte Silver • MMCX Cable",
+        "storeName": "UV Store",
+        "category": "Electronics"
+      }
+    ],
+    "pricing": {
+      "subtotal": 73000,
+      "shippingFee": 2500,
+      "discount": 5000,
+      "tax": 0,
+      "total": 70500,
+      "currency": "NGN"
+    },
+    "shippingAddress": {
+      "fullName": "Joshua David",
+      "phone": "+234 812 345 6789",
+      "street": "14 Admiralty Way, Lekki Phase 1",
+      "city": "Lagos",
+      "state": "Lagos State",
+      "postalCode": "105102",
+      "country": "Nigeria"
+    },
+    "shippingMethod": "Sellora Express Priority (Same/Next Day)",
+    "trackingNumber": "TRK-SEL-98240182",
+    "carrier": "Sellora Logistics Express",
+    "carrierPhone": "+234 1 800 735 567",
+    "payment": {
+      "method": "Mastercard •••• 4242",
+      "status": "PAID",
+      "transactionId": "TXN_SEL_78291039",
+      "cardLast4": "4242"
+    },
+    "notes": "Leave with security guard if unavailable at gate.",
+    "trackingEvents": [
+      {
+        "status": "ORDER_PLACED",
+        "title": "Order Placed & Payment Confirmed",
+        "description": "Your payment of ₦70,500 was successfully processed via Mastercard.",
+        "location": "Sellora Online Payment Gateway",
+        "timestamp": "2026-09-18T10:15:00.000Z",
+        "completed": true
+      },
+      {
+        "status": "CONFIRMED",
+        "title": "Order Packed by UV Store",
+        "description": "Seller UV Store carefully inspected and boxed 2 items with protective bubble wrap.",
+        "location": "UV Store Fulfillment Hub, Victoria Island",
+        "timestamp": "2026-09-18T14:30:00.000Z",
+        "completed": true
+      },
+      {
+        "status": "SHIPPED",
+        "title": "Dispatched & In Transit",
+        "description": "Package has arrived at the central sorting facility and is sorted for Lekki delivery hub.",
+        "location": "Sellora Central Sorting Hub, Ikeja",
+        "timestamp": "2026-09-19T08:45:00.000Z",
+        "completed": true,
+        "current": true
+      },
+      {
+        "status": "OUT_FOR_DELIVERY",
+        "title": "Out for Delivery",
+        "description": "Rider assigned for final mile delivery to Admiralty Way.",
+        "location": "Lekki Distribution Center",
+        "timestamp": "2026-09-21T09:00:00.000Z",
+        "completed": false
+      },
+      {
+        "status": "DELIVERED",
+        "title": "Package Delivered",
+        "description": "Recipient receives parcel and provides signature verification.",
+        "location": "Customer Address",
+        "timestamp": "2026-09-21T16:00:00.000Z",
+        "completed": false
+      }
+    ]
+  },
+  {
+    "id": "ord-002",
+    "orderNumber": "SEL-2026-74910",
+    "status": "PROCESSING",
+    "createdAt": "2026-09-20T11:40:00.000Z",
+    "estimatedDelivery": "Wed, Sep 23, 2026",
+    "store": {
+      "id": "store-keycraft",
+      "name": "KeyCraft Labs",
+      "slug": "keycraft-labs",
+      "avatar": "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=200&q=80",
+      "isVerified": true
+    },
+    "items": [
+      {
+        "productId": "p12",
+        "name": "Mechanical Keyboard, 75%",
+        "slug": "mechanical-keyboard-75",
+        "image": "https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=800&q=80",
+        "price": 38000,
+        "originalPrice": 45000,
+        "quantity": 1,
+        "variant": "Gateron Brown Switches • Retro Grey",
+        "storeName": "KeyCraft Labs",
+        "category": "Tech & Gadgets"
+      },
+      {
+        "productId": "p28",
+        "name": "PBT Chalk Keycaps Set",
+        "slug": "pbt-chalk-keycaps-set",
+        "image": "https://images.unsplash.com/photo-1626785774573-4b799315345d?w=800&q=80",
+        "price": 14500,
+        "originalPrice": 18000,
+        "quantity": 1,
+        "variant": "Cherry Profile • 134 Keys",
+        "storeName": "KeyCraft Labs",
+        "category": "Tech & Gadgets"
+      }
+    ],
+    "pricing": {
+      "subtotal": 52500,
+      "shippingFee": 1800,
+      "discount": 3000,
+      "tax": 0,
+      "total": 51300,
+      "currency": "NGN"
+    },
+    "shippingAddress": {
+      "fullName": "Joshua David",
+      "phone": "+234 812 345 6789",
+      "street": "14 Admiralty Way, Lekki Phase 1",
+      "city": "Lagos",
+      "state": "Lagos State",
+      "postalCode": "105102",
+      "country": "Nigeria"
+    },
+    "shippingMethod": "Standard Tracked Delivery",
+    "trackingNumber": "TRK-SEL-77319024",
+    "carrier": "Sellora Logistics Express",
+    "carrierPhone": "+234 1 800 735 567",
+    "payment": {
+      "method": "Visa •••• 8821",
+      "status": "PAID",
+      "transactionId": "TXN_SEL_66281093",
+      "cardLast4": "8821"
+    },
+    "trackingEvents": [
+      {
+        "status": "ORDER_PLACED",
+        "title": "Order Placed Successfully",
+        "description": "Order received and confirmed. Payment verified.",
+        "location": "Sellora System",
+        "timestamp": "2026-09-20T11:40:00.000Z",
+        "completed": true,
+        "current": true
+      },
+      {
+        "status": "CONFIRMED",
+        "title": "Seller Preparing Order",
+        "description": "KeyCraft Labs is testing switches and boxing your items.",
+        "location": "KeyCraft Labs Workshop, Ibadan",
+        "timestamp": "2026-09-20T16:00:00.000Z",
+        "completed": false
+      },
+      {
+        "status": "SHIPPED",
+        "title": "Handed to Courier",
+        "description": "Package will be picked up by Sellora Express dispatch.",
+        "location": "Sellora Transit Hub",
+        "timestamp": "2026-09-21T10:00:00.000Z",
+        "completed": false
+      }
+    ]
+  },
+  {
+    "id": "ord-003",
+    "orderNumber": "SEL-2026-61204",
+    "status": "DELIVERED",
+    "createdAt": "2026-09-05T09:20:00.000Z",
+    "estimatedDelivery": "Sep 08, 2026",
+    "deliveredAt": "2026-09-08T15:24:00.000Z",
+    "store": {
+      "id": "store-chronos",
+      "name": "Chronos Studio",
+      "slug": "chronos-studio",
+      "avatar": "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=200&q=80",
+      "isVerified": true
+    },
+    "items": [
+      {
+        "productId": "p2",
+        "name": "Minimalist Analog Watch",
+        "slug": "minimalist-analog-watch",
+        "image": "https://images.unsplash.com/photo-1524805444758-089113d48a6d?w=800&q=80",
+        "price": 32000,
+        "originalPrice": null,
+        "quantity": 1,
+        "variant": "Rose Gold Case • Dark Brown Leather",
+        "storeName": "Chronos Studio",
+        "category": "Fashion"
+      }
+    ],
+    "pricing": {
+      "subtotal": 32000,
+      "shippingFee": 0,
+      "discount": 0,
+      "tax": 0,
+      "total": 32000,
+      "currency": "NGN"
+    },
+    "shippingAddress": {
+      "fullName": "Joshua David",
+      "phone": "+234 812 345 6789",
+      "street": "14 Admiralty Way, Lekki Phase 1",
+      "city": "Lagos",
+      "state": "Lagos State",
+      "postalCode": "105102",
+      "country": "Nigeria"
+    },
+    "shippingMethod": "Complimentary VIP Delivery",
+    "trackingNumber": "TRK-SEL-61204891",
+    "carrier": "Sellora White Glove Service",
+    "carrierPhone": "+234 1 800 735 567",
+    "payment": {
+      "method": "Apple Pay / Mastercard •••• 4242",
+      "status": "PAID",
+      "transactionId": "TXN_SEL_55102948",
+      "cardLast4": "4242"
+    },
+    "trackingEvents": [
+      {
+        "status": "ORDER_PLACED",
+        "title": "Order Placed & Confirmed",
+        "description": "Payment approved.",
+        "location": "Sellora Platform",
+        "timestamp": "2026-09-05T09:20:00.000Z",
+        "completed": true
+      },
+      {
+        "status": "CONFIRMED",
+        "title": "Quality Inspection Passed",
+        "description": "Watch movement tested and certified at Chronos Studio.",
+        "location": "Chronos Atelier, Abuja",
+        "timestamp": "2026-09-06T11:00:00.000Z",
+        "completed": true
+      },
+      {
+        "status": "SHIPPED",
+        "title": "In Transit via Air Freight",
+        "description": "Shipped from Abuja hub to Lagos distribution facility.",
+        "location": "Murtala Muhammed Airport Cargo Wing",
+        "timestamp": "2026-09-07T14:15:00.000Z",
+        "completed": true
+      },
+      {
+        "status": "OUT_FOR_DELIVERY",
+        "title": "Out for Delivery",
+        "description": "Courier rider Michael is en route.",
+        "location": "Lekki Distribution Depot",
+        "timestamp": "2026-09-08T11:30:00.000Z",
+        "completed": true
+      },
+      {
+        "status": "DELIVERED",
+        "title": "Delivered to Customer",
+        "description": "Package handed directly to Joshua David. Signature obtained.",
+        "location": "14 Admiralty Way, Lekki",
+        "timestamp": "2026-09-08T15:24:00.000Z",
+        "completed": true,
+        "current": true
+      }
+    ]
+  },
+  {
+    "id": "ord-004",
+    "orderNumber": "SEL-2026-58291",
+    "status": "DELIVERED",
+    "createdAt": "2026-08-22T14:10:00.000Z",
+    "estimatedDelivery": "Aug 25, 2026",
+    "deliveredAt": "2026-08-25T13:40:00.000Z",
+    "store": {
+      "id": "store-artisan",
+      "name": "Artisan Craft",
+      "slug": "artisan-craft",
+      "avatar": "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=200&q=80",
+      "isVerified": true
+    },
+    "items": [
+      {
+        "productId": "p4",
+        "name": "Ceramic Pour-Over Coffee Set",
+        "slug": "ceramic-pour-over-coffee-set",
+        "image": "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=800&q=80",
+        "price": 18500,
+        "originalPrice": 22000,
+        "quantity": 1,
+        "variant": "Speckled Sand Glaze • 600ml",
+        "storeName": "Artisan Craft",
+        "category": "Home & Living"
+      },
+      {
+        "productId": "p6",
+        "name": "Scented Soy Candle Trio",
+        "slug": "scented-soy-candle-trio",
+        "image": "https://images.unsplash.com/photo-1602874801007-bd36c65cd951?w=800&q=80",
+        "price": 12000,
+        "originalPrice": 15000,
+        "quantity": 1,
+        "variant": "Amber & Cedarwood / Vanilla",
+        "storeName": "Aura Living",
+        "category": "Home & Living"
+      }
+    ],
+    "pricing": {
+      "subtotal": 30500,
+      "shippingFee": 1500,
+      "discount": 2000,
+      "tax": 0,
+      "total": 30000,
+      "currency": "NGN"
+    },
+    "shippingAddress": {
+      "fullName": "Joshua David",
+      "phone": "+234 812 345 6789",
+      "street": "14 Admiralty Way, Lekki Phase 1",
+      "city": "Lagos",
+      "state": "Lagos State",
+      "postalCode": "105102",
+      "country": "Nigeria"
+    },
+    "shippingMethod": "Fragile Secure Shipping",
+    "trackingNumber": "TRK-SEL-58291044",
+    "carrier": "Sellora Logistics Express",
+    "carrierPhone": "+234 1 800 735 567",
+    "payment": {
+      "method": "Sellora Wallet Balance",
+      "status": "PAID",
+      "transactionId": "TXN_WLT_99481720"
+    },
+    "trackingEvents": [
+      {
+        "status": "ORDER_PLACED",
+        "title": "Order Placed",
+        "description": "Paid with Sellora Wallet.",
+        "location": "Sellora",
+        "timestamp": "2026-08-22T14:10:00.000Z",
+        "completed": true
+      },
+      {
+        "status": "CONFIRMED",
+        "title": "Fragile Packing Complete",
+        "description": "Wrapped with high-density honeycomb paper.",
+        "location": "Enugu Studio",
+        "timestamp": "2026-08-23T10:00:00.000Z",
+        "completed": true
+      },
+      {
+        "status": "SHIPPED",
+        "title": "Dispatched Interstate",
+        "description": "En route to Lagos.",
+        "location": "Sellora Logistics East Hub",
+        "timestamp": "2026-08-24T08:30:00.000Z",
+        "completed": true
+      },
+      {
+        "status": "DELIVERED",
+        "title": "Delivered in Good Condition",
+        "description": "Items safely received with no transit breakage.",
+        "location": "14 Admiralty Way, Lekki",
+        "timestamp": "2026-08-25T13:40:00.000Z",
+        "completed": true,
+        "current": true
+      }
+    ]
+  },
+  {
+    "id": "ord-005",
+    "orderNumber": "SEL-2026-43180",
+    "status": "CANCELLED",
+    "createdAt": "2026-08-10T16:45:00.000Z",
+    "estimatedDelivery": "N/A",
+    "cancelledAt": "2026-08-11T09:12:00.000Z",
+    "cancellationReason": "Changed mind before shipment / ordered wrong size.",
+    "store": {
+      "id": "store-stride",
+      "name": "Stride Athletics",
+      "slug": "stride-athletics",
+      "avatar": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=200&q=80",
+      "isVerified": true
+    },
+    "items": [
+      {
+        "productId": "p14",
+        "name": "Breathable Mesh Running Shoes",
+        "slug": "breathable-mesh-running-shoes",
+        "image": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800&q=80",
+        "price": 42000,
+        "originalPrice": 52000,
+        "quantity": 1,
+        "variant": "Crimson Red • Size EU 42",
+        "storeName": "Stride Athletics",
+        "category": "Sports & Fitness"
+      }
+    ],
+    "pricing": {
+      "subtotal": 42000,
+      "shippingFee": 2000,
+      "discount": 0,
+      "tax": 0,
+      "total": 44000,
+      "currency": "NGN"
+    },
+    "shippingAddress": {
+      "fullName": "Joshua David",
+      "phone": "+234 812 345 6789",
+      "street": "14 Admiralty Way, Lekki Phase 1",
+      "city": "Lagos",
+      "state": "Lagos State",
+      "postalCode": "105102",
+      "country": "Nigeria"
+    },
+    "shippingMethod": "Standard Courier Delivery",
+    "trackingNumber": "TRK-SEL-CANCELLED",
+    "carrier": "Sellora Logistics",
+    "payment": {
+      "method": "Mastercard •••• 4242",
+      "status": "REFUNDED",
+      "transactionId": "TXN_REF_88192039",
+      "cardLast4": "4242"
+    },
+    "trackingEvents": [
+      {
+        "status": "ORDER_PLACED",
+        "title": "Order Placed",
+        "description": "Order submitted by customer.",
+        "location": "Sellora Platform",
+        "timestamp": "2026-08-10T16:45:00.000Z",
+        "completed": true
+      },
+      {
+        "status": "CANCELLED",
+        "title": "Order Cancelled & Full Refund Issued",
+        "description": "Full refund of ₦44,000 returned to Mastercard •••• 4242.",
+        "location": "Payment Processor",
+        "timestamp": "2026-08-11T09:12:00.000Z",
+        "completed": true,
+        "current": true
+      }
+    ]
+  },
+  {
+    "id": "ord-006",
+    "orderNumber": "SEL-2026-31908",
+    "status": "DELIVERED",
+    "createdAt": "2026-07-28T18:00:00.000Z",
+    "estimatedDelivery": "Jul 31, 2026",
+    "deliveredAt": "2026-07-31T14:10:00.000Z",
+    "store": {
+      "id": "store-nomad",
+      "name": "Nomad Supply Co.",
+      "slug": "nomad-supply-co",
+      "avatar": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=200&q=80",
+      "isVerified": true
+    },
+    "items": [
+      {
+        "productId": "p3",
+        "name": "Everyday Canvas Backpack",
+        "slug": "everyday-canvas-backpack",
+        "image": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=800&q=80",
+        "price": 21500,
+        "originalPrice": 27000,
+        "quantity": 1,
+        "variant": "Field Tan • 20L Water-Resistant",
+        "storeName": "Nomad Supply Co.",
+        "category": "Travel & Gear"
+      },
+      {
+        "productId": "p7",
+        "name": "Leather Bifold Wallet",
+        "slug": "leather-bifold-wallet",
+        "image": "https://images.unsplash.com/photo-1627123424574-724758594e93?w=800&q=80",
+        "price": 15800,
+        "originalPrice": null,
+        "quantity": 1,
+        "variant": "Cognac Brown • RFID Shielding",
+        "storeName": "Heritage Leather",
+        "category": "Fashion & Leather"
+      }
+    ],
+    "pricing": {
+      "subtotal": 37300,
+      "shippingFee": 2000,
+      "discount": 3000,
+      "tax": 0,
+      "total": 36300,
+      "currency": "NGN"
+    },
+    "shippingAddress": {
+      "fullName": "Joshua David",
+      "phone": "+234 812 345 6789",
+      "street": "14 Admiralty Way, Lekki Phase 1",
+      "city": "Lagos",
+      "state": "Lagos State",
+      "postalCode": "105102",
+      "country": "Nigeria"
+    },
+    "shippingMethod": "Standard Tracked Delivery",
+    "trackingNumber": "TRK-SEL-31908210",
+    "carrier": "Sellora Logistics Express",
+    "carrierPhone": "+234 1 800 735 567",
+    "payment": {
+      "method": "Mastercard •••• 4242",
+      "status": "PAID",
+      "transactionId": "TXN_SEL_44192084",
+      "cardLast4": "4242"
+    },
+    "trackingEvents": [
+      {
+        "status": "ORDER_PLACED",
+        "title": "Order Placed",
+        "description": "Order received.",
+        "location": "Sellora",
+        "timestamp": "2026-07-28T18:00:00.000Z",
+        "completed": true
+      },
+      {
+        "status": "SHIPPED",
+        "title": "Dispatched",
+        "description": "Courier dispatched parcel.",
+        "location": "Ikeja Distribution",
+        "timestamp": "2026-07-29T10:30:00.000Z",
+        "completed": true
+      },
+      {
+        "status": "DELIVERED",
+        "title": "Delivered",
+        "description": "Signed by Joshua David.",
+        "location": "14 Admiralty Way, Lekki",
+        "timestamp": "2026-07-31T14:10:00.000Z",
+        "completed": true,
+        "current": true
+      }
+    ]
+  }
+]

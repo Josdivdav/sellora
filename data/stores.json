@@ -1,0 +1,314 @@
+[
+  {
+    "id": "store-uv",
+    "name": "UV Store",
+    "slug": "uv-store",
+    "category": "Electronics & Audio",
+    "description": "Authorized flagship distributor for audiophile gear, studio headphones, and high-fidelity wireless sound systems.",
+    "logo": "https://images.unsplash.com/photo-1546435770-a3e426bf472b?w=200&q=80",
+    "banner": "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=1200&q=80",
+    "rating": 4.9,
+    "reviewsCount": 1420,
+    "followersCount": 24800,
+    "productsCount": 42,
+    "isVerified": true,
+    "isFavorite": true,
+    "joinedDate": "2023-04-12",
+    "location": "Lagos, Nigeria",
+    "deliverySpeed": "Ships within 24h",
+    "responseRate": "99% in under an hour",
+    "badge": "Top Rated Audio",
+    "tags": ["Audio", "Headphones", "Wireless", "Noise-Cancelling", "Accessories"],
+    "topProducts": [
+      {
+        "id": "p1",
+        "name": "Wireless Noise-Cancelling Headphones",
+        "price": 45000,
+        "oldPrice": 58000,
+        "image": "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&q=80",
+        "rating": 4.7
+      },
+      {
+        "id": "p17",
+        "name": "Hi-Res Studio Monitor Earbuds",
+        "price": 28000,
+        "oldPrice": 35000,
+        "image": "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=800&q=80",
+        "rating": 4.8
+      },
+      {
+        "id": "p22",
+        "name": "Desk DAC & Headphone Amplifier",
+        "price": 52000,
+        "oldPrice": 64000,
+        "image": "https://images.unsplash.com/photo-1545454675-3531b543be5d?w=800&q=80",
+        "rating": 4.9
+      }
+    ]
+  },
+  {
+    "id": "store-chronos",
+    "name": "Chronos Studio",
+    "slug": "chronos-studio",
+    "category": "Luxury & Watches",
+    "description": "Bespoke horology and minimalist timepieces crafted with sapphire glass, 316L stainless steel, and top-grain Italian leather.",
+    "logo": "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=200&q=80",
+    "banner": "https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=1200&q=80",
+    "rating": 4.8,
+    "reviewsCount": 890,
+    "followersCount": 18300,
+    "productsCount": 28,
+    "isVerified": true,
+    "isFavorite": true,
+    "joinedDate": "2023-08-19",
+    "location": "Abuja, Nigeria",
+    "deliverySpeed": "Express Dispatch (1-2 days)",
+    "responseRate": "98% within 2 hours",
+    "badge": "Official Brand",
+    "tags": ["Watches", "Luxury", "Minimalist", "Accessories", "Men's Style"],
+    "topProducts": [
+      {
+        "id": "p2",
+        "name": "Minimalist Analog Watch",
+        "price": 32000,
+        "oldPrice": null,
+        "image": "https://images.unsplash.com/photo-1524805444758-089113d48a6d?w=800&q=80",
+        "rating": 4.5
+      },
+      {
+        "id": "p23",
+        "name": "Chronograph Mesh Edition Watch",
+        "price": 48500,
+        "oldPrice": 59000,
+        "image": "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&q=80",
+        "rating": 4.9
+      },
+      {
+        "id": "p24",
+        "name": "Genuine Leather Watch Strap Set",
+        "price": 9500,
+        "oldPrice": 12000,
+        "image": "https://images.unsplash.com/photo-1614164185128-e4ec99c436d7?w=800&q=80",
+        "rating": 4.6
+      }
+    ]
+  },
+  {
+    "id": "store-nomad",
+    "name": "Nomad Supply Co.",
+    "slug": "nomad-supply-co",
+    "category": "Travel & Gear",
+    "description": "Durable, weatherproof gear, tactical daypacks, and smart modular travel essentials designed for modern globetrotters and urban explorers.",
+    "logo": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=200&q=80",
+    "banner": "https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1200&q=80",
+    "rating": 4.7,
+    "reviewsCount": 640,
+    "followersCount": 15200,
+    "productsCount": 35,
+    "isVerified": true,
+    "isFavorite": true,
+    "joinedDate": "2024-01-05",
+    "location": "Lagos, Nigeria",
+    "deliverySpeed": "Ships same day",
+    "responseRate": "95% in 30 mins",
+    "badge": "Adventure Choice",
+    "tags": ["Backpacks", "Travel", "Luggage", "Outdoor", "Waterproof"],
+    "topProducts": [
+      {
+        "id": "p3",
+        "name": "Everyday Canvas Backpack",
+        "price": 21500,
+        "oldPrice": 27000,
+        "image": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=800&q=80",
+        "rating": 4.6
+      },
+      {
+        "id": "p25",
+        "name": "Modular Tech Pouch Organizer",
+        "price": 8200,
+        "oldPrice": 11000,
+        "image": "https://images.unsplash.com/photo-1622560480605-d83c853bc5c3?w=800&q=80",
+        "rating": 4.7
+      }
+    ]
+  },
+  {
+    "id": "store-artisan",
+    "name": "Artisan Craft",
+    "slug": "artisan-craft",
+    "category": "Home & Living",
+    "description": "Hand-thrown pottery, artisanal kitchenware, and ceramic brew gear created by independent ceramicists with eco-friendly glazes.",
+    "logo": "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=200&q=80",
+    "banner": "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=1200&q=80",
+    "rating": 4.9,
+    "reviewsCount": 512,
+    "followersCount": 9700,
+    "productsCount": 24,
+    "isVerified": true,
+    "isFavorite": true,
+    "joinedDate": "2023-11-20",
+    "location": "Enugu, Nigeria",
+    "deliverySpeed": "Carefully packaged (2-3 days)",
+    "responseRate": "100% within 1 hour",
+    "badge": "Handmade Verified",
+    "tags": ["Ceramics", "Coffee", "Kitchen", "Handmade", "Home Decor"],
+    "topProducts": [
+      {
+        "id": "p4",
+        "name": "Ceramic Pour-Over Coffee Set",
+        "price": 18500,
+        "oldPrice": null,
+        "image": "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=800&q=80",
+        "rating": 4.8
+      },
+      {
+        "id": "p26",
+        "name": "Terracotta Serving Bowl",
+        "price": 14000,
+        "oldPrice": 17500,
+        "image": "https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=800&q=80",
+        "rating": 4.9
+      }
+    ]
+  },
+  {
+    "id": "store-luxeglow",
+    "name": "Luxe Glow Botanicals",
+    "slug": "luxe-glow-botanicals",
+    "category": "Beauty & Skincare",
+    "description": "Cruelty-free, clean beauty formulas powered by organic botanical oils, antioxidant serums, and African shea extracts.",
+    "logo": "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=200&q=80",
+    "banner": "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=1200&q=80",
+    "rating": 4.8,
+    "reviewsCount": 1130,
+    "followersCount": 31500,
+    "productsCount": 39,
+    "isVerified": true,
+    "isFavorite": false,
+    "joinedDate": "2023-02-14",
+    "location": "Lagos, Nigeria",
+    "deliverySpeed": "Same day dispatch",
+    "responseRate": "99% in 15 mins",
+    "badge": "Clean Beauty Award",
+    "tags": ["Skincare", "Organic", "Serums", "Cruelty-Free", "Wellness"],
+    "topProducts": [
+      {
+        "id": "p9",
+        "name": "Cold-Pressed Skincare Oil",
+        "price": 9800,
+        "oldPrice": null,
+        "image": "https://images.unsplash.com/photo-1571781926291-c477ebfd024b?w=800&q=80",
+        "rating": 4.7
+      },
+      {
+        "id": "p27",
+        "name": "Hyaluronic Rose Glow Mist",
+        "price": 7500,
+        "oldPrice": 9000,
+        "image": "https://images.unsplash.com/photo-1608248597359-0097f48e9f50?w=800&q=80",
+        "rating": 4.8
+      }
+    ]
+  },
+  {
+    "id": "store-keycraft",
+    "name": "KeyCraft Labs",
+    "slug": "keycraft-labs",
+    "category": "Tech & Gadgets",
+    "description": "Custom mechanical keyboards, lubed switches, PBT dye-sub keycaps, and ergonomic desk gear for coders and creators.",
+    "logo": "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=200&q=80",
+    "banner": "https://images.unsplash.com/photo-1595225476474-87563907a212?w=1200&q=80",
+    "rating": 4.9,
+    "reviewsCount": 780,
+    "followersCount": 21000,
+    "productsCount": 45,
+    "isVerified": true,
+    "isFavorite": true,
+    "joinedDate": "2023-06-10",
+    "location": "Ibadan, Nigeria",
+    "deliverySpeed": "Ships within 24h",
+    "responseRate": "97% in 1 hour",
+    "badge": "Enthusiast Grade",
+    "tags": ["Keyboards", "Mechanical", "Desk Setup", "Gaming", "Tech"],
+    "topProducts": [
+      {
+        "id": "p12",
+        "name": "Mechanical Keyboard, 75%",
+        "price": 38000,
+        "oldPrice": null,
+        "image": "https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=800&q=80",
+        "rating": 4.8
+      },
+      {
+        "id": "p28",
+        "name": "PBT Chalk Keycaps Set",
+        "price": 14500,
+        "oldPrice": 18000,
+        "image": "https://images.unsplash.com/photo-1626785774573-4b799315345d?w=800&q=80",
+        "rating": 4.9
+      }
+    ]
+  },
+  {
+    "id": "store-heritage",
+    "name": "Heritage Leather",
+    "slug": "heritage-leather",
+    "category": "Fashion & Leather",
+    "description": "Full-grain vegetable-tanned leather goods, handcrafted bifold wallets, cardholders, and heirloom-quality belts.",
+    "logo": "https://images.unsplash.com/photo-1627123424574-724758594e93?w=200&q=80",
+    "banner": "https://images.unsplash.com/photo-1473188557827-e14a1c6a6f6f?w=1200&q=80",
+    "rating": 4.7,
+    "reviewsCount": 430,
+    "followersCount": 8900,
+    "productsCount": 22,
+    "isVerified": false,
+    "isFavorite": false,
+    "joinedDate": "2024-03-01",
+    "location": "Kano, Nigeria",
+    "deliverySpeed": "Ships in 1-2 business days",
+    "responseRate": "92% in 2 hours",
+    "badge": "Artisanal Tannery",
+    "tags": ["Leather", "Wallets", "Handcrafted", "Heritage", "Men's Accessories"],
+    "topProducts": [
+      {
+        "id": "p7",
+        "name": "Leather Bifold Wallet",
+        "price": 15800,
+        "oldPrice": null,
+        "image": "https://images.unsplash.com/photo-1627123424574-724758594e93?w=800&q=80",
+        "rating": 4.4
+      }
+    ]
+  },
+  {
+    "id": "store-stride",
+    "name": "Stride Athletics",
+    "slug": "stride-athletics",
+    "category": "Sports & Fitness",
+    "description": "Performance marathon footwear, breathable running apparel, hydration packs, and athlete-tested compression gear.",
+    "logo": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=200&q=80",
+    "banner": "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=1200&q=80",
+    "rating": 4.8,
+    "reviewsCount": 1620,
+    "followersCount": 29400,
+    "productsCount": 60,
+    "isVerified": true,
+    "isFavorite": true,
+    "joinedDate": "2023-01-20",
+    "location": "Lagos, Nigeria",
+    "deliverySpeed": "Same day dispatch",
+    "responseRate": "99% in under 15 mins",
+    "badge": "Pro Fitness Gear",
+    "tags": ["Athletics", "Running", "Sneakers", "Fitness", "Sportswear"],
+    "topProducts": [
+      {
+        "id": "p14",
+        "name": "Breathable Mesh Running Shoes",
+        "price": 42000,
+        "oldPrice": 52000,
+        "image": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800&q=80",
+        "rating": 4.7
+      }
+    ]
+  }
+]

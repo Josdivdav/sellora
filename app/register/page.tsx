@@ -8,9 +8,10 @@ import {
   continueWithGoogle,
   getRegistrationErrorMessage,
 } from "@/functions/register.func";
-import router from "next/router";
+import { useRouter } from "next/navigation";
 
 export default function RegisterPage() {
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [emailError, setEmailError] = useState(false);

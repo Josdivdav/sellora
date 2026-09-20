@@ -45,7 +45,7 @@ export const registerWithEmailAndPassword = async (email: string, password: stri
   const user = userCredential.user;
   const { uid, email: userEmail, displayName, photoURL } = user;
 
-  return sendRegistrationDataToServer(
+  return await sendRegistrationDataToServer(
     uid,
     userEmail || "",
     displayName || username,
@@ -61,7 +61,7 @@ export const continueWithGoogle = async () => {
         const user = userCredential.user;
         const { uid, email: userEmail, displayName, photoURL } = user;
 
-        return sendRegistrationDataToServer(
+        return await sendRegistrationDataToServer(
           uid,
           userEmail || "",
           displayName || userEmail?.split("@")[0] || "Sellora user",
@@ -97,6 +97,7 @@ async function sendRegistrationDataToServer(
     }
 
     const data = await response.json();
+    console.log(data)
     return data;
   } catch (error) {
     console.error("Error sending registration data to server:", error);
