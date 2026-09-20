@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, Suspense } from "react";
 import styles from "./home.module.css";
 import { useAuth } from "@/context/AuthContext";
 import { SignOut } from "@/functions/home.func";
@@ -17,7 +17,19 @@ import {
 
 const products: Product[] = productsData as unknown as Product[];
 
-export default function Home() {
+function readCartCount(): number {
+  try {
+    const cartObj = JSON.parse(localStorage.getItem("sellora_cart") || "{}");
+    return Object.values(cartObj).reduce(
+      (acc: number, cur) => acc + (typeof cur === "number" ? cur : 1),
+      0,
+    );
+  } catch {
+    return 0;
+  }
+}
+
+function HomeContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user } = useAuth();
@@ -29,35 +41,13 @@ export default function Home() {
   const [category, setCategory] = useState(initialCat);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [toast, setToast] = useState("");
-
-  const [cartCount, setCartCount] = useState<number>(() => {
-    if (typeof window === "undefined") return 0;
-    try {
-      const cartObj = JSON.parse(localStorage.getItem("sellora_cart") || "{}");
-      return Object.values(cartObj).reduce(
-        (acc: number, cur) => acc + (typeof cur === "number" ? cur : 1),
-        0,
-      );
-    } catch {
-      return 0;
-    }
-  });
+  const [cartCount, setCartCount] = useState<number>(0);
 
   useEffect(() => {
-    const handleStorage = () => {
-      try {
-        const cartObj = JSON.parse(localStorage.getItem("sellora_cart") || "{}");
-        const count = Object.values(cartObj).reduce(
-          (acc: number, cur) => acc + (typeof cur === "number" ? cur : 1),
-          0,
-        );
-        setCartCount(count);
-      } catch {
-        // ignore
-      }
-    };
-    window.addEventListener("storage", handleStorage);
-    return () => window.removeEventListener("storage", handleStorage);
+    const update = () => setCartCount(readCartCount());
+    update();
+    window.addEventListener("storage", update);
+    return () => window.removeEventListener("storage", update);
   }, []);
 
   const categories = useMemo(
@@ -89,11 +79,7 @@ export default function Home() {
       existing[product.id] = (existing[product.id] || 0) + 1;
       localStorage.setItem("sellora_cart", JSON.stringify(existing));
 
-      const newCount = Object.values(existing).reduce(
-        (acc: number, cur) => acc + (typeof cur === "number" ? cur : 1),
-        0,
-      );
-      setCartCount(newCount);
+      setCartCount(readCartCount());
       window.dispatchEvent(new Event("storage"));
       setToast(`Added "${product.name}" to cart!`);
     } catch {
@@ -158,5 +144,13 @@ export default function Home() {
 
       <Toast message={toast} />
     </div>
+  );
+}
+
+export default function Home() {
+  return (
+    <Suspense fallback={null}>
+      <HomeContent />
+    </Suspense>
   );
 }
