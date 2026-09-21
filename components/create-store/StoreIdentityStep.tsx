@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import styles from "./create-store.module.css";
 import type { Store } from "@/types/store";
 
@@ -43,6 +44,12 @@ export default function StoreIdentityStep({ store, onUpdate }: StoreIdentityStep
       slug: generatedSlug || store.slug,
     });
   };
+
+  const [host, setHost] = useState("");
+
+  useEffect(() => {
+    setHost(window.location.hostname);
+  }, []);
 
   return (
     <div className={styles.formCardBody}>
@@ -88,7 +95,7 @@ export default function StoreIdentityStep({ store, onUpdate }: StoreIdentityStep
           Your personalized shareable Sellora store URL.
         </p>
         <div className={styles.textInputWrap}>
-          <span className={styles.slugPrefix}>{location.hostname}/@</span>
+          <span className={styles.slugPrefix}>{host}/@</span>
           <input
             id="store-slug-input"
             type="text"
