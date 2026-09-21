@@ -234,38 +234,6 @@ export default function StoreVisualsStep({
           </div>
         </div>
       </div>
-
-      {/* Storefront Highlight Badge */}
-      <div className={styles.fieldGroup}>
-        <label className={styles.fieldLabel}>
-          <span className="material-icons-round" style={{ fontSize: "17px", color: "#4f46e5" }}>
-            military_tech
-          </span>
-          Storefront Highlight Tag / Badge
-        </label>
-        <p className={styles.fieldHint}>
-          Prominently shown in the top-left corner of your store card.
-        </p>
-
-        <div className={styles.badgeOptionsGrid}>
-          {BADGE_OPTIONS.map((badge) => {
-            const isSelected = store.badge === badge;
-            return (
-              <button
-                key={badge}
-                type="button"
-                className={`${styles.badgeOptionBtn} ${
-                  isSelected ? styles.badgeOptionActive : ""
-                }`}
-                onClick={() => onUpdate({ badge: isSelected ? undefined : badge })}
-              >
-                {isSelected && <span style={{ marginRight: "4px" }}>✓</span>}
-                {badge}
-              </button>
-            );
-          })}
-        </div>
-      </div>
     </div>
   );
 }

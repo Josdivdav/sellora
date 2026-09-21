@@ -169,11 +169,6 @@ export default function FavoritesPage() {
     router.push("/login");
   };
 
-  const handleCreateStore = () => {
-    setSidebarOpen(false);
-    router.push("/create-store");
-  };
-
   const handleVisitStore = (store: Store) => {
     router.push(`/?store=${encodeURIComponent(store.name)}`);
   };
@@ -202,7 +197,6 @@ export default function FavoritesPage() {
           isOpen={sidebarOpen}
           onClose={() => setSidebarOpen(false)}
           user={user}
-          onCreateStore={handleCreateStore}
           onSignOut={handleSignOut}
           onSignIn={handleSignIn}
         />

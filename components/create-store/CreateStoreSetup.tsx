@@ -312,7 +312,7 @@ export default function CreateStoreSetup({
             <div>
               <strong>You already have an active storefront: {existingStore.name}</strong>
               <div style={{ fontSize: "12px", opacity: 0.9 }}>
-                sellora.ng/@{existingStore.slug} • Add, edit, or delete products and manage inventory in your Store Dashboard.
+                {window.location.hostname}/@{existingStore.slug} • Add, edit, or delete products and manage inventory in your Store Dashboard.
               </div>
             </div>
           </div>
@@ -362,29 +362,6 @@ export default function CreateStoreSetup({
             <span className={styles.statVal}>Zero Setup Fees</span>
             <span className={styles.statDesc}>Keep 100% of initial sales</span>
           </div>
-        </div>
-      </div>
-
-      {/* Quick Template Strip */}
-      <div className={styles.presetStrip}>
-        <div className={styles.presetLabel}>
-          <span className="material-icons-round">auto_awesome</span>
-          <span>Quick Inspiration Templates:</span>
-        </div>
-        <div className={styles.presetButtons}>
-          {TEMPLATES.map((tpl) => (
-            <button
-              key={tpl.label}
-              type="button"
-              className={styles.presetBtn}
-              onClick={() => applyTemplate(tpl.data)}
-            >
-              <span className="material-icons-round" style={{ fontSize: "15px" }}>
-                {tpl.icon}
-              </span>
-              {tpl.label}
-            </button>
-          ))}
         </div>
       </div>
 

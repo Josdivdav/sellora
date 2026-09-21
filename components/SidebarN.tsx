@@ -13,7 +13,7 @@ interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
   user: User | null;
-  onCreateStore: () => void;
+  onCreateStore?: () => void;
   onSignOut: () => void;
   onSignIn: () => void;
   hasStore?: boolean;
@@ -48,7 +48,6 @@ export default function Sidebar({
   });
   
   useEffect(() => {
-    console.log(user)
 
     const handleStorage = () => {
       try {

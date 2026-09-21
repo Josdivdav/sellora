@@ -27,6 +27,7 @@ const POPULAR_LOCATIONS = [
   "Enugu, Nigeria",
   "Kano, Nigeria",
   "Asaba, Nigeria",
+  "Adamawa, Nigeria",
 ];
 
 export default function StoreIdentityStep({ store, onUpdate }: StoreIdentityStepProps) {
@@ -87,10 +88,11 @@ export default function StoreIdentityStep({ store, onUpdate }: StoreIdentityStep
           Your personalized shareable Sellora store URL.
         </p>
         <div className={styles.textInputWrap}>
-          <span className={styles.slugPrefix}>sellora.ng/@</span>
+          <span className={styles.slugPrefix}>{window.location.hostname}/@</span>
           <input
             id="store-slug-input"
             type="text"
+            disabled
             className={`${styles.textInput} ${styles.slugInput}`}
             value={store.slug}
             placeholder="store-handle"

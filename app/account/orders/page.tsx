@@ -152,11 +152,6 @@ export default function OrdersPage() {
     router.push("/login");
   };
 
-  const handleCreateStore = () => {
-    setSidebarOpen(false);
-    router.push("/create-store");
-  };
-
   const handleBuyAgain = (order: Order) => {
     try {
       const existingCart = JSON.parse(
@@ -232,7 +227,6 @@ export default function OrdersPage() {
           isOpen={sidebarOpen}
           onClose={() => setSidebarOpen(false)}
           user={user}
-          onCreateStore={handleCreateStore}
           onSignOut={handleSignOut}
           onSignIn={handleSignIn}
         />

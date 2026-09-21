@@ -113,11 +113,6 @@ function HomeContent() {
     checkStore();
   }, [user]);
 
-  const handleCreateStore = async () => {
-    setSidebarOpen(false);
-    router.push("/account/create-store");
-  };
-
   const manageStore = () => {
     setSidebarOpen(false);
     router.push("/account/create-store");
@@ -138,7 +133,6 @@ function HomeContent() {
           isOpen={sidebarOpen}
           onClose={() => setSidebarOpen(false)}
           user={user}
-          onCreateStore={handleCreateStore}
           onSignOut={handleSignOut}
           onSignIn={handleSignIn}
           hasStore={hasStore}

@@ -367,7 +367,6 @@
 /* Studio Form Layout */
 .studioGrid {
   display: block;
-  max-width: 860px;
   margin: 0 auto;
   width: 100%;
 }
