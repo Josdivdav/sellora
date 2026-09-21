@@ -88,7 +88,7 @@ export default function StoreIdentityStep({ store, onUpdate }: StoreIdentityStep
           Your personalized shareable Sellora store URL.
         </p>
         <div className={styles.textInputWrap}>
-          <span className={styles.slugPrefix}>{window.location.hostname}/@</span>
+          <span className={styles.slugPrefix}>{location.hostname}/@</span>
           <input
             id="store-slug-input"
             type="text"
