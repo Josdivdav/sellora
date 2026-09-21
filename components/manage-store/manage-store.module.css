@@ -1,0 +1,977 @@
+/* Manage Store / Merchant Dashboard CSS Module */
+
+.page {
+  min-height: 100vh;
+  padding: 10px;
+  background: linear-gradient(135deg, #eef1ff, #f7f4ff 45%, #eef6ff);
+  color: #14142b;
+  font-family: var(--font-poppins), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.contentArea {
+  display: flex;
+  width: 95.5%;
+  margin: 14px auto 0;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.main {
+  min-width: 0;
+  flex: 1;
+  width: auto;
+  margin: 0;
+  padding: 0 0 60px;
+}
+
+/* Breadcrumb */
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #6b7280;
+  margin-bottom: 14px;
+}
+
+.breadcrumbLink {
+  color: #4f46e5;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.15s ease;
+}
+
+.breadcrumbLink:hover {
+  color: #3730a3;
+  text-decoration: underline;
+}
+
+.breadcrumbSep {
+  color: #9ca3af;
+  font-size: 14px;
+}
+
+/* Store Hero Banner Card */
+.storeHeroCard {
+  background: #ffffff;
+  border-radius: 24px;
+  border: 1px solid #edf0f7;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(11, 18, 48, 0.05);
+  margin-bottom: 24px;
+}
+
+.heroBannerWrap {
+  position: relative;
+  height: 160px;
+  background: #e0e7ff;
+  overflow: hidden;
+}
+
+.heroBannerImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.heroBadge {
+  position: absolute;
+  top: 14px;
+  left: 16px;
+  padding: 5px 12px;
+  border-radius: 50px;
+  background: rgba(11, 18, 48, 0.85);
+  backdrop-filter: blur(6px);
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+.heroQuickActions {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  display: flex;
+  gap: 8px;
+}
+
+.heroActionBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(6px);
+  border: 0;
+  border-radius: 50px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #1f2937;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  transition: all 0.15s ease;
+}
+
+.heroActionBtn:hover {
+  background: #ffffff;
+  transform: translateY(-1px);
+  color: #4f46e5;
+}
+
+.storeMetaSection {
+  padding: 0 24px 22px;
+  position: relative;
+}
+
+.storeIdentityRow {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: -36px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.logoAndName {
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+}
+
+.storeLogoWrap {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  border: 4px solid #ffffff;
+  box-shadow: 0 4px 14px rgba(11, 18, 48, 0.12);
+  background: #ffffff;
+  overflow: hidden;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+}
+
+.storeLogoImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.storeLogoFallback {
+  font-size: 30px;
+  font-weight: 800;
+  color: #4f46e5;
+}
+
+.nameBlock {
+  padding-bottom: 2px;
+}
+
+.storeName {
+  font-size: 22px;
+  font-weight: 800;
+  color: #0b1230;
+  margin: 0 0 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.verifiedCheck {
+  color: #2b6dff;
+  font-size: 20px;
+}
+
+.storeSlugLine {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  color: #6b7280;
+}
+
+.slugTag {
+  color: #4f46e5;
+  font-weight: 600;
+}
+
+.categoryTag {
+  background: #f3f4f6;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #4b5563;
+}
+
+.heroButtonRight {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.editStoreBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 8px 16px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.editStoreBtn:hover {
+  background: #eef2ff;
+  border-color: #c7d2fe;
+  color: #4f46e5;
+}
+
+.storeBioRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  padding-top: 6px;
+  border-top: 1px solid #f3f4f6;
+}
+
+.storeBio {
+  font-size: 13px;
+  color: #4b5563;
+  margin: 0;
+  max-width: 650px;
+  line-height: 1.45;
+}
+
+.storePills {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.storePillItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.deliveryGreen {
+  color: #059669;
+  font-weight: 700;
+}
+
+/* Dashboard Stats Grid */
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.statCard {
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 16px 18px;
+  border: 1px solid #edf0f7;
+  box-shadow: 0 2px 10px rgba(11, 18, 48, 0.04);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  transition: transform 0.15s ease;
+}
+
+.statCard:hover {
+  transform: translateY(-2px);
+}
+
+.statIconWrap {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.statIconIndigo { background: #eef2ff; color: #4f46e5; }
+.statIconEmerald { background: #ecfdf5; color: #059669; }
+.statIconAmber { background: #fffbeb; color: #d97706; }
+.statIconRose { background: #fff1f2; color: #e11d48; }
+
+.statInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.statValue {
+  font-size: 18px;
+  font-weight: 800;
+  color: #0b1230;
+  line-height: 1.2;
+}
+
+.statTitle {
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: 2px;
+  font-weight: 500;
+}
+
+/* Products Section Card */
+.catalogCard {
+  background: #ffffff;
+  border-radius: 20px;
+  border: 1px solid #edf0f7;
+  box-shadow: 0 4px 18px rgba(11, 18, 48, 0.05);
+  overflow: hidden;
+}
+
+.catalogHeader {
+  padding: 20px 24px;
+  border-bottom: 1px solid #f3f4f6;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.catalogHeaderTitle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.catalogHeaderTitle h2 {
+  font-size: 18px;
+  font-weight: 800;
+  color: #0b1230;
+  margin: 0;
+}
+
+.countBadge {
+  background: #eef2ff;
+  color: #4f46e5;
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 50px;
+}
+
+.addProductBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  color: #ffffff;
+  border: 0;
+  border-radius: 12px;
+  padding: 10px 18px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 3px 12px rgba(79, 70, 229, 0.35);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.addProductBtn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(79, 70, 229, 0.45);
+}
+
+/* Catalog Filter Bar */
+.filterBar {
+  padding: 14px 24px;
+  background: #fafbff;
+  border-bottom: 1px solid #edf0f7;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.searchBox {
+  display: flex;
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 50px;
+  padding: 0 14px;
+  min-width: 280px;
+  flex: 1;
+  max-width: 440px;
+  height: 38px;
+  transition: all 0.15s ease;
+}
+
+.searchBox:focus-within {
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+}
+
+.searchBox :global(.material-icons-round) {
+  color: #9ca3af;
+  font-size: 18px;
+  margin-right: 8px;
+}
+
+.searchInput {
+  border: 0;
+  outline: 0;
+  background: transparent;
+  width: 100%;
+  font: inherit;
+  font-size: 13px;
+  color: #111827;
+}
+
+.filterControls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.statusFilterSelect {
+  height: 38px;
+  border: 1px solid #e5e7eb;
+  border-radius: 50px;
+  background: #ffffff;
+  padding: 0 14px;
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: #374151;
+  cursor: pointer;
+  outline: none;
+}
+
+/* Products Table */
+.tableResponsive {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.productsTable {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.productsTable th {
+  padding: 12px 20px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid #f3f4f6;
+  background: #fafafa;
+}
+
+.productsTable td {
+  padding: 14px 20px;
+  font-size: 13px;
+  color: #374151;
+  border-bottom: 1px solid #f3f4f6;
+  vertical-align: middle;
+}
+
+.productRow:hover {
+  background: #fbfbfe;
+}
+
+.productCellMain {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.productThumb {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  background: #f3f4f6;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 1px solid #e5e7eb;
+}
+
+.productTitleBlock {
+  display: flex;
+  flex-direction: column;
+}
+
+.productTitle {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #111827;
+  line-height: 1.3;
+}
+
+.productSku {
+  font-size: 11px;
+  color: #9ca3af;
+  margin-top: 2px;
+}
+
+.priceBlock {
+  display: flex;
+  flex-direction: column;
+}
+
+.currentPrice {
+  font-weight: 700;
+  color: #111827;
+}
+
+.oldPriceStrike {
+  font-size: 11px;
+  color: #9ca3af;
+  text-decoration: line-through;
+}
+
+/* Stock Status Badges */
+.stockBadgeIn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 9px;
+  border-radius: 50px;
+  background: #ecfdf5;
+  color: #059669;
+  font-size: 11.5px;
+  font-weight: 700;
+}
+
+.stockBadgeLow {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 9px;
+  border-radius: 50px;
+  background: #fffbeb;
+  color: #d97706;
+  font-size: 11.5px;
+  font-weight: 700;
+}
+
+.stockBadgeOut {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 9px;
+  border-radius: 50px;
+  background: #fff1f2;
+  color: #e11d48;
+  font-size: 11.5px;
+  font-weight: 700;
+}
+
+/* Action Buttons in Row */
+.actionBtns {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.editBtn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  color: #4b5563;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.editBtn:hover {
+  border-color: #4f46e5;
+  color: #4f46e5;
+  background: #eef2ff;
+}
+
+.deleteBtn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid #fee2e2;
+  background: #fff;
+  color: #e11d48;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.deleteBtn:hover {
+  background: #fff1f2;
+  border-color: #fca5a5;
+}
+
+/* Empty State */
+.emptyState {
+  padding: 60px 24px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.emptyStateIcon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: #f3f4f6;
+  color: #9ca3af;
+  display: grid;
+  place-items: center;
+  font-size: 32px;
+}
+
+.emptyStateTitle {
+  font-size: 17px;
+  font-weight: 800;
+  color: #1f2937;
+  margin: 0;
+}
+
+.emptyStateSub {
+  font-size: 13px;
+  color: #6b7280;
+  max-width: 400px;
+  margin: 0;
+}
+
+/* Modal Styling */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(11, 18, 48, 0.6);
+  backdrop-filter: blur(6px);
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modalContent {
+  background: #ffffff;
+  border-radius: 20px;
+  width: min(100%, 560px);
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 40px rgba(11, 18, 48, 0.2);
+  display: flex;
+  flex-direction: column;
+  animation: modalPop 0.2s ease;
+}
+
+@keyframes modalPop {
+  from { transform: scale(0.94); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.modalHeader {
+  padding: 18px 24px;
+  border-bottom: 1px solid #f3f4f6;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modalHeaderTitle {
+  font-size: 17px;
+  font-weight: 800;
+  color: #0b1230;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.modalCloseBtn {
+  background: transparent;
+  border: 0;
+  color: #9ca3af;
+  cursor: pointer;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+}
+
+.modalCloseBtn:hover {
+  color: #111827;
+}
+
+.modalBody {
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.modalFooter {
+  padding: 16px 24px;
+  background: #fafbff;
+  border-top: 1px solid #edf0f7;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+/* Form Controls in Modal */
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.formLabel {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.formInput {
+  height: 42px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #f9fafb;
+  padding: 0 14px;
+  font: inherit;
+  font-size: 13px;
+  color: #111827;
+  transition: all 0.15s ease;
+}
+
+.formInput:focus {
+  background: #ffffff;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+  outline: none;
+}
+
+.formTextarea {
+  min-height: 80px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #f9fafb;
+  padding: 10px 14px;
+  font: inherit;
+  font-size: 13px;
+  color: #111827;
+  resize: vertical;
+}
+
+.formTextarea:focus {
+  background: #ffffff;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+  outline: none;
+}
+
+.twoColRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+/* Delete confirmation box */
+.deleteConfirmBox {
+  padding: 24px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.deleteConfirmIcon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #fee2e2;
+  color: #e11d48;
+  display: grid;
+  place-items: center;
+  font-size: 30px;
+}
+
+.deleteConfirmTitle {
+  font-size: 18px;
+  font-weight: 800;
+  color: #111827;
+  margin: 0;
+}
+
+.deleteConfirmDesc {
+  font-size: 13px;
+  color: #6b7280;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.cancelModalBtn {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #4b5563;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.cancelModalBtn:hover {
+  background: #f3f4f6;
+}
+
+.confirmDeleteBtn {
+  background: #e11d48;
+  color: #ffffff;
+  border: 0;
+  border-radius: 10px;
+  padding: 8px 18px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.confirmDeleteBtn:hover {
+  background: #be123c;
+}
+
+.saveModalBtn {
+  background: #4f46e5;
+  color: #ffffff;
+  border: 0;
+  border-radius: 10px;
+  padding: 9px 20px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.saveModalBtn:hover {
+  background: #4338ca;
+}
+
+/* No Store Fallback Box */
+.noStoreBox {
+  background: #ffffff;
+  border-radius: 20px;
+  border: 1px solid #edf0f7;
+  padding: 50px 24px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  max-width: 600px;
+  margin: 40px auto;
+  box-shadow: 0 4px 20px rgba(11, 18, 48, 0.05);
+}
+
+.noStoreIcon {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  background: #eef2ff;
+  color: #4f46e5;
+  display: grid;
+  place-items: center;
+  font-size: 34px;
+}
+
+.noStoreTitle {
+  font-size: 20px;
+  font-weight: 800;
+  color: #0b1230;
+  margin: 0;
+}
+
+.noStoreDesc {
+  font-size: 13.5px;
+  color: #6b7280;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.createStorePromptBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  color: #ffffff;
+  border: 0;
+  border-radius: 12px;
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(79, 70, 229, 0.35);
+  transition: transform 0.15s ease;
+  text-decoration: none;
+  margin-top: 8px;
+}
+
+.createStorePromptBtn:hover {
+  transform: translateY(-1px);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .storeIdentityRow {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .heroQuickActions {
+    position: static;
+    margin: 10px 16px 0;
+  }
+
+  .catalogHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .filterBar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .searchBox {
+    max-width: none;
+    min-width: 0;
+  }
+
+  .twoColRow {
+    grid-template-columns: 1fr;
+  }
+}

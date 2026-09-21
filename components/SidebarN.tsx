@@ -16,6 +16,8 @@ interface SidebarProps {
   onCreateStore: () => void;
   onSignOut: () => void;
   onSignIn: () => void;
+  hasStore?: boolean;
+  manageStore?: () => void;
 }
 
 export default function Sidebar({
@@ -25,6 +27,8 @@ export default function Sidebar({
   onCreateStore,
   onSignOut,
   onSignIn,
+  hasStore,
+  manageStore = () => {},
 }: SidebarProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -42,8 +46,9 @@ export default function Sidebar({
     }
     return storesData.filter((s) => s.isFavorite).length;
   });
-
+  
   useEffect(() => {
+    console.log(user)
 
     const handleStorage = () => {
       try {
@@ -79,6 +84,24 @@ export default function Sidebar({
     return undefined;
   };
 
+  const handleManageStore = () => {
+    onClose();
+    if (manageStore) {
+      manageStore();
+    } else {
+      router.push("/account/manage-store");
+    }
+  };
+
+  const handleCreateStore = () => {
+    onClose();
+    if (onCreateStore) {
+      onCreateStore();
+    } else {
+      router.push("/account/create-store");
+    }
+  };
+
   return (
     <>
       <button
@@ -98,13 +121,20 @@ export default function Sidebar({
           </button>
         </div>
 
-        {user && (
-          <button className={styles.createStore} onClick={onCreateStore}>
-            <span className="material-icons-round">add</span>
-            Create store
-          </button>
-        )}
-
+        {
+          (user ? (
+            !hasStore ? 
+            <button className={styles.createStore} onClick={handleCreateStore}>
+              <span className="material-icons-round">add</span>
+              Create store
+            </button> : (
+              <button className={styles.createStore} onClick={handleManageStore}>
+                Manage store
+                <span className="material-icons-round">chevron_right</span>
+              </button>
+            )
+          ) : <div></div>)
+        }
         <nav className={styles.sideNav}>
           {visibleNav.map((item) => {
             const isActive =
@@ -138,7 +168,9 @@ export default function Sidebar({
           <span className="material-icons-round">auto_awesome</span>
           <strong>Sell on Sellora</strong>
           <p>Reach millions of shoppers and open your own verified storefront.</p>
-          <button onClick={onCreateStore}>Start selling</button>
+          <button onClick={hasStore ? handleManageStore : handleCreateStore}>
+            {hasStore ? "Manage store" : "Start selling"}
+          </button>
         </div>
       </aside>
     </>

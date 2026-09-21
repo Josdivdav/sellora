@@ -33,6 +33,7 @@ export async function GET(request: Request) {
         displayName: user?.displayName,
         photoURL: user?.photoURL,
         role: user?.role || 'buyer',
+        has_store: user?.has_store,
       },
     });
   } catch (error) {

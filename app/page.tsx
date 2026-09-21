@@ -3,7 +3,7 @@
 import { useMemo, useState, useEffect, Suspense } from "react";
 import styles from "./home.module.css";
 import { useAuth } from "@/context/AuthContext";
-import { SignOut } from "@/functions/home.func";
+import { fetchUserData, SignOut } from "@/functions/home.func";
 import { useRouter, useSearchParams } from "next/navigation";
 import productsData from "@/data/products.json";
 import type { Product } from "@/types/product";
@@ -43,6 +43,8 @@ function HomeContent() {
   const [toast, setToast] = useState("");
   const [cartCount, setCartCount] = useState<number>(0);
 
+  const [hasStore, setHasStore] = useState<boolean>(false);
+
   useEffect(() => {
     const update = () => setCartCount(readCartCount());
     update();
@@ -55,17 +57,8 @@ function HomeContent() {
     [],
   );
 
-  const visibleProducts = useMemo(
-    () =>
-      products.filter(
-        (product) =>
-          (category === "All" || product.category === category) &&
-          (product.name.toLowerCase().includes(search.toLowerCase()) ||
-            (product.author &&
-              product.author.toLowerCase().includes(search.toLowerCase()))),
-      ),
-    [category, search],
-  );
+  const visibleProducts = useMemo(() => products.filter((product) => (category === "All" || product.category === category) && (product.name.toLowerCase().includes(search.toLowerCase()) || (product.author && product.author.toLowerCase().includes(search.toLowerCase())))),
+    [category, search]);
 
   useEffect(() => {
     if (!toast) return;
@@ -102,9 +95,32 @@ function HomeContent() {
     router.push("/account/orders");
   };
 
-  const handleCreateStore = () => {
+  const checkStore = async () => {
+    try {
+      if (typeof window !== "undefined" && localStorage.getItem("sellora_my_store")) {
+        setHasStore(true);
+        return;
+      }
+    } catch {}
+    if (user) {
+      const res = await fetchUserData(user);
+      if (res?.has_store) {
+        setHasStore(true);
+      }
+    }
+  };
+  useEffect(() => {
+    checkStore();
+  }, [user]);
+
+  const handleCreateStore = async () => {
     setSidebarOpen(false);
-    setToast("Create store is coming soon");
+    router.push("/account/create-store");
+  };
+
+  const manageStore = () => {
+    setSidebarOpen(false);
+    router.push("/account/create-store");
   };
 
   return (
@@ -125,6 +141,8 @@ function HomeContent() {
           onCreateStore={handleCreateStore}
           onSignOut={handleSignOut}
           onSignIn={handleSignIn}
+          hasStore={hasStore}
+          manageStore={manageStore}
         />
 
         <main className={styles.main}>

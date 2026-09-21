@@ -171,7 +171,7 @@ export default function FavoritesPage() {
 
   const handleCreateStore = () => {
     setSidebarOpen(false);
-    setToast("Create store is coming soon");
+    router.push("/create-store");
   };
 
   const handleVisitStore = (store: Store) => {

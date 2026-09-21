@@ -207,7 +207,7 @@ export default function ProductDetailPage() {
 
   const handleCreateStore = () => {
     setSidebarOpen(false);
-    setToast("Create store is coming soon");
+    router.push("/create-store");
   };
 
   const handleHeaderSearch = (val: string) => {

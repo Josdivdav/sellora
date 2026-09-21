@@ -74,9 +74,7 @@ export default function OrdersPage() {
           0,
         );
         setCartCount(count);
-      } catch {
-        // ignore
-      }
+      } catch {}
     };
     window.addEventListener("storage", handleStorage);
     return () => window.removeEventListener("storage", handleStorage);
@@ -156,7 +154,7 @@ export default function OrdersPage() {
 
   const handleCreateStore = () => {
     setSidebarOpen(false);
-    setToast("Create store is coming soon");
+    router.push("/create-store");
   };
 
   const handleBuyAgain = (order: Order) => {

@@ -51,7 +51,7 @@ export async function POST(request: Request) {
       email,
       displayName,
       photoURL,
-      ...(existingUser.exists ? {} : { createdAt: new Date() }),
+      ...(existingUser.exists ? {} : { createdAt: new Date(), has_store: false }),
     }, { merge: true });
 
     return NextResponse.json({ message: 'User registered successfully' }, { status: 201 });

@@ -13,12 +13,14 @@ const buyerNav: NavItem[] = [
     href: "/account/orders",
     icon: "receipt_long",
     badgeKey: "activeOrders",
+    requiresAuth: true,
   },
   { 
     label: "Favorite stores", 
     href: "/account/favorites", 
     icon: "favorite", 
     badgeKey: "favoriteStores",
+    requiresAuth: true,
   },
   { label: "Help", href: "/help", icon: "help" },
   {
