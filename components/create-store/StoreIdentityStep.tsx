@@ -32,17 +32,10 @@ const POPULAR_LOCATIONS = [
 ];
 
 export default function StoreIdentityStep({ store, onUpdate }: StoreIdentityStepProps) {
-  const handleNameChange = (newName: string) => {
-    // Generate clean slug if user hasn't explicitly customized it wildly
-    const generatedSlug = newName
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/(^-|-$)+/g, "");
 
-    onUpdate({
-      name: newName,
-      slug: generatedSlug || store.slug,
-    });
+  const handleNameChange = (newName: string) => {
+    const generatedSlug = newName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)+/g, "");
+    onUpdate({name: newName, slug: generatedSlug || store.slug});
   };
 
   const [host, setHost] = useState("");

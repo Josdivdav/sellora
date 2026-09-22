@@ -8,7 +8,7 @@ import StoreVisualsStep from "./StoreVisualsStep";
 import StoreLogisticsStep from "./StoreLogisticsStep";
 import StoreReviewStep from "./StoreReviewStep";
 import StoreSuccessModal from "./StoreSuccessModal";
-import type { Store, StoreTopProduct } from "@/types/store";
+import type { Store } from "@/types/store";
 import type { User } from "firebase/auth";
 import productsData from "@/data/products.json";
 
@@ -18,127 +18,28 @@ interface CreateStoreSetupProps {
   onStoreCreated?: (store: Store) => void;
 }
 
-const DEFAULT_TOP_PRODUCTS: StoreTopProduct[] = [
-  {
-    id: "preview-1",
-    name: "Signature Streetwear Hoodie",
-    price: 38000,
-    oldPrice: 45000,
-    image: "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=800&q=80",
-    rating: 4.8,
-  },
-  {
-    id: "preview-2",
-    name: "Minimalist Leather Sneakers",
-    price: 52000,
-    oldPrice: 65000,
-    image: "https://images.unsplash.com/photo-1549298916-b41d501d3772?w=800&q=80",
-    rating: 4.9,
-  },
-  {
-    id: "preview-3",
-    name: "Vintage Utility Crossbody Bag",
-    price: 24000,
-    oldPrice: 30000,
-    image: "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=800&q=80",
-    rating: 4.7,
-  },
-];
 
 const INITIAL_STORE: Store = {
   id: "my-sellora-store",
-  name: "Aura Studio",
-  slug: "aura-studio",
+  name: "",
+  slug: "",
   category: "Fashion & Apparel",
-  description:
-    "Curated contemporary streetwear, authentic bespoke fashion, and premium accessories designed for discerning trendsetters.",
+  description: "",
   logo: "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=200&q=80",
   banner: "https://images.unsplash.com/photo-1552346154-21d32810aba3?w=1200&q=80",
   rating: 5.0,
   reviewsCount: 0,
   followersCount: 1,
   productsCount: 3,
-  isVerified: true,
-  isFavorite: true,
+  isVerified: false,
+  isFavorite: false,
   joinedDate: new Date().toISOString().split("T")[0],
-  location: "Lagos, Nigeria",
+  location: "",
   deliverySpeed: "Ships within 24h",
   responseRate: "99% in under an hour",
   badge: "OFFICIAL STORE",
-  tags: ["Fashion", "Streetwear", "Footwear", "Accessories"],
-  topProducts: DEFAULT_TOP_PRODUCTS,
+  tags: ["Fashion", "Streetwear", "Footwear", "Accessories"]
 };
-
-const TEMPLATES = [
-  {
-    label: "Streetwear & Fashion",
-    icon: "checkroom",
-    data: {
-      name: "Kicks & Street",
-      slug: "kicks-and-street",
-      category: "Fashion & Apparel",
-      description:
-        "Exclusive sneaker releases, premium Japanese denim, graphic tees, and modern oversized streetwear essentials.",
-      banner: "https://images.unsplash.com/photo-1552346154-21d32810aba3?w=1200&q=80",
-      logo: "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=200&q=80",
-      badge: "OFFICIAL STORE",
-      tags: ["Sneakers", "Streetwear", "Footwear", "LimitedEdition"],
-      location: "Lagos, Nigeria",
-      deliverySpeed: "Same-Day Delivery",
-    },
-  },
-  {
-    label: "Audio & Flagship Tech",
-    icon: "headphones",
-    data: {
-      name: "Sonic Audio Lab",
-      slug: "sonic-audio-lab",
-      category: "Electronics & Audio",
-      description:
-        "Authorized distributor for audiophile gear, studio headphones, and high-fidelity wireless sound systems.",
-      banner: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=1200&q=80",
-      logo: "https://images.unsplash.com/photo-1546435770-a3e426bf472b?w=200&q=80",
-      badge: "TOP RATED",
-      tags: ["Audio", "Headphones", "Wireless", "Hi-Res"],
-      location: "Abuja, Nigeria",
-      deliverySpeed: "Ships within 24h",
-    },
-  },
-  {
-    label: "Horology & Luxury",
-    icon: "watch",
-    data: {
-      name: "Chronos Vault",
-      slug: "chronos-vault",
-      category: "Luxury & Watches",
-      description:
-        "Bespoke horology and minimalist timepieces crafted with sapphire glass, 316L stainless steel, and top-grain Italian leather.",
-      banner: "https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=1200&q=80",
-      logo: "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=200&q=80",
-      badge: "PREMIUM MERCHANT",
-      tags: ["Watches", "Horology", "Luxury", "Bespoke"],
-      location: "Lagos, Nigeria",
-      deliverySpeed: "1-2 Business Days",
-    },
-  },
-  {
-    label: "Botanical Skincare",
-    icon: "spa",
-    data: {
-      name: "Glow & Co",
-      slug: "glow-and-co",
-      category: "Skincare & Beauty",
-      description:
-        "Dermatologist-tested skincare crafted with cold-pressed botanical oils, hyaluronic complexes, and natural vitamins.",
-      banner: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=1200&q=80",
-      logo: "https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=200&q=80",
-      badge: "ARTISAN BRAND",
-      tags: ["Skincare", "Organic", "CrueltyFree", "Glow"],
-      location: "Port Harcourt, Nigeria",
-      deliverySpeed: "Ships within 24h",
-    },
-  },
-];
 
 export default function CreateStoreSetup({
   user,
@@ -151,8 +52,11 @@ export default function CreateStoreSetup({
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [existingStore, setExistingStore] = useState<Store | null>(null);
 
+  const [host, setHost] = useState("");
+
   // Check if user already has a store
   useEffect(() => {
+    setHost(window.location.hostname);
     try {
       const existing = localStorage.getItem("sellora_my_store");
       if (existing) {
@@ -168,15 +72,6 @@ export default function CreateStoreSetup({
 
   const handleUpdate = (fields: Partial<Store>) => {
     setStore((prev) => ({ ...prev, ...fields }));
-  };
-
-  const applyTemplate = (templateData: Partial<Store>) => {
-    setStore((prev) => ({
-      ...prev,
-      ...templateData,
-      id: `store-${templateData.slug || prev.slug}`,
-    }));
-    onShowToast(`Applied ${templateData.name} template!`);
   };
 
   const validateStep = (step: number): boolean => {
@@ -206,6 +101,9 @@ export default function CreateStoreSetup({
   const handleNextStep = () => {
     if (!validateStep(currentStep)) return;
     if (currentStep < 4) {
+      if(currentStep == 1) {
+        alert(JSON.stringify(store))
+      }
       setCurrentStep(currentStep + 1);
       window.scrollTo({ top: 120, behavior: "smooth" });
     } else {
@@ -312,7 +210,7 @@ export default function CreateStoreSetup({
             <div>
               <strong>You already have an active storefront: {existingStore.name}</strong>
               <div style={{ fontSize: "12px", opacity: 0.9 }}>
-                {window.location.hostname}/@{existingStore.slug} • Add, edit, or delete products and manage inventory in your Store Dashboard.
+                {host}/@{existingStore.slug} • Add, edit, or delete products and manage inventory in your Store Dashboard.
               </div>
             </div>
           </div>

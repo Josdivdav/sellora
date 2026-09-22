@@ -13,27 +13,27 @@ interface StoreVisualsStepProps {
 const BANNER_PRESETS = [
   {
     name: "Modern Tech / Studio",
-    url: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=1200&q=80",
+    url: "/images/banners/banner_1.jpeg",
   },
   {
     name: "Luxury Horology / Dark",
-    url: "https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=1200&q=80",
+    url: "/images/banners/banner_2.jpeg",
   },
   {
     name: "Urban Footwear & Streetwear",
-    url: "https://images.unsplash.com/photo-1552346154-21d32810aba3?w=1200&q=80",
+    url: "/images/banners/banner_3.jpeg",
   },
   {
     name: "Botanicals & Clean Beauty",
-    url: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=1200&q=80",
+    url: "/images/banners/banner_4.jpeg",
   },
   {
     name: "Aesthetic Interior & Decor",
-    url: "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=1200&q=80",
+    url: "/images/banners/banner_5.jpeg",
   },
   {
     name: "Jewelry & Gold Minimalist",
-    url: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=1200&q=80",
+    url: "/images/banners/banner_6.jpeg",
   },
 ];
 

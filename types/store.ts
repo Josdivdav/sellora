@@ -1,12 +1,3 @@
-export interface StoreTopProduct {
-  id: string;
-  name: string;
-  price: number;
-  oldPrice?: number | null;
-  image: string;
-  rating: number;
-}
-
 export interface Store {
   id: string;
   name: string;
@@ -26,6 +17,5 @@ export interface Store {
   deliverySpeed: string;
   responseRate: string;
   tags: string[];
-  topProducts: StoreTopProduct[];
   badge?: string;
 }
