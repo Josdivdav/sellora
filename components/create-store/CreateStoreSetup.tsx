@@ -38,7 +38,8 @@ const INITIAL_STORE: Store = {
   deliverySpeed: "Ships within 24h",
   responseRate: "99% in under an hour",
   badge: "OFFICIAL STORE",
-  tags: ["Fashion", "Streetwear", "Footwear", "Accessories"]
+  tags: ["Fashion", "Streetwear", "Footwear", "Accessories"],
+  topProducts: []
 };
 
 export default function CreateStoreSetup({
@@ -101,9 +102,6 @@ export default function CreateStoreSetup({
   const handleNextStep = () => {
     if (!validateStep(currentStep)) return;
     if (currentStep < 4) {
-      if(currentStep == 1) {
-        alert(JSON.stringify(store))
-      }
       setCurrentStep(currentStep + 1);
       window.scrollTo({ top: 120, behavior: "smooth" });
     } else {
@@ -118,7 +116,7 @@ export default function CreateStoreSetup({
     }
   };
 
-  const handlePublishStore = () => {
+  const handlePublishStore = async () => {
     if (!agreedToTerms) {
       onShowToast("Please accept the merchant terms of service to proceed");
       return;
@@ -131,27 +129,9 @@ export default function CreateStoreSetup({
       joinedDate: store.joinedDate || new Date().toISOString().split("T")[0],
     };
 
-    // Save to localStorage
     try {
-      localStorage.setItem("sellora_my_store", JSON.stringify(finalStore));
-
-      // Also add to favorites list so it appears in /account/favorites
-      const favStored = localStorage.getItem("sellora_favorite_stores");
-      let favList: string[] = [];
-      if (favStored) {
-        try {
-          favList = JSON.parse(favStored);
-        } catch {
-          favList = [];
-        }
-      }
-      if (!favList.includes(finalStore.id)) {
-        favList.unshift(finalStore.id);
-        localStorage.setItem("sellora_favorite_stores", JSON.stringify(favList));
-      }
-
-      window.dispatchEvent(new Event("sellora_favorites_updated"));
-      window.dispatchEvent(new Event("sellora_store_created"));
+      const response = await publishStore(finalStore);
+      alert(JSON.stringify(response))
     } catch {
       // ignore
     }
@@ -160,6 +140,22 @@ export default function CreateStoreSetup({
     onShowToast("Storefront successfully published!");
     setShowSuccessModal(true);
   };
+
+  async function publishStore(data?:any) {
+    const token = await user?.getIdToken();
+    if(token) {
+      const response = await fetch("/api/user/store", {
+        method: "POST",
+        headers: {
+          'authorization': 'Bearer '+token,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+      });
+      const result = await response.json();
+      return result;
+    }
+  }
 
   const stepTitles = [
     { num: 1, name: "Store Identity", sub: "Name, URL & Bio" },

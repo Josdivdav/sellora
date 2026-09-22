@@ -9,6 +9,7 @@ import EditStoreModal from "./EditStoreModal";
 import type { Store } from "@/types/store";
 import type { Product } from "@/types/product";
 import type { User } from "firebase/auth";
+import { useAuth } from "@/context/AuthContext";
 
 interface ManageStoreDashboardProps {
   user: User | null;
@@ -107,33 +108,28 @@ export default function ManageStoreDashboard({
   // Load store and products from localStorage
   useEffect(() => {
     try {
-      const storedStore = localStorage.getItem("sellora_my_store");
-      if (storedStore) {
-        const parsedStore: Store = JSON.parse(storedStore);
-        setStore(parsedStore);
-
-        // Load products for this store
-        const prodKey = `sellora_merchant_products_${parsedStore.id}`;
-        const storedProducts = localStorage.getItem(prodKey);
-        if (storedProducts) {
-          const parsedProducts: Product[] = JSON.parse(storedProducts);
-          setProducts(parsedProducts);
-        } else {
-          // Initialize with starter products tagged to this store
-          const initial = DEFAULT_STARTER_PRODUCTS.map((p) => ({
-            ...p,
-            author: parsedStore.name,
-          }));
-          setProducts(initial);
-          localStorage.setItem(prodKey, JSON.stringify(initial));
-        }
-      }
+      getStore();
     } catch {
       // ignore
     } finally {
       setIsLoaded(true);
     }
-  }, []);
+  }, [user]);
+
+  async function getStore() {
+    const token = await user?.getIdToken();
+    if(token) {
+      const response = await fetch("/api/user/store", {
+        method: "GET",
+        headers: {
+          'authorization': 'Bearer '+token,
+          'Content-Type': 'application/json',
+        },
+      });
+      const result = await response.json();
+      setStore(result);
+    }
+  }
 
   // Persist products to localStorage
   const persistProducts = (updated: Product[], targetStore: Store | null = store) => {
@@ -352,7 +348,7 @@ export default function ManageStoreDashboard({
                   />
                 ) : (
                   <span className={styles.storeLogoFallback}>
-                    {store.name.charAt(0)}
+                    {store.name}
                   </span>
                 )}
               </div>
@@ -451,7 +447,7 @@ export default function ManageStoreDashboard({
             <span className="material-icons-round">star</span>
           </div>
           <div className={styles.statInfo}>
-            <span className={styles.statValue}>{store.rating.toFixed(1)} ★</span>
+            <span className={styles.statValue}>{parseInt(store.rating).toFixed(1)} ★</span>
             <span className={styles.statTitle}>{store.reviewsCount} Customer Reviews</span>
           </div>
         </div>

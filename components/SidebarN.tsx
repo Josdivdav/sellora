@@ -85,20 +85,12 @@ export default function Sidebar({
 
   const handleManageStore = () => {
     onClose();
-    if (manageStore) {
-      manageStore();
-    } else {
-      router.push("/account/manage-store");
-    }
+    router.push("/account/manage-store");
   };
 
   const handleCreateStore = () => {
     onClose();
-    if (onCreateStore) {
-      onCreateStore();
-    } else {
-      router.push("/account/create-store");
-    }
+    router.push("/account/create-store");
   };
 
   return (

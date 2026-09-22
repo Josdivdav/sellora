@@ -19,5 +19,6 @@ const firebaseAdmin = initializeApp({
   }),
 });
 
+
 export const db = getFirestore(firebaseAdmin);
 export { firebaseAdmin as admin };

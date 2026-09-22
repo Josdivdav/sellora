@@ -18,4 +18,5 @@ export interface Store {
   responseRate: string;
   tags: string[];
   badge?: string;
+  topProducts: any;
 }

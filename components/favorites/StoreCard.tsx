@@ -137,7 +137,7 @@ export default function StoreCard({
           <div className={styles.productsPreviewSection}>
             <div className={styles.productsPreviewTitle}>Featured by Merchant</div>
             <div className={styles.productsPreviewGrid}>
-              {store.topProducts.slice(0, 3).map((p) => (
+              {store.topProducts.slice(0, 3).map((p : any) => (
                 <div
                   key={p.id}
                   className={styles.previewProductCard}

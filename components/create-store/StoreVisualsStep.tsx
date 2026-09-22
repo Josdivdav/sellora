@@ -17,7 +17,7 @@ const BANNER_PRESETS = [
   },
   {
     name: "Luxury Horology / Dark",
-    url: "/images/banners/banner_2.jpeg",
+    url: "https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=1200&q=80",
   },
   {
     name: "Urban Footwear & Streetwear",

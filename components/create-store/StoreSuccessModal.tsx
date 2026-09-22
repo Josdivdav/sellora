@@ -14,7 +14,7 @@ export default function StoreSuccessModal({ store, onClose }: StoreSuccessModalP
   const router = useRouter();
   const [copied, setCopied] = useState(false);
 
-  const fullUrl = `https://sellora.ng/@${store.slug}`;
+  const fullUrl = `https://${window.location.hostname}/@${store.slug}`;
 
   const handleCopy = () => {
     if (typeof navigator !== "undefined" && navigator.clipboard) {
@@ -52,7 +52,7 @@ export default function StoreSuccessModal({ store, onClose }: StoreSuccessModalP
             className={styles.viewStorefrontBtn}
             onClick={() => {
               onClose();
-              router.push("/manage-store");
+              router.push("/account/manage-store");
             }}
           >
             <span className="material-icons-round">inventory</span>
