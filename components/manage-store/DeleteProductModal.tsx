@@ -7,12 +7,14 @@ interface DeleteProductModalProps {
   product: Product;
   onClose: () => void;
   onConfirm: () => void;
+  isDeleting?: boolean;
 }
 
 export default function DeleteProductModal({
   product,
   onClose,
   onConfirm,
+  isDeleting = false,
 }: DeleteProductModalProps) {
   return (
     <div className={styles.modalOverlay} role="dialog" aria-modal="true">
@@ -29,11 +31,11 @@ export default function DeleteProductModal({
         </div>
 
         <div className={styles.modalFooter}>
-          <button type="button" className={styles.cancelModalBtn} onClick={onClose}>
+          <button type="button" className={styles.cancelModalBtn} onClick={onClose} disabled={isDeleting}>
             Cancel
           </button>
-          <button type="button" className={styles.confirmDeleteBtn} onClick={onConfirm}>
-            Yes, Delete Product
+          <button type="button" className={styles.confirmDeleteBtn} onClick={onConfirm} disabled={isDeleting}>
+            {isDeleting ? "Deleting..." : "Yes, Delete Product"}
           </button>
         </div>
       </div>

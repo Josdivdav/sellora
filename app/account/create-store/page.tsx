@@ -4,7 +4,8 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import styles from "@/components/create-store/create-store.module.css";
 import { useAuth } from "@/context/AuthContext";
-import { fetchUserData, SignOut } from "@/functions/home.func";
+import { SignOut } from "@/functions/home.func";
+import { useStoreStatus } from "@/hooks/useStoreStatus";
 import {
   CreateStoreSetup,
   HomeHeader,
@@ -15,11 +16,11 @@ import {
 export default function CreateStorePage() {
   const router = useRouter();
   const { user } = useAuth();
+  const hasStore = useStoreStatus();
 
   const [headerSearch, setHeaderSearch] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [toast, setToast] = useState("");
-  const [hasStore, setHasStore] = useState(false);
 
   // Cart count from localStorage
   const [cartCount, setCartCount] = useState<number>(() => {
@@ -51,34 +52,6 @@ export default function CreateStorePage() {
     window.addEventListener("storage", handleStorage);
     return () => window.removeEventListener("storage", handleStorage);
   }, []);
-
-  // Check store status
-  useEffect(() => {
-    const checkStore = async () => {
-      // First check local storage
-      try {
-        const local = localStorage.getItem("sellora_my_store");
-        if (local) {
-          setHasStore(true);
-          return;
-        }
-      } catch {
-        // ignore
-      }
-
-      if (user) {
-        try {
-          const res = await fetchUserData(user);
-          if (res?.has_store) {
-            setHasStore(true);
-          }
-        } catch {
-          // ignore
-        }
-      }
-    };
-    checkStore();
-  }, [user]);
 
   // Toast timer
   useEffect(() => {
@@ -116,21 +89,18 @@ export default function CreateStorePage() {
           isOpen={sidebarOpen}
           onClose={() => setSidebarOpen(false)}
           user={user}
-          onCreateStore={() => {
-            setSidebarOpen(false);
-          }}
           onSignOut={handleSignOut}
           onSignIn={handleSignIn}
           hasStore={hasStore}
-          manageStore={() => {
-            setSidebarOpen(false);
-          }}
         />
 
         <CreateStoreSetup
           user={user}
           onShowToast={(msg) => setToast(msg)}
-          onStoreCreated={() => setHasStore(true)}
+          onStoreCreated={() => {
+            // useStoreStatus will auto-update from localStorage after store is cached
+            router.push("/account/manage-store");
+          }}
         />
       </div>
 

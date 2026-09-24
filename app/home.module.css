@@ -512,3 +512,39 @@
         gap: 12px
     }
 }
+
+/* Skeleton Loading for Browse Page */
+.skeletonCard {
+    border-radius: 18px;
+    background: #fff;
+    overflow: hidden;
+    box-shadow: 0 0 4px #0002;
+    display: flex;
+    flex-direction: column;
+}
+
+.skeletonImage {
+    aspect-ratio: 1;
+    background: linear-gradient(90deg, #f0f3f8 25%, #e6ebf4 50%, #f0f3f8 75%);
+    background-size: 200% 100%;
+    animation: homeShimmer 1.5s infinite;
+}
+
+.skeletonInfo {
+    padding: 14px 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.skeletonLine {
+    border-radius: 6px;
+    background: linear-gradient(90deg, #f0f3f8 25%, #e6ebf4 50%, #f0f3f8 75%);
+    background-size: 200% 100%;
+    animation: homeShimmer 1.5s infinite;
+}
+
+@keyframes homeShimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}

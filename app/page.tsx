@@ -1,11 +1,10 @@
 "use client";
 
-import { useMemo, useState, useEffect, Suspense } from "react";
+import { useMemo, useState, useEffect, useCallback, Suspense } from "react";
 import styles from "./home.module.css";
 import { useAuth } from "@/context/AuthContext";
 import { fetchUserData, SignOut } from "@/functions/home.func";
 import { useRouter, useSearchParams } from "next/navigation";
-import productsData from "@/data/products.json";
 import type { Product } from "@/types/product";
 import {
   HomeHeader,
@@ -14,8 +13,6 @@ import {
   ProductGrid,
   Toast,
 } from "@/components/home";
-
-const products: Product[] = productsData as unknown as Product[];
 
 function readCartCount(): number {
   try {
@@ -42,8 +39,43 @@ function HomeContent() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [toast, setToast] = useState("");
   const [cartCount, setCartCount] = useState<number>(0);
-
   const [hasStore, setHasStore] = useState<boolean>(false);
+
+  // Live database products state
+  const [products, setProducts] = useState<Product[]>([]);
+  const [dbCategories, setDbCategories] = useState<string[]>(["All"]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
+
+  // Fetch products live directly from database API
+  const fetchProducts = useCallback(async () => {
+    setIsLoading(true);
+    setFetchError(null);
+    try {
+      const res = await fetch("/api/products", {
+        cache: "no-store",
+      });
+      if (!res.ok) {
+        throw new Error("Failed to load products from database");
+      }
+      const data = await res.json();
+      if (Array.isArray(data.products)) {
+        setProducts(data.products);
+      }
+      if (Array.isArray(data.categories) && data.categories.length > 0) {
+        setDbCategories(data.categories);
+      }
+    } catch (err: any) {
+      console.error("Error fetching live products from db:", err);
+      setFetchError(err?.message || "Failed to load products");
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void fetchProducts();
+  }, [fetchProducts]);
 
   useEffect(() => {
     const update = () => setCartCount(readCartCount());
@@ -52,13 +84,31 @@ function HomeContent() {
     return () => window.removeEventListener("storage", update);
   }, []);
 
-  const categories = useMemo(
-    () => ["All", ...Array.from(new Set(products.map((p) => p.category)))],
-    [],
-  );
+  // Compute dynamic categories based on database products
+  const categories = useMemo(() => {
+    if (dbCategories.length > 1) return dbCategories;
+    const cats = Array.from(new Set(products.map((p) => p.category).filter(Boolean)));
+    return ["All", ...cats];
+  }, [dbCategories, products]);
 
-  const visibleProducts = useMemo(() => products.filter((product) => (category === "All" || product.category === category) && (product.name.toLowerCase().includes(search.toLowerCase()) || (product.author && product.author.toLowerCase().includes(search.toLowerCase())))),
-    [category, search]);
+  // Compute visible products according to active category and search input
+  const visibleProducts = useMemo(() => {
+    return products.filter((product) => {
+      const matchesCategory =
+        category === "All" ||
+        product.category.toLowerCase() === category.toLowerCase();
+      const q = search.trim().toLowerCase();
+      const matchesSearch =
+        !q ||
+        product.name.toLowerCase().includes(q) ||
+        (product.author && product.author.toLowerCase().includes(q)) ||
+        (product.category && product.category.toLowerCase().includes(q)) ||
+        (product.description && product.description.toLowerCase().includes(q)) ||
+        (product.tags && product.tags.some((t) => t.toLowerCase().includes(q)));
+
+      return matchesCategory && matchesSearch;
+    });
+  }, [products, category, search]);
 
   useEffect(() => {
     if (!toast) return;
@@ -109,13 +159,14 @@ function HomeContent() {
       }
     }
   };
+
   useEffect(() => {
     checkStore();
   }, [user]);
 
   const manageStore = () => {
     setSidebarOpen(false);
-    router.push("/account/create-store");
+    router.push("/account/manage-store");
   };
 
   return (
@@ -146,11 +197,44 @@ function HomeContent() {
             onSelectCategory={setCategory}
           />
 
-          <ProductGrid
-            category={category}
-            products={visibleProducts}
-            onAddToCart={handleAddToCart}
-          />
+          {fetchError && products.length === 0 ? (
+            <div
+              style={{
+                background: "#fff1f2",
+                border: "1px solid #fecdd3",
+                borderRadius: "16px",
+                padding: "24px",
+                textAlign: "center",
+                margin: "20px 0",
+              }}
+            >
+              <p style={{ color: "#e11d48", fontWeight: 600, margin: "0 0 10px" }}>
+                {fetchError}
+              </p>
+              <button
+                type="button"
+                onClick={fetchProducts}
+                style={{
+                  background: "#e11d48",
+                  color: "#fff",
+                  border: 0,
+                  borderRadius: "8px",
+                  padding: "8px 16px",
+                  fontWeight: 700,
+                  cursor: "pointer",
+                }}
+              >
+                Retry
+              </button>
+            </div>
+          ) : (
+            <ProductGrid
+              category={category}
+              products={visibleProducts}
+              isLoading={isLoading}
+              onAddToCart={handleAddToCart}
+            />
+          )}
         </main>
       </div>
 

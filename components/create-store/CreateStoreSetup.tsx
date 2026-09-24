@@ -130,8 +130,7 @@ export default function CreateStoreSetup({
     };
 
     try {
-      const response = await publishStore(finalStore);
-      alert(JSON.stringify(response))
+      await publishStore(finalStore);
     } catch {
       // ignore
     }
@@ -210,7 +209,7 @@ export default function CreateStoreSetup({
               </div>
             </div>
           </div>
-          <Link href="/manage-store" className={styles.existingStoreBtn}>
+          <Link href="/account/manage-store" className={styles.existingStoreBtn}>
             Go to Manage Store
           </Link>
         </div>

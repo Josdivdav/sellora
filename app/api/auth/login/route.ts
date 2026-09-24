@@ -11,19 +11,38 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  let uid: string;
+  let decodedToken;
   try {
-    uid = (await getAuth().verifyIdToken(idToken)).uid;
+    decodedToken = await getAuth().verifyIdToken(idToken);
   } catch (error) {
     console.error('Invalid login token:', error);
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
+  const uid = decodedToken.uid;
+
   try {
-    const userSnapshot = await db.collection('users').doc(uid).get();
+    const userRef = db.collection('users').doc(uid);
+    let userSnapshot = await userRef.get();
 
     if (!userSnapshot.exists) {
-      return NextResponse.json({ error: 'Account profile not found' }, { status: 404 });
+      const email = decodedToken.email || '';
+      const displayName = decodedToken.name || email.split('@')[0] || 'User';
+      const photoURL = decodedToken.picture || null;
+
+      await userRef.set(
+        {
+          email,
+          displayName,
+          photoURL,
+          has_store: false,
+          role: 'buyer',
+          createdAt: new Date().toISOString(),
+        },
+        { merge: true }
+      );
+
+      userSnapshot = await userRef.get();
     }
 
     const user = userSnapshot.data();
@@ -31,9 +50,10 @@ export async function POST(request: Request) {
       message: 'Signed in successfully',
       user: {
         uid,
-        email: user?.email,
-        displayName: user?.displayName,
-        photoURL: user?.photoURL,
+        email: user?.email || decodedToken.email,
+        displayName: user?.displayName || decodedToken.name,
+        photoURL: user?.photoURL || decodedToken.picture,
+        has_store: user?.has_store ?? false,
       },
     });
   } catch (error) {

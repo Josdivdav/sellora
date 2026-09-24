@@ -1,0 +1,428 @@
+/* Shared CSS for all merchant hub tab pages */
+
+.tabPage {
+  padding: 0;
+}
+
+.tabHeader {
+  margin-bottom: 24px;
+}
+
+.tabTitle {
+  font-size: 20px;
+  font-weight: 800;
+  color: #0b1230;
+  margin: 0 0 4px;
+  letter-spacing: -0.3px;
+}
+
+.tabSubtitle {
+  font-size: 13px;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* Stat Pills Row */
+.statRow {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+
+.statPill {
+  background: #ffffff;
+  border: 1px solid #edf0f7;
+  border-radius: 18px;
+  padding: 16px 20px;
+  flex: 1;
+  min-width: 130px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  box-shadow: 0 2px 10px rgba(11, 18, 48, 0.04);
+}
+
+.statPillIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  font-size: 20px;
+}
+
+.statPillValue {
+  font-size: 22px;
+  font-weight: 800;
+  color: #0b1230;
+  line-height: 1.2;
+  letter-spacing: -0.4px;
+}
+
+.statPillLabel {
+  font-size: 11.5px;
+  color: #6b7280;
+  margin-top: 2px;
+}
+
+/* Filter row */
+.filterRow {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+  align-items: center;
+}
+
+.searchInput {
+  flex: 1;
+  min-width: 200px;
+  height: 38px;
+  border: 1px solid #e5e7eb;
+  border-radius: 50px;
+  padding: 0 16px;
+  font: inherit;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.searchInput:focus {
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.filterSelect {
+  height: 38px;
+  border: 1px solid #e5e7eb;
+  border-radius: 50px;
+  padding: 0 14px;
+  font: inherit;
+  font-size: 12.5px;
+  cursor: pointer;
+  outline: none;
+  background: #ffffff;
+}
+
+/* Empty State */
+.emptyState {
+  text-align: center;
+  padding: 64px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.emptyIcon {
+  width: 72px;
+  height: 72px;
+  border-radius: 22px;
+  background: linear-gradient(135deg, #eef2ff, #f5f3ff);
+  color: #a5b4fc;
+  display: grid;
+  place-items: center;
+  font-size: 36px;
+  border: 1px solid #e0e7ff;
+}
+
+.emptyTitle {
+  font-size: 18px;
+  font-weight: 800;
+  color: #1f2937;
+  margin: 0;
+}
+
+.emptyText {
+  font-size: 13.5px;
+  color: #6b7280;
+  max-width: 380px;
+  margin: 0;
+  line-height: 1.55;
+}
+
+/* Card */
+.card {
+  background: #ffffff;
+  border-radius: 20px;
+  border: 1px solid #edf0f7;
+  box-shadow: 0 4px 18px rgba(11, 18, 48, 0.05);
+  padding: 24px;
+  margin-bottom: 20px;
+}
+
+.cardTitle {
+  font-size: 16px;
+  font-weight: 800;
+  color: #0b1230;
+  margin: 0 0 18px;
+}
+
+/* Form */
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.formGroupFull {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  grid-column: 1 / -1;
+}
+
+.formLabel {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #374151;
+}
+
+.formHint {
+  font-size: 11px;
+  color: #9ca3af;
+  margin-top: 2px;
+}
+
+.formInput {
+  height: 40px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 0 12px;
+  font: inherit;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.15s;
+  background: #ffffff;
+}
+
+.formInput:focus {
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.formTextarea {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font: inherit;
+  font-size: 13px;
+  outline: none;
+  resize: vertical;
+  min-height: 90px;
+  transition: border-color 0.15s;
+}
+
+.formTextarea:focus {
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.selectInput {
+  height: 40px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 0 12px;
+  font: inherit;
+  font-size: 13px;
+  outline: none;
+  cursor: pointer;
+  background: #ffffff;
+}
+
+/* Image preview */
+.imgPreviewBox {
+  margin-top: 8px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.imgPreview {
+  border-radius: 10px;
+  object-fit: cover;
+  border: 1px solid #e5e7eb;
+}
+
+/* Buttons */
+.saveBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  padding: 11px 24px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(79, 70, 229, 0.3);
+  transition: all 0.18s;
+}
+
+.saveBtn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
+}
+
+.saveBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.createBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  padding: 9px 18px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 3px 12px rgba(79, 70, 229, 0.3);
+  transition: all 0.15s;
+}
+
+.createBtn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 5px 16px rgba(79, 70, 229, 0.4);
+}
+
+.cancelBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 9px 18px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.cancelBtn:hover {
+  background: #f3f4f6;
+}
+
+/* Coming soon card */
+.comingSoonCard {
+  background: linear-gradient(135deg, #f5f3ff, #eef2ff);
+  border: 1px solid #e0e7ff;
+  border-radius: 18px;
+  padding: 36px 24px;
+  text-align: center;
+  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.comingSoonCard h3 {
+  font-size: 17px;
+  font-weight: 800;
+  color: #1e1b4b;
+  margin: 0;
+}
+
+.comingSoonCard p {
+  font-size: 13px;
+  color: #6b7280;
+  max-width: 380px;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Top products list */
+.topProductRow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.topProductRow:last-child {
+  border-bottom: none;
+}
+
+.topProductThumb {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  object-fit: cover;
+  border: 1px solid #e5e7eb;
+  flex-shrink: 0;
+}
+
+.topProductName {
+  flex: 1;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #111827;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.topProductPrice {
+  font-size: 14px;
+  font-weight: 800;
+  color: #0b1230;
+  flex-shrink: 0;
+}
+
+/* Promo form card */
+.promoFormCard {
+  background: #fafbff;
+  border: 1px solid #e0e7ff;
+  border-radius: 16px;
+  padding: 20px 24px;
+  margin-bottom: 20px;
+}
+
+.promoFormTitle {
+  font-size: 15px;
+  font-weight: 800;
+  color: #0b1230;
+  margin: 0 0 18px;
+}
+
+.formRow {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+
+/* Card header with action button */
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  gap: 12px;
+  flex-wrap: wrap;
+}

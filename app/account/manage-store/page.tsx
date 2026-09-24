@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import styles from "@/components/manage-store/manage-store.module.css";
 import { useAuth } from "@/context/AuthContext";
 import { SignOut } from "@/functions/home.func";
+import { useStoreStatus } from "@/hooks/useStoreStatus";
 import {
   ManageStoreDashboard,
   HomeHeader,
@@ -12,9 +13,15 @@ import {
   Toast,
 } from "@/components/manage-store";
 
-export default function ManageStorePage() {
+export type MerchantTab = "dashboard" | "orders" | "analytics" | "products" | "promotions" | "settings";
+
+function ManageStoreInner() {
   const router = useRouter();
-  const { user } = useAuth();
+  const searchParams = useSearchParams();
+  const { user, loading: isAuthLoading } = useAuth();
+  const hasStore = useStoreStatus();
+
+  const activeTab = (searchParams.get("tab") as MerchantTab) || "dashboard";
 
   const [headerSearch, setHeaderSearch] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -51,22 +58,15 @@ export default function ManageStorePage() {
     return () => window.removeEventListener("storage", handleStorage);
   }, []);
 
-  // Toast timer
   useEffect(() => {
     if (!toast) return;
-    const timer = setTimeout(() => setToast(""), 3000);
+    const timer = setTimeout(() => setToast(""), 3500);
     return () => clearTimeout(timer);
   }, [toast]);
 
   const handleSignOut = async () => {
     const success = await SignOut();
-    if (success) {
-      router.refresh();
-    }
-  };
-
-  const handleSignIn = () => {
-    router.push("/login");
+    if (success) router.refresh();
   };
 
   return (
@@ -76,10 +76,7 @@ export default function ManageStorePage() {
         onSearchChange={setHeaderSearch}
         cartCount={cartCount}
         onOpenSidebar={() => setSidebarOpen(true)}
-        onCartClick={() => {
-          setToast("Opening cart");
-          router.push("/");
-        }}
+        onCartClick={() => { setToast("Opening cart"); router.push("/"); }}
       />
 
       <div className={styles.contentArea}>
@@ -87,25 +84,28 @@ export default function ManageStorePage() {
           isOpen={sidebarOpen}
           onClose={() => setSidebarOpen(false)}
           user={user}
-          onCreateStore={() => {
-            setSidebarOpen(false);
-            router.push("/create-store");
-          }}
           onSignOut={handleSignOut}
-          onSignIn={handleSignIn}
-          hasStore={true}
-          manageStore={() => {
-            setSidebarOpen(false);
-          }}
+          onSignIn={() => router.push("/login")}
+          hasStore={hasStore}
         />
 
         <ManageStoreDashboard
           user={user}
+          isAuthLoading={isAuthLoading}
+          activeTab={activeTab}
           onShowToast={(msg) => setToast(msg)}
         />
       </div>
 
       <Toast message={toast} />
     </div>
+  );
+}
+
+export default function ManageStorePage() {
+  return (
+    <Suspense>
+      <ManageStoreInner />
+    </Suspense>
   );
 }

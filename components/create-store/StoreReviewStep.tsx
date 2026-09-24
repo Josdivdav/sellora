@@ -23,7 +23,7 @@ export default function StoreReviewStep({
           <div>
             <h4 className={styles.checkTitle}>Store Identity & Handle Configured</h4>
             <p className={styles.checkDesc}>
-              <strong>{store.name}</strong> • sellora.ng/@{store.slug} ({store.category})
+              <strong>{store.name}</strong> • {typeof window !== "undefined" ? window.location.host : (process.env.NEXT_PUBLIC_SITE_URL ? new URL(process.env.NEXT_PUBLIC_SITE_URL).host : "sellora")}/@{store.slug} ({store.category})
             </p>
           </div>
         </div>

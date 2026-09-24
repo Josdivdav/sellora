@@ -1,21 +1,16 @@
-import type { Metadata, Viewport } from "next";
-
-export const viewport: Viewport = {
-  themeColor: "#2563EB",
-};
+import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Sign Up",
   description:
     "Create your free Sellora account. Start your online store, upload products, accept payments, and grow your business.",
   alternates: {
-    canonical: "/signup",
+    canonical: "/register",
   },
   openGraph: {
     type: "website",
     title: "Sign Up | Sellora",
-    description:
-      "Create your free Sellora account and start selling online in minutes.",
+    description: "Create your free Sellora account and start selling online in minutes.",
     images: [{ url: "/logo.png", alt: "Sellora" }],
   },
   twitter: {
@@ -26,10 +21,6 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RegisterLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function SignupLayout({ children }: { children: React.ReactNode }) {
   return children;
 }

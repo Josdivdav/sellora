@@ -7,6 +7,7 @@ import { SignOut } from "@/functions/home.func";
 import { useRouter } from "next/navigation";
 import initialOrdersData from "@/data/orders.json";
 import type { Order } from "@/types/order";
+import { useStoreStatus } from "@/hooks/useStoreStatus";
 import {
   HomeHeader,
   Sidebar,
@@ -25,6 +26,7 @@ const STORAGE_ORDERS_KEY = "sellora_mock_orders";
 export default function OrdersPage() {
   const router = useRouter();
   const { user } = useAuth();
+  const hasStore = useStoreStatus();
 
   const [orders, setOrders] = useState<Order[]>(() => {
     if (typeof window === "undefined") return initialOrdersData as Order[];
@@ -208,7 +210,7 @@ export default function OrdersPage() {
 
   const handleOrderHelp = (order: Order) => {
     setToast(
-      `Support for ${order.orderNumber}: Call +234 1 800 735 567 or email support@sellora.ng`,
+      `Support for ${order.orderNumber}: Call +234 1 800 735 567 or email support@${typeof window !== "undefined" ? window.location.hostname : "sellora.ng"}`,
     );
   };
 
@@ -229,6 +231,7 @@ export default function OrdersPage() {
           user={user}
           onSignOut={handleSignOut}
           onSignIn={handleSignIn}
+          hasStore={hasStore}
         />
 
         <main className={styles.main}>

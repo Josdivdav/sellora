@@ -6,7 +6,6 @@ import { useParams, useRouter } from "next/navigation";
 import styles from "@/components/product/product.module.css";
 import { useAuth } from "@/context/AuthContext";
 import { SignOut } from "@/functions/home.func";
-import productsData from "@/data/products.json";
 import type { Product } from "@/types/product";
 import {
   HomeHeader,
@@ -19,8 +18,6 @@ import {
   Toast,
 } from "@/components/product";
 
-const allProducts = productsData as unknown as Product[];
-
 export default function ProductDetailPage() {
   const router = useRouter();
   const params = useParams();
@@ -28,12 +25,66 @@ export default function ProductDetailPage() {
 
   const id = typeof params?.id === "string" ? params.id : Array.isArray(params?.id) ? params.id[0] : "";
 
-  // Locate product by id or slug
-  const product = useMemo(() => {
-    return allProducts.find(
-      (p) => p.id === id || (p.slug && p.slug.toLowerCase() === id.toLowerCase()),
-    );
+  // Locate product by id or slug directly from database API
+  const [dbProduct, setDbProduct] = useState<Product | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    if (!id) return;
+    let isMounted = true;
+    setIsLoading(true);
+
+    async function loadProductFromDb() {
+      try {
+        const res = await fetch(`/api/products/${id}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.product && isMounted) {
+            setDbProduct(data.product);
+            if (isMounted) setIsLoading(false);
+            return;
+          }
+        }
+      } catch (err) {
+        console.warn("Could not fetch product from /api/products/[id]:", err);
+      }
+
+      // Fallback: check localStorage merchant products
+      if (typeof window !== "undefined") {
+        try {
+          for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key && (key.startsWith("sellora_merchant_products") || key === "sellora_my_store_products")) {
+              const list = JSON.parse(localStorage.getItem(key) || "[]");
+              const found = list.find(
+                (item: any) =>
+                  item.id === id ||
+                  (item.slug && item.slug.toLowerCase() === id.toLowerCase()),
+              );
+              if (found && isMounted) {
+                setDbProduct(found);
+                if (isMounted) setIsLoading(false);
+                return;
+              }
+            }
+          }
+        } catch {
+          // ignore
+        }
+      }
+
+      // Nothing found anywhere — stop loading
+      if (isMounted) setIsLoading(false);
+    }
+
+    void loadProductFromDb();
+
+    return () => {
+      isMounted = false;
+    };
   }, [id]);
+
+  const product = useMemo(() => dbProduct, [dbProduct]);
 
   const [headerSearch, setHeaderSearch] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -109,15 +160,10 @@ export default function ProductDetailPage() {
     return () => window.removeEventListener("storage", handleStorage);
   }, [product]);
 
-  // Related products from the same category or author
+  // Related products: currently returns [] until a dedicated API is added
   const relatedProducts = useMemo(() => {
-    if (!product) return [];
-    return allProducts.filter(
-      (p) =>
-        p.id !== product.id &&
-        (p.category === product.category || p.author === product.author),
-    );
-  }, [product]);
+    return [] as Product[];
+  }, []);
 
   const handleAddToCart = (item: Product, qty = 1) => {
     try {
@@ -207,7 +253,7 @@ export default function ProductDetailPage() {
 
   const handleCreateStore = () => {
     setSidebarOpen(false);
-    router.push("/create-store");
+    router.push("/account/create-store");
   };
 
   const handleHeaderSearch = (val: string) => {
@@ -217,7 +263,7 @@ export default function ProductDetailPage() {
     }
   };
 
-  if (!product) {
+  if (isLoading || !product) {
     return (
       <div className={styles.page}>
         <HomeHeader
@@ -239,55 +285,98 @@ export default function ProductDetailPage() {
           />
 
           <main className={styles.main}>
-            <div
-              style={{
-                background: "#ffffff",
-                borderRadius: "20px",
-                padding: "60px 24px",
-                textAlign: "center",
-                boxShadow: "0 2px 8px rgba(11, 18, 48, 0.04)",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: "14px",
-              }}
-            >
-              <span
-                className="material-icons-round"
-                style={{ fontSize: "54px", color: "#9ca3af" }}
-              >
-                search_off
-              </span>
-              <h2 style={{ margin: 0, fontSize: "20px", fontWeight: 800 }}>
-                Product Not Found
-              </h2>
-              <p style={{ margin: 0, color: "#6b7280", fontSize: "14px", maxWidth: "380px" }}>
-                The product you are looking for may have been removed or the link is expired.
-              </p>
-              <Link
-                href="/"
+            {isLoading ? (
+              /* ── Skeleton loader ── */
+              <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+                {/* Hero skeleton */}
+                <div style={{
+                  background: "#ffffff",
+                  borderRadius: "20px",
+                  padding: "32px",
+                  boxShadow: "0 2px 8px rgba(11,18,48,0.04)",
+                  display: "grid",
+                  gridTemplateColumns: "1fr 1fr",
+                  gap: "32px",
+                }}>
+                  <div style={{ borderRadius: "16px", background: "#f3f4f6", aspectRatio: "1", animation: "productPageShimmer 1.4s ease infinite" }} />
+                  <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+                    {[80, 55, 40, 30, 30].map((w, i) => (
+                      <div key={i} style={{ height: i === 0 ? "28px" : "16px", width: `${w}%`, borderRadius: "8px", background: "#f3f4f6", animation: "productPageShimmer 1.4s ease infinite" }} />
+                    ))}
+                    <div style={{ height: "48px", borderRadius: "12px", background: "#f3f4f6", marginTop: "8px", animation: "productPageShimmer 1.4s ease infinite" }} />
+                  </div>
+                </div>
+                {/* Details row skeleton */}
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 320px", gap: "20px" }}>
+                  {[1, 2].map((n) => (
+                    <div key={n} style={{ background: "#ffffff", borderRadius: "20px", padding: "28px", boxShadow: "0 2px 8px rgba(11,18,48,0.04)", display: "flex", flexDirection: "column", gap: "12px" }}>
+                      {[60, 90, 70, 50].map((w, i) => (
+                        <div key={i} style={{ height: "14px", width: `${w}%`, borderRadius: "6px", background: "#f3f4f6", animation: "productPageShimmer 1.4s ease infinite" }} />
+                      ))}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              /* ── Product not found ── */
+              <div
                 style={{
-                  marginTop: "8px",
-                  display: "inline-flex",
+                  background: "#ffffff",
+                  borderRadius: "20px",
+                  padding: "60px 24px",
+                  textAlign: "center",
+                  boxShadow: "0 2px 8px rgba(11, 18, 48, 0.04)",
+                  display: "flex",
+                  flexDirection: "column",
                   alignItems: "center",
-                  gap: "6px",
-                  padding: "10px 22px",
-                  borderRadius: "10px",
-                  background: "linear-gradient(135deg, #2b6dff, #7b2ff7)",
-                  color: "#ffffff",
-                  fontWeight: 700,
-                  fontSize: "13.5px",
-                  textDecoration: "none",
+                  gap: "14px",
                 }}
               >
-                <span className="material-icons-round" style={{ fontSize: "18px" }}>
-                  arrow_back
+                <span
+                  className="material-icons-round"
+                  style={{ fontSize: "54px", color: "#9ca3af" }}
+                >
+                  search_off
                 </span>
-                Back to Browse
-              </Link>
-            </div>
+                <h2 style={{ margin: 0, fontSize: "20px", fontWeight: 800 }}>
+                  Product Not Found
+                </h2>
+                <p style={{ margin: 0, color: "#6b7280", fontSize: "14px", maxWidth: "380px" }}>
+                  The product you are looking for may have been removed or the link is expired.
+                </p>
+                <Link
+                  href="/"
+                  style={{
+                    marginTop: "8px",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "6px",
+                    padding: "10px 22px",
+                    borderRadius: "10px",
+                    background: "linear-gradient(135deg, #2b6dff, #7b2ff7)",
+                    color: "#ffffff",
+                    fontWeight: 700,
+                    fontSize: "13.5px",
+                    textDecoration: "none",
+                  }}
+                >
+                  <span className="material-icons-round" style={{ fontSize: "18px" }}>
+                    arrow_back
+                  </span>
+                  Back to Browse
+                </Link>
+              </div>
+            )}
           </main>
         </div>
+
+        <style>{`
+          @keyframes productPageShimmer {
+            0%   { opacity: 1; }
+            50%  { opacity: 0.4; }
+            100% { opacity: 1; }
+          }
+        `}</style>
       </div>
     );
   }

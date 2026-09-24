@@ -1,9 +1,8 @@
-import { initializeApp, cert } from 'firebase-admin/app';
+import { initializeApp, getApps, getApp, cert } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import dotenv from 'dotenv';
 
 dotenv.config();
-
 
 const requiredEnv = (name: string): string => {
   const value = process.env[name];
@@ -11,13 +10,15 @@ const requiredEnv = (name: string): string => {
   return value;
 };
 
-const firebaseAdmin = initializeApp({
-  credential: cert({
-    projectId: requiredEnv('PROJECT_ID'),
-    clientEmail: requiredEnv('CLIENT_EMAIL'),
-    privateKey: requiredEnv('PRIVATE_KEY').replace(/\\n/g, '\n'),
-  }),
-});
+const firebaseAdmin = getApps().length > 0
+  ? getApp()
+  : initializeApp({
+      credential: cert({
+        projectId: requiredEnv('PROJECT_ID'),
+        clientEmail: requiredEnv('CLIENT_EMAIL'),
+        privateKey: requiredEnv('PRIVATE_KEY').replace(/\\n/g, '\n'),
+      }),
+    });
 
 
 export const db = getFirestore(firebaseAdmin);

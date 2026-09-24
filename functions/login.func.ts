@@ -33,10 +33,11 @@ export async function continueWithGoogle(remember: boolean) {
 }
 
 async function completeLogin(user: User) {
+  const token = await user.getIdToken(true).catch(() => user.getIdToken());
   const response = await fetch("/api/auth/login", {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${await user.getIdToken()}`,
+      Authorization: `Bearer ${token}`,
     },
   });
 
@@ -45,7 +46,7 @@ async function completeLogin(user: User) {
     throw new Error(
       body?.error === "Account profile not found"
         ? "login/profile-not-found"
-        : "login/server-failed",
+        : body?.error || "login/server-failed",
     );
   }
 

@@ -7,6 +7,7 @@ import { SignOut } from "@/functions/home.func";
 import { useRouter } from "next/navigation";
 import initialStoresData from "@/data/stores.json";
 import type { Store } from "@/types/store";
+import { useStoreStatus } from "@/hooks/useStoreStatus";
 import {
   HomeHeader,
   Sidebar,
@@ -21,6 +22,7 @@ const STORAGE_FAVORITES_KEY = "sellora_favorite_stores";
 export default function FavoritesPage() {
   const router = useRouter();
   const { user } = useAuth();
+  const hasStore = useStoreStatus();
 
   const allStores = initialStoresData as Store[];
 
@@ -199,6 +201,7 @@ export default function FavoritesPage() {
           user={user}
           onSignOut={handleSignOut}
           onSignIn={handleSignIn}
+          hasStore={hasStore}
         />
 
         <main className={styles.main}>
