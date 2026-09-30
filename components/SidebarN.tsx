@@ -18,6 +18,15 @@ interface SidebarProps {
   onSignIn: () => void;
   hasStore?: boolean;
   manageStore?: () => void;
+  isAuthor?: boolean;
+  product?: {
+    id: string;
+    name: string;
+    author?: string;
+    category?: string;
+    price?: number;
+    image?: string;
+  } | null;
 }
 
 const MERCHANT_PATHS = [
@@ -41,6 +50,10 @@ export default function Sidebar({
   onSignOut,
   onSignIn,
   hasStore,
+  onCreateStore,
+  manageStore,
+  isAuthor = false,
+  product = null,
 }: SidebarProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -54,7 +67,6 @@ export default function Sidebar({
 
   // Merchant mode: true when on a merchant page
   const isMerchantMode = MERCHANT_PATHS.some((p) => pathname.startsWith(p));
-
 
   const [favCount, setFavCount] = useState(0);
 
@@ -85,7 +97,40 @@ export default function Sidebar({
     return undefined;
   };
 
-  const navigate = (href: string) => { onClose(); router.push(href); };
+  const navigate = (href: string) => {
+    onClose();
+    router.push(href);
+  };
+
+  const handleManageStore = () => {
+    onClose();
+    if (manageStore) {
+      manageStore();
+    } else {
+      router.push("/account/manage-store");
+    }
+  };
+
+  const handleCreateStore = () => {
+    onClose();
+    if (onCreateStore) {
+      onCreateStore();
+    } else {
+      router.push("/account/create-store");
+    }
+  };
+
+  const scrollToSection = (id: string) => {
+    onClose();
+    if (typeof document !== "undefined") {
+      const el = document.getElementById(id);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
+  };
+
+  const isProductPage = pathname.startsWith("/products/");
 
   return (
     <>
@@ -163,7 +208,7 @@ export default function Sidebar({
             </div>
           </>
         ) : (
-          /* ── BUYER SIDEBAR ── */
+          /* ── BUYER & PRODUCT DETAIL SIDEBAR ── */
           <>
             <div className={styles.sidebarTitle}>
               <span>{user ? user.displayName || "My account" : "Navigation"}</span>
@@ -172,27 +217,158 @@ export default function Sidebar({
               </button>
             </div>
 
-            {user && (
-              hasStore ? (
-                <button className={styles.createStore} onClick={() => navigate("/account/manage-store")}>
-                  Manage store
-                  <span className="material-icons-round">chevron_right</span>
-                </button>
-              ) : (
-                <button className={styles.createStore} onClick={() => navigate("/account/create-store")}>
-                  <span className="material-icons-round">add</span>
-                  Create store
-                </button>
+            {/* ── AUTHOR / SELLER HUB IN SIDEBAR ── */}
+            {isAuthor && product ? (
+              <div className={sideStyles.authorHubCard}>
+                <div className={sideStyles.authorHubBadge}>
+                  <span className="material-icons-round" style={{ fontSize: "15px", color: "#b45309" }}>
+                    workspace_premium
+                  </span>
+                  Your Product Listing
+                </div>
+                <div className={sideStyles.authorHubTitle}>Owner Controls</div>
+                <div className={sideStyles.authorHubDesc}>
+                  You are viewing this listing as customers see it.
+                </div>
+                <div className={sideStyles.authorActionsList}>
+                  <button
+                    className={sideStyles.authorActionBtn}
+                    onClick={() => navigate("/account/manage-store?tab=products")}
+                  >
+                    <span className="material-icons-round">edit_note</span>
+                    Manage in Merchant Hub
+                  </button>
+                  <button
+                    className={sideStyles.authorActionBtn}
+                    onClick={() => navigate("/account/manage-store?tab=orders")}
+                  >
+                    <span className="material-icons-round">receipt_long</span>
+                    Customer Orders
+                  </button>
+                  <button
+                    className={sideStyles.authorActionBtn}
+                    onClick={handleManageStore}
+                  >
+                    <span className="material-icons-round">dashboard</span>
+                    Store Dashboard
+                  </button>
+                </div>
+              </div>
+            ) : (
+              /* Create Store or Manage Store for general users */
+              user && (
+                hasStore ? (
+                  <button className={styles.createStore} onClick={handleManageStore}>
+                    Manage store
+                    <span className="material-icons-round">chevron_right</span>
+                  </button>
+                ) : (
+                  <button className={styles.createStore} onClick={handleCreateStore}>
+                    <span className="material-icons-round">add</span>
+                    Create store
+                  </button>
+                )
               )
             )}
 
+            {/* ── PRODUCT STORE CONTEXT (for buyers viewing a product) ── */}
+            {product && !isAuthor && (
+              <div className={sideStyles.productContextCard}>
+                <div className={sideStyles.productContextTitle}>
+                  <span className="material-icons-round" style={{ fontSize: "14px", color: "#2b6dff" }}>
+                    storefront
+                  </span>
+                  Sold by Store
+                </div>
+                <div className={sideStyles.productStoreHeader}>
+                  <div className={sideStyles.productStoreAvatar}>
+                    {(product.author || "S")[0].toUpperCase()}
+                  </div>
+                  <div>
+                    <div className={sideStyles.productStoreName}>
+                      {product.author || "Sellora Merchant"}
+                    </div>
+                    {product.category && (
+                      <div className={sideStyles.productStoreCat}>
+                        {product.category}
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <div className={sideStyles.productContextActions}>
+                  {product.author && (
+                    <button
+                      type="button"
+                      className={sideStyles.productContextBtn}
+                      onClick={() => navigate(`/?search=${encodeURIComponent(product.author || "")}`)}
+                    >
+                      <span className="material-icons-round">store</span>
+                      Browse Store Items
+                    </button>
+                  )}
+                  {product.category && (
+                    <button
+                      type="button"
+                      className={sideStyles.productContextBtn}
+                      onClick={() => navigate(`/?category=${encodeURIComponent(product.category || "")}`)}
+                    >
+                      <span className="material-icons-round">category</span>
+                      More in {product.category}
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* ── ON-PAGE JUMP SECTIONS (When viewing a product) ── */}
+            {isProductPage && (
+              <div className={sideStyles.pageJumpList}>
+                <div className={sideStyles.pageJumpTitle}>On This Page</div>
+                <button
+                  type="button"
+                  className={sideStyles.pageJumpBtn}
+                  onClick={() => scrollToSection("product-overview")}
+                >
+                  <span className="material-icons-round">info</span>
+                  Overview
+                </button>
+                <button
+                  type="button"
+                  className={sideStyles.pageJumpBtn}
+                  onClick={() => scrollToSection("product-specs")}
+                >
+                  <span className="material-icons-round">tune</span>
+                  Specifications
+                </button>
+                <button
+                  type="button"
+                  className={sideStyles.pageJumpBtn}
+                  onClick={() => scrollToSection("product-seller")}
+                >
+                  <span className="material-icons-round">storefront</span>
+                  About Seller
+                </button>
+                <button
+                  type="button"
+                  className={sideStyles.pageJumpBtn}
+                  onClick={() => scrollToSection("product-related")}
+                >
+                  <span className="material-icons-round">auto_awesome_motion</span>
+                  Related Items
+                </button>
+              </div>
+            )}
+
+            {/* Main Buyer Navigation */}
             <nav className={styles.sideNav}>
               {visibleBuyerNav.map((item) => {
-                const isActive = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
+                const isActive = item.href === "/"
+                  ? pathname === "/" || isProductPage
+                  : pathname.startsWith(item.href);
                 return (
                   <SideButton
                     key={item.href}
-                    label={item.label}
+                    label={item.href === "/" && isProductPage ? "Browse catalog" : item.label}
                     icon={item.icon}
                     n={getBadge(item.badgeKey)}
                     onClick={() => navigate(item.href)}
@@ -207,14 +383,33 @@ export default function Sidebar({
               )}
             </nav>
 
-            <div className={styles.upgradeCard}>
-              <span className="material-icons-round">auto_awesome</span>
-              <strong>Sell on Sellora</strong>
-              <p>Reach millions of shoppers and open your own verified storefront.</p>
-              <button onClick={() => navigate(hasStore ? "/account/manage-store" : "/account/create-store")}>
-                {hasStore ? "Manage store" : "Start selling"}
-              </button>
-            </div>
+            {/* Bottom Card */}
+            {isAuthor || hasStore ? (
+              <div className={sideStyles.merchantCard} style={{ marginTop: "14px" }}>
+                <span className="material-icons-round" style={{ color: "#7c3aed", fontSize: "20px" }}>
+                  auto_awesome
+                </span>
+                <strong>Your Store is Active</strong>
+                <p>Manage your inventory, track customer orders, and grow your sales.</p>
+                <button
+                  className={sideStyles.switchModeBtn}
+                  style={{ marginTop: "10px", marginBottom: 0, justifyContent: "center" }}
+                  onClick={handleManageStore}
+                >
+                  <span className="material-icons-round" style={{ fontSize: "16px" }}>storefront</span>
+                  Merchant Hub
+                </button>
+              </div>
+            ) : (
+              <div className={styles.upgradeCard}>
+                <span className="material-icons-round">auto_awesome</span>
+                <strong>Sell on Sellora</strong>
+                <p>Reach millions of shoppers and open your own verified storefront.</p>
+                <button onClick={handleCreateStore}>
+                  Start selling
+                </button>
+              </div>
+            )}
           </>
         )}
       </aside>

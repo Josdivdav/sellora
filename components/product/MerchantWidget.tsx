@@ -10,6 +10,7 @@ interface MerchantWidgetProps {
   onFollowToggle?: () => void;
   isFollowing?: boolean;
   isAuthor?: boolean;
+  id?: string;
 }
 
 export default function MerchantWidget({
@@ -17,6 +18,7 @@ export default function MerchantWidget({
   onFollowToggle,
   isFollowing,
   isAuthor = false,
+  id,
 }: MerchantWidgetProps) {
   const store = (storesData as Store[]).find(
     (s) => s.name.toLowerCase() === (authorName || "").toLowerCase(),
@@ -28,7 +30,7 @@ export default function MerchantWidget({
   };
 
   return (
-    <div className={styles.sectionCard}>
+    <div id={id} className={styles.sectionCard}>
       <h3 className={styles.sectionTitle}>
         <span className="material-icons-round">verified</span>
         Merchant Profile

@@ -3,6 +3,7 @@ import { NextResponse, NextRequest } from 'next/server';
 import { db } from '@/lib/firebaseAdmin';
 import { FieldValue } from 'firebase-admin/firestore';
 import type { Product } from '@/types/product';
+import { invalidateProductsCache } from '@/lib/getProduct';
 
 interface RouteContext {
   params: Promise<{ id: string }>;
@@ -70,6 +71,7 @@ export async function PUT(request: NextRequest, context: RouteContext) {
       rootRef.set({ ...updatedProduct, storeId: uid }, { merge: true }),
     ]);
 
+    invalidateProductsCache();
     return NextResponse.json({ success: true, product: updatedProduct }, { status: 200 });
   } catch (error) {
     console.error('Error in PUT /api/user/store/products/[id]:', error);
@@ -126,6 +128,7 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
       });
     }
 
+    invalidateProductsCache();
     return NextResponse.json({ success: true, message: 'Product deleted successfully' }, { status: 200 });
   } catch (error) {
     console.error('Error in DELETE /api/user/store/products/[id]:', error);

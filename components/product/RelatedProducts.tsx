@@ -14,12 +14,14 @@ interface RelatedProductsProps {
   products: Product[];
   currentProductId: string;
   onAddToCart: (product: Product) => void;
+  id?: string;
 }
 
 export default function RelatedProducts({
   products,
   currentProductId,
   onAddToCart,
+  id,
 }: RelatedProductsProps) {
   const related = products
     .filter((p) => p.id !== currentProductId)
@@ -28,7 +30,7 @@ export default function RelatedProducts({
   if (related.length === 0) return null;
 
   return (
-    <section className={styles.relatedSection}>
+    <section id={id} className={styles.relatedSection}>
       <div className={styles.relatedHeading}>
         <h2>
           <span className="material-icons-round" style={{ verticalAlign: "middle", marginRight: "8px", color: "#2b6dff" }}>

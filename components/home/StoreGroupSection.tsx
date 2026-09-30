@@ -10,12 +10,14 @@ interface StoreGroupSectionProps {
   productsByStore: Record<string, Product[]>;
   onSelectStore: (storeName: string) => void;
   onAddToCart: (product: Pick<Product, "id" | "name">) => void;
+  stores?: Store[];
 }
 
 export default function StoreGroupSection({
   productsByStore,
   onSelectStore,
   onAddToCart,
+  stores = [],
 }: StoreGroupSectionProps) {
   const storeNames = Object.keys(productsByStore);
 
@@ -27,9 +29,13 @@ export default function StoreGroupSection({
     <div className={styles.storeGroupSection}>
       {storeNames.map((storeName) => {
         const storeProducts = productsByStore[storeName];
-        const store = (storesData as Store[]).find(
-          (s) => s.name.toLowerCase() === storeName.toLowerCase()
-        );
+        const store =
+          stores.find(
+            (s) => s.name.toLowerCase() === storeName.toLowerCase()
+          ) ||
+          (storesData as Store[]).find(
+            (s) => s.name.toLowerCase() === storeName.toLowerCase()
+          );
 
         return (
           <section key={storeName} className={styles.storeGroupBlock}>

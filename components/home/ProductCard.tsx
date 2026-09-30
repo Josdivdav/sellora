@@ -27,7 +27,12 @@ export default function ProductCard({
         title={`View details for ${product.name}`}
       >
         <div className={styles.image}>
-          <img src={product.image} alt={product.name} />
+          <img
+            src={product.image}
+            alt={product.name}
+            loading="lazy"
+            decoding="async"
+          />
           {product.oldPrice && <b>Sale</b>}
         </div>
       </Link>

@@ -5,14 +5,15 @@ import type { Product } from "@/types/product";
 
 interface ProductSpecsProps {
   product: Product;
+  id?: string;
 }
 
-export default function ProductSpecs({ product }: ProductSpecsProps) {
+export default function ProductSpecs({ product, id }: ProductSpecsProps) {
   const specs = product.specifications || {};
   const specEntries = Object.entries(specs);
 
   return (
-    <div className={styles.sectionCard}>
+    <div id={id} className={styles.sectionCard}>
       <h3 className={styles.sectionTitle}>
         <span className="material-icons-round">tune</span>
         Technical Specifications

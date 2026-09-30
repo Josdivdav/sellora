@@ -3,6 +3,7 @@ import { NextResponse, NextRequest } from 'next/server';
 import { db } from '@/lib/firebaseAdmin';
 import { FieldValue } from 'firebase-admin/firestore';
 import type { Product } from '@/types/product';
+import { invalidateProductsCache } from '@/lib/getProduct';
 
 export async function GET(request: NextRequest) {
   const authorization = request.headers.get('authorization');
@@ -159,6 +160,7 @@ export async function POST(request: NextRequest) {
         })),
       });
 
+      invalidateProductsCache();
       return NextResponse.json({ success: true, count: createdProducts.length, products: createdProducts }, { status: 201 });
     }
 
@@ -221,6 +223,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
+    invalidateProductsCache();
     return NextResponse.json({ success: true, product: newProduct }, { status: 201 });
   } catch (error) {
     console.error('Error in POST /api/user/store/products:', error);

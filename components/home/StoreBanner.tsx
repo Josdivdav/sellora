@@ -8,16 +8,20 @@ interface StoreBannerProps {
   storeName: string;
   productCount: number;
   onClear: () => void;
+  store?: Store | null;
 }
 
 export default function StoreBanner({
   storeName,
   productCount,
   onClear,
+  store: propStore,
 }: StoreBannerProps) {
-  const store = (storesData as Store[]).find(
-    (s) => s.name.toLowerCase() === storeName.toLowerCase()
-  );
+  const store =
+    propStore ||
+    (storesData as Store[]).find(
+      (s) => s.name.toLowerCase() === storeName.toLowerCase()
+    );
 
   return (
     <div className={styles.storeSpotlightBanner}>

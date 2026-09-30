@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import styles from "./product.module.css";
 import { useAuth } from "@/context/AuthContext";
 import { SignOut } from "@/functions/home.func";
+import { useStoreStatus } from "@/hooks/useStoreStatus";
 import type { Product } from "@/types/product";
 import {
   HomeHeader,
@@ -29,6 +30,7 @@ export default function ProductDetailClient({
 }: ProductDetailClientProps) {
   const router = useRouter();
   const { user } = useAuth();
+  const hasStore = useStoreStatus();
 
   // Instant state initialization from server pre-rendered product
   const [dbProduct, setDbProduct] = useState<Product | null>(initialProduct);
@@ -393,6 +395,11 @@ export default function ProductDetailClient({
     router.push("/account/create-store");
   };
 
+  const handleManageStore = () => {
+    setSidebarOpen(false);
+    router.push("/account/manage-store");
+  };
+
   const handleHeaderSearch = (val: string) => {
     setHeaderSearch(val);
     if (val.trim()) {
@@ -416,9 +423,13 @@ export default function ProductDetailClient({
             isOpen={sidebarOpen}
             onClose={() => setSidebarOpen(false)}
             user={user}
+            hasStore={hasStore}
             onCreateStore={handleCreateStore}
+            manageStore={handleManageStore}
             onSignOut={handleSignOut}
             onSignIn={handleSignIn}
+            isAuthor={isAuthor}
+            product={product}
           />
 
           <main className={styles.main}>
@@ -553,9 +564,13 @@ export default function ProductDetailClient({
           isOpen={sidebarOpen}
           onClose={() => setSidebarOpen(false)}
           user={user}
+          hasStore={hasStore}
           onCreateStore={handleCreateStore}
+          manageStore={handleManageStore}
           onSignOut={handleSignOut}
           onSignIn={handleSignIn}
+          isAuthor={isAuthor}
+          product={product}
         />
 
         <main className={styles.main}>
@@ -585,7 +600,7 @@ export default function ProductDetailClient({
           </div>
 
           {/* Product Hero Card (Gallery + Info) */}
-          <section className={styles.productHeroCard}>
+          <section id="product-overview" className={styles.productHeroCard}>
             <ProductGallery product={product} />
 
             <ProductInfo
@@ -601,9 +616,10 @@ export default function ProductDetailClient({
 
           {/* Secondary Details: Specifications & Merchant Profile */}
           <section className={styles.detailsGrid}>
-            <ProductSpecs product={product} />
+            <ProductSpecs id="product-specs" product={product} />
 
             <MerchantWidget
+              id="product-seller"
               authorName={product.author}
               onFollowToggle={handleFollowStoreToggle}
               isFollowing={isFollowingStore}
@@ -613,6 +629,7 @@ export default function ProductDetailClient({
 
           {/* Related / Category Recommendations */}
           <RelatedProducts
+            id="product-related"
             products={relatedProducts}
             currentProductId={product.id}
             onAddToCart={(item) => handleAddToCart(item, 1)}

@@ -43,6 +43,10 @@
     border-radius: 18px;
     background: #fff;
     box-shadow: 0 0 4px #0002;
+    max-height: calc(100vh - 105px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
 }
 
 .sidebarTitle {
@@ -479,6 +483,9 @@
         border-radius: 0 18px 18px 0;
         transform: translateX(-105%);
         transition: transform .25s ease;
+        overflow-y: auto;
+        overflow-x: hidden;
+        scrollbar-width: thin;
     }
 
     .sidebarOpen {
