@@ -10,9 +10,16 @@ import {
   HomeHeader,
   Sidebar,
   CategoryFilter,
+  StoreFilter,
+  StoreBanner,
+  StoreGroupSection,
+  StoreQuickBar,
   ProductGrid,
   Toast,
 } from "@/components/home";
+import storesData from "@/data/stores.json";
+import type { Store } from "@/types/store";
+import type { StoreFilterItem } from "@/components/home/StoreFilter";
 
 function readCartCount(): number {
   try {
@@ -33,9 +40,14 @@ function HomeContent() {
 
   const initialSearch = searchParams?.get("search") || "";
   const initialCat = searchParams?.get("category") || "All";
+  const initialStore = searchParams?.get("store") || "";
 
   const [search, setSearch] = useState(initialSearch);
   const [category, setCategory] = useState(initialCat);
+  const [classificationMode, setClassificationMode] = useState<"category" | "store">(
+    initialStore ? "store" : "category"
+  );
+  const [selectedStore, setSelectedStore] = useState<string>(initialStore || "All");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [toast, setToast] = useState("");
   const [cartCount, setCartCount] = useState<number>(0);
@@ -91,6 +103,29 @@ function HomeContent() {
     return ["All", ...cats];
   }, [dbCategories, products]);
 
+  // Compute unique stores from products and match with storesData
+  const storeList = useMemo<StoreFilterItem[]>(() => {
+    const countMap: Record<string, number> = {};
+    products.forEach((p) => {
+      const author = p.author?.trim() || "Sellora";
+      countMap[author] = (countMap[author] || 0) + 1;
+    });
+
+    const result: StoreFilterItem[] = Object.keys(countMap).map((name) => {
+      const found = (storesData as Store[]).find(
+        (s) => s.name.toLowerCase() === name.toLowerCase()
+      );
+      return {
+        name,
+        logo: found?.logo,
+        category: found?.category,
+        count: countMap[name],
+      };
+    });
+
+    return result.sort((a, b) => b.count - a.count);
+  }, [products]);
+
   // Compute visible products according to active category and search input
   const visibleProducts = useMemo(() => {
     return products.filter((product) => {
@@ -109,6 +144,50 @@ function HomeContent() {
       return matchesCategory && matchesSearch;
     });
   }, [products, category, search]);
+
+  // Compute products grouped by store for "All Stores" classification view
+  const productsByStore = useMemo(() => {
+    const groups: Record<string, Product[]> = {};
+    const q = search.trim().toLowerCase();
+
+    products.forEach((product) => {
+      const author = product.author?.trim() || "Sellora";
+      const matchesSearch =
+        !q ||
+        product.name.toLowerCase().includes(q) ||
+        author.toLowerCase().includes(q) ||
+        (product.category && product.category.toLowerCase().includes(q)) ||
+        (product.description && product.description.toLowerCase().includes(q)) ||
+        (product.tags && product.tags.some((t) => t.toLowerCase().includes(q)));
+
+      if (matchesSearch) {
+        if (!groups[author]) groups[author] = [];
+        groups[author].push(product);
+      }
+    });
+
+    return groups;
+  }, [products, search]);
+
+  // Compute products for single selected store
+  const storeProducts = useMemo(() => {
+    if (selectedStore === "All") return [];
+    const q = search.trim().toLowerCase();
+
+    return products.filter((product) => {
+      const author = product.author?.trim() || "Sellora";
+      const matchesStore = author.toLowerCase() === selectedStore.toLowerCase();
+      const matchesSearch =
+        !q ||
+        product.name.toLowerCase().includes(q) ||
+        author.toLowerCase().includes(q) ||
+        (product.category && product.category.toLowerCase().includes(q)) ||
+        (product.description && product.description.toLowerCase().includes(q)) ||
+        (product.tags && product.tags.some((t) => t.toLowerCase().includes(q)));
+
+      return matchesStore && matchesSearch;
+    });
+  }, [products, selectedStore, search]);
 
   useEffect(() => {
     if (!toast) return;
@@ -191,11 +270,56 @@ function HomeContent() {
         />
 
         <main className={styles.main}>
-          <CategoryFilter
-            categories={categories}
-            selectedCategory={category}
-            onSelectCategory={setCategory}
-          />
+          {/* Classification Mode Toggle */}
+          <div className={styles.classificationTabs} role="tablist" aria-label="Browse Classification">
+            <button
+              type="button"
+              role="tab"
+              aria-selected={classificationMode === "category"}
+              className={`${styles.classificationTab} ${
+                classificationMode === "category" ? styles.classificationTabActive : ""
+              }`}
+              onClick={() => {
+                setClassificationMode("category");
+              }}
+            >
+              <span className="material-icons-round" style={{ fontSize: "16px" }}>
+                category
+              </span>
+              By Category
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={classificationMode === "store"}
+              className={`${styles.classificationTab} ${
+                classificationMode === "store" ? styles.classificationTabActive : ""
+              }`}
+              onClick={() => {
+                setClassificationMode("store");
+              }}
+            >
+              <span className="material-icons-round" style={{ fontSize: "16px" }}>
+                storefront
+              </span>
+              By Store
+            </button>
+          </div>
+
+          {/* Filters based on active classification mode */}
+          {classificationMode === "category" ? (
+            <CategoryFilter
+              categories={categories}
+              selectedCategory={category}
+              onSelectCategory={(cat) => setCategory(cat)}
+            />
+          ) : (
+            <StoreFilter
+              stores={storeList}
+              selectedStore={selectedStore}
+              onSelectStore={(st) => setSelectedStore(st)}
+            />
+          )}
 
           {fetchError && products.length === 0 ? (
             <div
@@ -227,13 +351,55 @@ function HomeContent() {
                 Retry
               </button>
             </div>
+          ) : classificationMode === "category" ? (
+            <>
+              {category === "All" && !search && storeList.length > 0 && (
+                <StoreQuickBar
+                  stores={storeList}
+                  onSelectStore={(st) => {
+                    setSelectedStore(st);
+                    setClassificationMode("store");
+                  }}
+                  onViewAllStores={() => {
+                    setSelectedStore("All");
+                    setClassificationMode("store");
+                  }}
+                />
+              )}
+
+              <ProductGrid
+                category={category}
+                products={visibleProducts}
+                isLoading={isLoading}
+                onAddToCart={handleAddToCart}
+              />
+            </>
           ) : (
-            <ProductGrid
-              category={category}
-              products={visibleProducts}
-              isLoading={isLoading}
-              onAddToCart={handleAddToCart}
-            />
+            /* Store classification view */
+            <>
+              {selectedStore === "All" ? (
+                <StoreGroupSection
+                  productsByStore={productsByStore}
+                  onSelectStore={(st) => setSelectedStore(st)}
+                  onAddToCart={handleAddToCart}
+                />
+              ) : (
+                <>
+                  <StoreBanner
+                    storeName={selectedStore}
+                    productCount={storeProducts.length}
+                    onClear={() => setSelectedStore("All")}
+                  />
+
+                  <ProductGrid
+                    category={selectedStore}
+                    products={storeProducts}
+                    isLoading={isLoading}
+                    onAddToCart={handleAddToCart}
+                  />
+                </>
+              )}
+            </>
           )}
         </main>
       </div>

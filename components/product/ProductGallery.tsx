@@ -23,6 +23,9 @@ export default function ProductGallery({ product }: ProductGalleryProps) {
           src={activeImage}
           alt={product.name}
           className={styles.mainImage}
+          loading="eager"
+          fetchPriority="high"
+          decoding="async"
         />
 
         {product.discountPercentage && product.discountPercentage > 0 ? (
@@ -50,6 +53,8 @@ export default function ProductGallery({ product }: ProductGalleryProps) {
                 src={imgUrl}
                 alt={`${product.name} thumbnail ${idx + 1}`}
                 className={styles.thumbnailImg}
+                loading="lazy"
+                decoding="async"
               />
             </button>
           ))}
