@@ -173,6 +173,14 @@
   gap: 16px;
 }
 
+.sellerHeaderRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
 .storeBannerLink {
   display: inline-flex;
   align-items: center;
@@ -193,6 +201,41 @@
   background: #edf3ff;
   border-color: #bfdbfe;
   color: #2b6dff;
+}
+
+.chatSellerBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 50px;
+  border: 1px solid #bfdbfe;
+  background: #eff6ff;
+  color: #2b6dff;
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.chatSellerBtn:hover {
+  background: #dbeafe;
+  border-color: #93c5fd;
+  color: #1d4ed8;
+}
+
+.ownerBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border-radius: 50px;
+  background: #f0fdf4;
+  color: #16a34a;
+  border: 1px solid #bbf7d0;
+  font-size: 12px;
+  font-weight: 700;
 }
 
 .productTitle {
@@ -403,6 +446,73 @@
   color: #e11d48;
 }
 
+.ownerActionsBox {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 6px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 16px;
+}
+
+.ownerNotice {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 12px;
+}
+
+.ownerNoticeTitle {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #1e3a8a;
+  margin-bottom: 2px;
+}
+
+.ownerNoticeDesc {
+  font-size: 12px;
+  color: #3b82f6;
+  line-height: 1.45;
+}
+
+.ownerBtnsRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.manageListingBtn {
+  flex: 1;
+  min-width: 180px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border-radius: 50px;
+  background: linear-gradient(135deg, #2b6dff, #7b2ff7);
+  color: #ffffff;
+  border: 0;
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(43, 109, 255, 0.3);
+  transition: all 0.15s ease;
+}
+
+.manageListingBtn:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
 /* Assurances */
 .assurancesList {
   display: grid;
@@ -558,6 +668,29 @@
 
 .merchantVisitBtn:hover {
   background: #edf3ff;
+}
+
+.merchantChatBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 14px;
+  border-radius: 10px;
+  background: #f8fafc;
+  color: #0b1230;
+  border: 1px solid #e2e8f0;
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.merchantChatBtn:hover {
+  background: #edf3ff;
+  border-color: #bfdbfe;
+  color: #2b6dff;
 }
 
 /* Related Products */

@@ -90,6 +90,105 @@ export default function ProductDetailPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [toast, setToast] = useState("");
 
+  // Store information of currently logged in user (if any)
+  const [userStore, setUserStore] = useState<{ id?: string; name?: string } | null>(() => {
+    if (typeof window === "undefined") return null;
+    try {
+      const stored = localStorage.getItem("sellora_my_store");
+      if (stored) return JSON.parse(stored);
+    } catch {
+      // ignore
+    }
+    return null;
+  });
+
+  useEffect(() => {
+    if (!user) return;
+    let isMounted = true;
+
+    async function loadUserStore() {
+      try {
+        const token = await user?.getIdToken();
+        if (!token) return;
+        const res = await fetch("/api/user/store", {
+          headers: { authorization: `Bearer ${token}` },
+        });
+        if (res.ok && isMounted) {
+          const json = await res.json();
+          if (json.data) {
+            setUserStore(json.data);
+            try {
+              localStorage.setItem("sellora_my_store", JSON.stringify(json.data));
+            } catch {
+              // ignore
+            }
+          }
+        }
+      } catch (err) {
+        // ignore
+      }
+    }
+
+    void loadUserStore();
+    return () => {
+      isMounted = false;
+    };
+  }, [user]);
+
+  // Check if the current viewer is the author/seller of this product
+  const isAuthor = useMemo(() => {
+    if (!product) return false;
+
+    // 1. Direct storeId / userId match with logged in user uid
+    if (user?.uid && product.storeId && user.uid === product.storeId) {
+      return true;
+    }
+
+    // 2. User's store ID matches product storeId or user uid
+    if (userStore?.id && product.storeId && (userStore.id === product.storeId || userStore.id === user?.uid)) {
+      return true;
+    }
+
+    // 3. User's store name matches product author
+    if (userStore?.name && product.author) {
+      if (userStore.name.trim().toLowerCase() === product.author.trim().toLowerCase()) {
+        return true;
+      }
+    }
+
+    // 4. User's display name matches product author
+    if (user?.displayName && product.author) {
+      if (user.displayName.trim().toLowerCase() === product.author.trim().toLowerCase()) {
+        return true;
+      }
+    }
+
+    // 5. Product is in user's merchant products in localStorage
+    if (typeof window !== "undefined") {
+      try {
+        const keysToCheck = [
+          user?.uid ? `sellora_merchant_products_${user.uid}` : null,
+          userStore?.id ? `sellora_merchant_products_${userStore.id}` : null,
+          "sellora_my_store_products",
+        ].filter(Boolean) as string[];
+
+        for (const key of keysToCheck) {
+          const raw = localStorage.getItem(key);
+          if (raw) {
+            const list = JSON.parse(raw);
+            if (Array.isArray(list) && list.some((item: any) => item.id === product.id || (item.slug && item.slug === product.slug))) {
+              return true;
+            }
+          }
+        }
+      } catch {
+        // ignore
+      }
+    }
+
+    return false;
+  }, [product, user, userStore]);
+
   // Cart count state initialized safely from localStorage
   const [cartCount, setCartCount] = useState<number>(() => {
     if (typeof window === "undefined") return 0;
@@ -166,6 +265,10 @@ export default function ProductDetailPage() {
   }, []);
 
   const handleAddToCart = (item: Product, qty = 1) => {
+    if (isAuthor) {
+      setToast("You cannot add your own product to cart.");
+      return;
+    }
     try {
       const existing = JSON.parse(localStorage.getItem("sellora_cart") || "{}");
       existing[item.id] = (existing[item.id] || 0) + qty;
@@ -184,11 +287,19 @@ export default function ProductDetailPage() {
   };
 
   const handleBuyNow = (item: Product, qty = 1) => {
+    if (isAuthor) {
+      setToast("You cannot purchase your own product.");
+      return;
+    }
     handleAddToCart(item, qty);
     router.push("/account/orders");
   };
 
   const handleToggleWishlist = (item: Product) => {
+    if (isAuthor) {
+      setToast("You cannot wishlist your own product.");
+      return;
+    }
     try {
       const stored = localStorage.getItem("sellora_wishlist");
       let list: string[] = stored ? JSON.parse(stored) : [];
@@ -218,7 +329,7 @@ export default function ProductDetailPage() {
   };
 
   const handleFollowStoreToggle = () => {
-    if (!product?.author) return;
+    if (!product?.author || isAuthor) return;
     try {
       const stored = localStorage.getItem("sellora_favorite_stores");
       let list: string[] = stored ? JSON.parse(stored) : [];
@@ -438,6 +549,7 @@ export default function ProductDetailPage() {
               onShare={handleShare}
               onToggleWishlist={handleToggleWishlist}
               isWishlisted={isWishlisted}
+              isAuthor={isAuthor}
             />
           </section>
 
@@ -449,6 +561,7 @@ export default function ProductDetailPage() {
               authorName={product.author}
               onFollowToggle={handleFollowStoreToggle}
               isFollowing={isFollowingStore}
+              isAuthor={isAuthor}
             />
           </section>
 

@@ -9,12 +9,14 @@ interface MerchantWidgetProps {
   authorName?: string;
   onFollowToggle?: () => void;
   isFollowing?: boolean;
+  isAuthor?: boolean;
 }
 
 export default function MerchantWidget({
   authorName,
   onFollowToggle,
   isFollowing,
+  isAuthor = false,
 }: MerchantWidgetProps) {
   const store = (storesData as Store[]).find(
     (s) => s.name.toLowerCase() === (authorName || "").toLowerCase(),
@@ -96,7 +98,7 @@ export default function MerchantWidget({
             "Authorized merchant selling authentic products directly on Sellora marketplace."}
         </p>
 
-        <div style={{ display: "flex", gap: "8px" }}>
+        <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
           <Link
             href={`/?search=${encodeURIComponent(authorName || "")}`}
             className={styles.merchantVisitBtn}
@@ -108,32 +110,59 @@ export default function MerchantWidget({
             Visit Store
           </Link>
 
-          {onFollowToggle && (
-            <button
-              type="button"
-              onClick={onFollowToggle}
-              style={{
-                padding: "9px 14px",
-                borderRadius: "10px",
-                border: "1px solid #e5e7eb",
-                background: isFollowing ? "#fff1f2" : "#ffffff",
-                color: isFollowing ? "#e11d48" : "#374151",
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                gap: "5px",
-                fontSize: "12.5px",
-                fontWeight: 600,
-              }}
+          {isAuthor ? (
+            <Link
+              href="/account/manage-store"
+              className={styles.merchantChatBtn}
+              style={{ textDecoration: "none" }}
             >
-              <span
-                className="material-icons-round"
-                style={{ fontSize: "16px", color: isFollowing ? "#e11d48" : "#6b7280" }}
-              >
-                {isFollowing ? "favorite" : "favorite_border"}
+              <span className="material-icons-round" style={{ fontSize: "16px" }}>
+                settings
               </span>
-              {isFollowing ? "Following" : "Follow"}
-            </button>
+              Manage Store
+            </Link>
+          ) : (
+            <>
+              <button
+                type="button"
+                className={styles.merchantChatBtn}
+                aria-label="Chat with seller"
+                title="Chat with seller"
+              >
+                <span className="material-icons-round" style={{ fontSize: "16px" }}>
+                  chat
+                </span>
+                Chat
+              </button>
+
+              {onFollowToggle && (
+                <button
+                  type="button"
+                  onClick={onFollowToggle}
+                  style={{
+                    padding: "9px 14px",
+                    borderRadius: "10px",
+                    border: "1px solid #e5e7eb",
+                    background: isFollowing ? "#fff1f2" : "#ffffff",
+                    color: isFollowing ? "#e11d48" : "#374151",
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "5px",
+                    fontSize: "12.5px",
+                    fontWeight: 600,
+                  }}
+                >
+                  <span
+                    className="material-icons-round"
+                    style={{ fontSize: "16px", color: isFollowing ? "#e11d48" : "#6b7280" }}
+                  >
+                    {isFollowing ? "favorite" : "favorite_border"}
+                  </span>
+                  {isFollowing ? "Following" : "Follow"}
+                </button>
+              )}
+            </>
           )}
         </div>
       </div>

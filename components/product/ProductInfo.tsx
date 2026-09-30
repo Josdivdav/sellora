@@ -18,6 +18,7 @@ interface ProductInfoProps {
   onShare: (product: Product) => void;
   onToggleWishlist: (product: Product) => void;
   isWishlisted: boolean;
+  isAuthor?: boolean;
 }
 
 export default function ProductInfo({
@@ -27,6 +28,7 @@ export default function ProductInfo({
   onShare,
   onToggleWishlist,
   isWishlisted,
+  isAuthor = false,
 }: ProductInfoProps) {
   const [quantity, setQuantity] = useState(1);
   const roundedRating = Math.round(product.rating);
@@ -44,21 +46,51 @@ export default function ProductInfo({
 
   return (
     <div className={styles.infoWrap}>
-      {/* Merchant / Author attribution */}
-      {product.author && (
-        <Link
-          href={`/?search=${encodeURIComponent(product.author)}`}
-          className={styles.storeBannerLink}
-        >
-          <span className="material-icons-round" style={{ fontSize: "16px", color: "#2b6dff" }}>
-            storefront
+      {/* Merchant / Author attribution & Contact */}
+      <div className={styles.sellerHeaderRow}>
+        {product.author ? (
+          <Link
+            href={`/?search=${encodeURIComponent(product.author)}`}
+            className={styles.storeBannerLink}
+          >
+            <span className="material-icons-round" style={{ fontSize: "16px", color: "#2b6dff" }}>
+              storefront
+            </span>
+            <span>Sold by {product.author}</span>
+            <span className="material-icons-round" style={{ fontSize: "14px", color: "#2b6dff" }}>
+              verified
+            </span>
+          </Link>
+        ) : (
+          <div className={styles.storeBannerLink}>
+            <span className="material-icons-round" style={{ fontSize: "16px", color: "#2b6dff" }}>
+              storefront
+            </span>
+            <span>Sellora Official Store</span>
+          </div>
+        )}
+
+        {isAuthor ? (
+          <span className={styles.ownerBadge}>
+            <span className="material-icons-round" style={{ fontSize: "15px" }}>
+              store
+            </span>
+            Your Listing
           </span>
-          <span>Sold by {product.author}</span>
-          <span className="material-icons-round" style={{ fontSize: "14px", color: "#2b6dff" }}>
-            verified
-          </span>
-        </Link>
-      )}
+        ) : (
+          <button
+            type="button"
+            className={styles.chatSellerBtn}
+            aria-label="Chat with seller"
+            title="Chat with seller"
+          >
+            <span className="material-icons-round" style={{ fontSize: "16px" }}>
+              chat
+            </span>
+            <span>Chat with Seller</span>
+          </button>
+        )}
+      </div>
 
       {/* Title */}
       <h1 className={styles.productTitle}>{product.name}</h1>
@@ -119,71 +151,120 @@ export default function ProductInfo({
         <p className={styles.descriptionSnippet}>{product.description}</p>
       )}
 
-      {/* Quantity & CTAs */}
-      <div className={styles.purchaseRow}>
-        <div className={styles.quantityControl}>
+      {/* Quantity & CTAs (Buyer controls vs Owner controls) */}
+      {isAuthor ? (
+        <div className={styles.ownerActionsBox}>
+          <div className={styles.ownerNotice}>
+            <span className="material-icons-round" style={{ fontSize: "20px", color: "#2b6dff" }}>
+              info
+            </span>
+            <div>
+              <div className={styles.ownerNoticeTitle}>
+                You are viewing your own product listing
+              </div>
+              <div className={styles.ownerNoticeDesc}>
+                Buyer actions (purchasing, chat, and wishlist) are disabled for the seller.
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.ownerBtnsRow}>
+            <Link
+              href="/account/manage-store?tab=products"
+              className={styles.manageListingBtn}
+            >
+              <span className="material-icons-round" style={{ fontSize: "18px" }}>
+                edit
+              </span>
+              Manage Listing in Store
+            </Link>
+
+            <button
+              type="button"
+              className={styles.iconActionBtn}
+              onClick={() => onShare(product)}
+              aria-label="Share product"
+              title="Share product link"
+            >
+              <span className="material-icons-round">share</span>
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div className={styles.purchaseRow}>
+          <div className={styles.quantityControl}>
+            <button
+              type="button"
+              className={styles.qtyBtn}
+              onClick={handleDecrease}
+              disabled={quantity <= 1}
+              aria-label="Decrease quantity"
+            >
+              -
+            </button>
+            <span className={styles.qtyInput}>{quantity}</span>
+            <button
+              type="button"
+              className={styles.qtyBtn}
+              onClick={handleIncrease}
+              disabled={quantity >= maxStock}
+              aria-label="Increase quantity"
+            >
+              +
+            </button>
+          </div>
+
           <button
             type="button"
-            className={styles.qtyBtn}
-            onClick={handleDecrease}
-            disabled={quantity <= 1}
-            aria-label="Decrease quantity"
+            className={styles.addToCartBtn}
+            onClick={() => onAddToCart(product, quantity)}
           >
-            -
+            <span className="material-icons-round">shopping_cart</span>
+            Add to Cart
           </button>
-          <span className={styles.qtyInput}>{quantity}</span>
+
           <button
             type="button"
-            className={styles.qtyBtn}
-            onClick={handleIncrease}
-            disabled={quantity >= maxStock}
-            aria-label="Increase quantity"
+            className={styles.buyNowBtn}
+            onClick={() => onBuyNow(product, quantity)}
           >
-            +
+            Buy Now
+          </button>
+
+          <button
+            type="button"
+            className={styles.iconActionBtn}
+            aria-label="Chat with seller"
+            title="Chat with seller"
+          >
+            <span className="material-icons-round">chat</span>
+          </button>
+
+          <button
+            type="button"
+            className={`${styles.iconActionBtn} ${
+              isWishlisted ? styles.iconActionBtnLiked : ""
+            }`}
+            onClick={() => onToggleWishlist(product)}
+            aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
+            title={isWishlisted ? "Saved in wishlist" : "Save to wishlist"}
+          >
+            <span className="material-icons-round">
+              {isWishlisted ? "favorite" : "favorite_border"}
+            </span>
+          </button>
+
+          <button
+            type="button"
+            className={styles.iconActionBtn}
+            onClick={() => onShare(product)}
+            aria-label="Share product"
+            title="Share product link"
+          >
+            <span className="material-icons-round">share</span>
           </button>
         </div>
-
-        <button
-          type="button"
-          className={styles.addToCartBtn}
-          onClick={() => onAddToCart(product, quantity)}
-        >
-          <span className="material-icons-round">shopping_cart</span>
-          Add to Cart
-        </button>
-
-        <button
-          type="button"
-          className={styles.buyNowBtn}
-          onClick={() => onBuyNow(product, quantity)}
-        >
-          Buy Now
-        </button>
-
-        <button
-          type="button"
-          className={`${styles.iconActionBtn} ${
-            isWishlisted ? styles.iconActionBtnLiked : ""
-          }`}
-          onClick={() => onToggleWishlist(product)}
-          aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
-          title={isWishlisted ? "Saved in wishlist" : "Save to wishlist"}
-        >
-          <span className="material-icons-round">
-            {isWishlisted ? "favorite" : "favorite_border"}
-          </span>
-        </button>
-
-        <button
-          type="button"
-          className={styles.iconActionBtn}
-          onClick={() => onShare(product)}
-          aria-label="Share product"
-          title="Share product link"
-        >
-          <span className="material-icons-round">share</span>
-        </button>
-      </div>
+      )}
 
       {/* Trust & Guarantees */}
       <div className={styles.assurancesList}>

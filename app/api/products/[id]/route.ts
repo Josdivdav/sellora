@@ -57,6 +57,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
       image: productData.image || '',
       images: Array.isArray(productData.images) && productData.images.length > 0 ? productData.images : [productData.image].filter(Boolean),
       author: productData.author || 'Sellora',
+      storeId: productData.storeId || productData.merchantId || productData.userId || undefined,
       description: productData.description || '',
       stock: numStock,
       inStock: productData.inStock !== undefined ? Boolean(productData.inStock) : numStock > 0,
