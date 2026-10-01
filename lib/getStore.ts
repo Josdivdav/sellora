@@ -120,6 +120,9 @@ export async function getStoreBySlug(rawSlug: string): Promise<{
     tags: Array.isArray(foundStore.tags) ? foundStore.tags : [],
     badge: foundStore.badge,
     topProducts: foundStore.topProducts || [],
+    phone: foundStore.phone || "",
+    whatsapp: foundStore.whatsapp || foundStore.phone || "",
+    bankDetails: foundStore.bankDetails || undefined,
   };
 
   // 4. Fetch Products for this store

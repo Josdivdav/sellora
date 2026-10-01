@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import styles from "@/app/home.module.css";
 import type { Product } from "@/types/product";
+import { getStoreRelativePath } from "@/lib/storeUrl";
 
 const currency = new Intl.NumberFormat("en-NG", {
   style: "currency",
@@ -89,16 +90,21 @@ export default function ProductCard({
         >
           <h2>{product.name}</h2>
         </Link>
-        <small
-          style={{
-            color: "#6b7280",
-            textTransform: "none",
-            fontSize: "12px",
-            fontWeight: 500,
-          }}
-        >
-          {product.author || "Sellora Merchant"}
-        </small>
+        {product.author ? (
+          <Link
+            href={getStoreRelativePath(product.author)}
+            onClick={(e) => e.stopPropagation()}
+            className={styles.cardMerchantLink}
+            title={`Visit ${product.author} storefront`}
+          >
+            <span className="material-icons-round" style={{ fontSize: "13px" }}>
+              storefront
+            </span>
+            <span>{product.author}</span>
+          </Link>
+        ) : (
+          <small className={styles.cardMerchantDefault}>Sellora Merchant</small>
+        )}
 
         <p className={styles.rating}>
           <i aria-hidden="true">

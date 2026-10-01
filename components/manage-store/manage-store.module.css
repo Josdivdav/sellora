@@ -986,6 +986,52 @@
   gap: 12px;
 }
 
+.formSectionDivider {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid #edf0f7;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.formSectionTitle {
+  font-size: 13.5px;
+  font-weight: 800;
+  color: #111827;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+}
+
+.formNotice {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #166534;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 12px;
+  line-height: 1.45;
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.formNotice :global(.material-icons-round) {
+  font-size: 16px;
+  color: #16a34a;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.formFieldHint {
+  font-size: 11.5px;
+  color: #6b7280;
+  line-height: 1.35;
+  margin: 0;
+}
+
 /* Delete confirmation box */
 .deleteConfirmBox {
   padding: 24px;

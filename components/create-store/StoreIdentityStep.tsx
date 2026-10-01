@@ -20,15 +20,44 @@ const CATEGORIES = [
   { name: "Sports & Fitness", icon: "fitness_center" },
 ];
 
-const POPULAR_LOCATIONS = [
-  "Lagos, Nigeria",
-  "Abuja, Nigeria",
-  "Port Harcourt, Nigeria",
-  "Ibadan, Nigeria",
-  "Enugu, Nigeria",
-  "Kano, Nigeria",
-  "Asaba, Nigeria",
+const NIGERIAN_STATES = [
+  "Abia, Nigeria",
   "Adamawa, Nigeria",
+  "Akwa Ibom, Nigeria",
+  "Anambra, Nigeria",
+  "Bauchi, Nigeria",
+  "Bayelsa, Nigeria",
+  "Benue, Nigeria",
+  "Borno, Nigeria",
+  "Cross River, Nigeria",
+  "Delta, Nigeria",
+  "Ebonyi, Nigeria",
+  "Edo, Nigeria",
+  "Ekiti, Nigeria",
+  "Enugu, Nigeria",
+  "FCT - Abuja, Nigeria",
+  "Gombe, Nigeria",
+  "Imo, Nigeria",
+  "Jigawa, Nigeria",
+  "Kaduna, Nigeria",
+  "Kano, Nigeria",
+  "Katsina, Nigeria",
+  "Kebbi, Nigeria",
+  "Kogi, Nigeria",
+  "Kwara, Nigeria",
+  "Lagos, Nigeria",
+  "Nasarawa, Nigeria",
+  "Niger, Nigeria",
+  "Ogun, Nigeria",
+  "Ondo, Nigeria",
+  "Osun, Nigeria",
+  "Oyo, Nigeria",
+  "Plateau, Nigeria",
+  "Rivers, Nigeria",
+  "Sokoto, Nigeria",
+  "Taraba, Nigeria",
+  "Yobe, Nigeria",
+  "Zamfara, Nigeria",
 ];
 
 export default function StoreIdentityStep({ store, onUpdate }: StoreIdentityStepProps) {
@@ -188,7 +217,7 @@ export default function StoreIdentityStep({ store, onUpdate }: StoreIdentityStep
             value={store.location}
             onChange={(e) => onUpdate({ location: e.target.value })}
           >
-            {POPULAR_LOCATIONS.map((loc) => (
+            {NIGERIAN_STATES.map((loc) => (
               <option key={loc} value={loc}>
                 {loc}
               </option>

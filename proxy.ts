@@ -58,7 +58,8 @@ export function proxy(request: NextRequest) {
       pathname.startsWith('/products/') ||
       pathname.startsWith('/api/') ||
       pathname.startsWith('/account/') ||
-      pathname.startsWith('/cart')
+      pathname.startsWith('/cart') ||
+      pathname.startsWith('/checkout')
     ) {
       return NextResponse.next();
     }

@@ -22,6 +22,7 @@ import storesData from "@/data/stores.json";
 import type { Store } from "@/types/store";
 import type { StoreFilterItem } from "@/components/home/StoreFilter";
 import { useCart } from "@/context/CartContext";
+import { shuffleArray } from "@/lib/shuffle";
 
 export type SortOption =
   | "FEATURED"
@@ -87,7 +88,7 @@ export default function HomeClient({
       }
       const data = await res.json();
       if (Array.isArray(data.products)) {
-        setProducts(data.products);
+        setProducts(shuffleArray(data.products));
       }
       if (Array.isArray(data.categories) && data.categories.length > 0) {
         setDbCategories(data.categories);
@@ -343,12 +344,19 @@ export default function HomeClient({
     router.push("/cart");
   };
 
+  const handleShuffle = () => {
+    setProducts((prev) => shuffleArray(prev));
+    setSortBy("FEATURED");
+    setToast("Products randomized!");
+  };
+
   const handleResetAllFilters = () => {
     setSearch("");
     setCategory("All");
     setSelectedStore("All");
     setClassificationMode("category");
     setSortBy("FEATURED");
+    setProducts((prev) => shuffleArray(prev));
     if (typeof window !== "undefined") {
       window.history.replaceState(null, "", window.location.pathname);
     }
@@ -577,6 +585,7 @@ export default function HomeClient({
                 onAddToCart={handleAddToCart}
                 sortBy={sortBy}
                 onSortChange={(val) => setSortBy(val as SortOption)}
+                onShuffle={handleShuffle}
                 onResetFilters={handleResetAllFilters}
                 searchQuery={search}
               />
@@ -610,6 +619,7 @@ export default function HomeClient({
                     onAddToCart={handleAddToCart}
                     sortBy={sortBy}
                     onSortChange={(val) => setSortBy(val as SortOption)}
+                    onShuffle={handleShuffle}
                     onResetFilters={handleResetAllFilters}
                     searchQuery={search}
                   />

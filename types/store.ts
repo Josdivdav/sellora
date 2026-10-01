@@ -1,3 +1,9 @@
+export interface BankDetails {
+  bankName: string;
+  accountNumber: string;
+  accountName: string;
+}
+
 export interface Store {
   id: string;
   name: string;
@@ -19,4 +25,7 @@ export interface Store {
   tags: string[];
   badge?: string;
   topProducts: any;
+  phone?: string;
+  whatsapp?: string;
+  bankDetails?: BankDetails;
 }

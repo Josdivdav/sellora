@@ -211,84 +211,8 @@ export default function OrdersPage() {
     }
   };
 
-  // Checkout items currently held in cart
-  const handleCheckoutCart = async () => {
-    if (!user) {
-      router.push("/login?redirect=/account/orders");
-      return;
-    }
-
-    try {
-      setIsCheckingOut(true);
-      const productIds = Object.keys(cart);
-
-      if (productIds.length === 0) {
-        setToast("Your cart is currently empty.");
-        setIsCheckingOut(false);
-        return;
-      }
-
-      // Retrieve product details for cart items
-      let productsList: any[] = [];
-      try {
-        const prodRes = await fetch("/api/products");
-        if (prodRes.ok) {
-          const prodData = await prodRes.json();
-          productsList = prodData.products || [];
-        }
-      } catch (prodErr) {
-        console.warn("Could not fetch product catalog for cart checkout:", prodErr);
-      }
-
-      const items = productIds.map((id) => {
-        const found = productsList.find((p) => p.id === id);
-        const qty = cart[id] || 1;
-        return {
-          productId: id,
-          name: found?.name || "Order Item",
-          slug: found?.slug || "",
-          image: (Array.isArray(found?.images) ? found.images[0] : found?.image) || "",
-          price: Number(found?.price) || 5000,
-          originalPrice: (found?.oldPrice ?? found?.originalPrice) ? Number(found?.oldPrice ?? found?.originalPrice) : null,
-          quantity: qty,
-          storeName: found?.author || "Sellora Official",
-          storeId: found?.storeId || "sellora-store",
-          category: found?.category || "General",
-        };
-      });
-
-      const firstItem = items[0];
-      const token = await user.getIdToken();
-      const orderRes = await fetch("/api/orders", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          items,
-          store: {
-            id: firstItem?.storeId || "sellora-store",
-            name: firstItem?.storeName || "Sellora Official",
-            isVerified: true,
-          },
-        }),
-      });
-
-      const orderData = await orderRes.json();
-      if (orderRes.ok && orderData.success && orderData.order) {
-        await clearCart();
-        setOrders((prev) => [orderData.order, ...prev]);
-        setToast(`Order #${orderData.order.orderNumber} placed successfully!`);
-      } else {
-        setToast(orderData.error || "Failed to place order.");
-      }
-    } catch (err) {
-      console.error("Cart checkout error:", err);
-      setToast("Failed to place order. Please try again.");
-    } finally {
-      setIsCheckingOut(false);
-    }
+  const handleCheckoutCart = () => {
+    router.push("/checkout");
   };
 
   const handleOrderHelp = (order: Order) => {

@@ -242,55 +242,14 @@ export default function ProductDetailClient({
       return;
     }
 
+    await addToCart(item.id, qty);
     if (!user) {
-      handleAddToCart(item, qty);
-      setToast("Please sign in to complete your purchase.");
-      router.push(`/login?redirect=/products/${item.id}`);
+      setToast("Please sign in to complete your checkout.");
+      router.push(`/login?redirect=/checkout`);
       return;
     }
 
-    try {
-      setToast("Placing your order...");
-      const token = await user.getIdToken();
-      const res = await fetch("/api/orders", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          items: [
-            {
-              productId: item.id,
-              name: item.name,
-              slug: item.slug || "",
-              image: item.images?.[0] || "",
-              price: item.price,
-              originalPrice: item.oldPrice || null,
-              quantity: qty,
-              storeName: item.author || "Sellora Merchant",
-              storeId: item.storeId || "",
-              category: item.category || "General",
-            },
-          ],
-          store: {
-            id: item.storeId || "sellora-store",
-            name: item.author || "Sellora Merchant",
-            isVerified: true,
-          },
-        }),
-      });
-
-      const data = await res.json();
-      if (res.ok && data.success) {
-        router.push("/account/orders?newOrder=true");
-      } else {
-        setToast(data.error || "Failed to place order.");
-      }
-    } catch (err) {
-      console.error("Error creating order:", err);
-      setToast("Could not place order. Please try again.");
-    }
+    router.push("/checkout");
   };
 
   const handleToggleWishlist = async (item: Product) => {

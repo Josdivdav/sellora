@@ -23,7 +23,8 @@ const buyerNav: NavItem[] = [
     badgeKey: "favoriteStores",
     requiresAuth: true,
   },
-  { label: "Help", href: "/help", icon: "help" },
+  { label: "About Sellora", href: "/about", icon: "info" },
+  { label: "How it works", href: "/about#tutorial", icon: "menu_book" },
   {
     label: "Me",
     href: "/account/me",

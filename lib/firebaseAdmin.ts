@@ -20,6 +20,11 @@ const firebaseAdmin = getApps().length > 0
       }),
     });
 
-
 export const db = getFirestore(firebaseAdmin);
+try {
+  db.settings({ ignoreUndefinedProperties: true });
+} catch {
+  // Settings already initialized or frozen
+}
+
 export { firebaseAdmin as admin };

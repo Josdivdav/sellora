@@ -35,7 +35,6 @@ export default function CartClient() {
   // Products catalog data matching cart IDs
   const [productsMap, setProductsMap] = useState<Record<string, Product>>({});
   const [isLoadingProducts, setIsLoadingProducts] = useState(false);
-  const [isCheckingOut, setIsCheckingOut] = useState(false);
 
   const cartProductIds = useMemo(() => {
     return Object.keys(cart).filter((id) => (cart[id] || 0) > 0);
@@ -139,63 +138,12 @@ export default function CartClient() {
     }
 
     if (!user) {
-      setToast("Please sign in to complete your checkout.");
-      router.push("/login?redirect=/cart");
+      setToast("Please sign in to proceed to checkout.");
+      router.push("/login?redirect=/checkout");
       return;
     }
 
-    setIsCheckingOut(true);
-    setToast("Processing your order...");
-
-    try {
-      const items = cartItems.map(({ id, product, quantity, unitPrice, originalPrice }) => ({
-        productId: id,
-        name: product?.name || "Cart Product",
-        slug: product?.slug || "",
-        image: (Array.isArray(product?.images) && product.images.length > 0 ? product.images[0] : product?.image) || "/favico.png",
-        price: unitPrice || 1000,
-        originalPrice: originalPrice || null,
-        quantity,
-        storeName: product?.author || "Sellora Official",
-        storeId: product?.storeId || undefined,
-        category: product?.category || "General",
-      }));
-
-      const firstItem = items[0];
-      const token = await user.getIdToken();
-
-      const res = await fetch("/api/orders", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          items,
-          store: {
-            id: firstItem.storeId || "sellora-official",
-            name: firstItem.storeName || "Sellora Official Store",
-            isVerified: true,
-          },
-        }),
-      });
-
-      const data = await res.json();
-      if (res.ok && data.success && data.order) {
-        await clearCart();
-        setToast(`Order #${data.order.orderNumber} placed successfully!`);
-        setTimeout(() => {
-          router.push("/account/orders");
-        }, 1200);
-      } else {
-        setToast(data.error || "Failed to place order. Please try again.");
-        setIsCheckingOut(false);
-      }
-    } catch (err) {
-      console.error("Checkout error:", err);
-      setToast("An error occurred during checkout. Please try again.");
-      setIsCheckingOut(false);
-    }
+    router.push("/checkout");
   };
 
   return (
@@ -454,14 +402,10 @@ export default function CartClient() {
                   type="button"
                   className={styles.checkoutBtn}
                   onClick={handleCheckout}
-                  disabled={isCheckingOut || cartItems.length === 0}
+                  disabled={cartItems.length === 0}
                 >
-                  <span className="material-icons-round">
-                    {isCheckingOut ? "hourglass_top" : "lock"}
-                  </span>
-                  {isCheckingOut
-                    ? "Placing Order..."
-                    : `Proceed to Checkout (${cartCount})`}
+                  <span className="material-icons-round">lock</span>
+                  Proceed to Checkout ({cartCount})
                 </button>
 
                 <Link href="/" className={styles.continueShoppingBtn}>

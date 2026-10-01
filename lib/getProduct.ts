@@ -1,6 +1,7 @@
 import { db } from "@/lib/firebaseAdmin";
 import type { Product } from "@/types/product";
 import type { Store } from "@/types/store";
+import { shuffleArray } from "@/lib/shuffle";
 
 // In-memory cache with 5-minute TTL to ensure sub-millisecond retrieval
 interface CachedItem {
@@ -178,10 +179,10 @@ export async function getAllProducts(): Promise<{
   categories: string[];
   stores: Store[];
 }> {
-  // 1. In-memory cache hit
+  // 1. In-memory cache hit - returns newly randomized array of products
   if (allProductsCache && Date.now() < allProductsCache.expires) {
     return {
-      products: allProductsCache.products,
+      products: shuffleArray(allProductsCache.products),
       categories: allProductsCache.categories,
       stores: allProductsCache.stores,
     };
@@ -270,6 +271,9 @@ export async function getAllProducts(): Promise<{
         tags: Array.isArray(data.tags) ? data.tags : [],
         badge: data.badge,
         topProducts: data.topProducts || [],
+        phone: data.phone || "",
+        whatsapp: data.whatsapp || data.phone || "",
+        bankDetails: data.bankDetails || undefined,
       });
     });
 
@@ -292,7 +296,7 @@ export async function getAllProducts(): Promise<{
       expires: Date.now() + ALL_PRODUCTS_TTL_MS,
     };
 
-    return { products: dbProducts, categories, stores: dbStores };
+    return { products: shuffleArray(dbProducts), categories, stores: dbStores };
   } catch (err) {
     console.error("Could not fetch products from Firestore:", err);
     return { products: [], categories: ["All"], stores: [] };

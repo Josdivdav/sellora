@@ -10,6 +10,69 @@ interface EditStoreModalProps {
   onSave: (updatedStore: Store) => Promise<boolean | void> | void;
 }
 
+const NIGERIAN_STATES = [
+  "Abia, Nigeria",
+  "Adamawa, Nigeria",
+  "Akwa Ibom, Nigeria",
+  "Anambra, Nigeria",
+  "Bauchi, Nigeria",
+  "Bayelsa, Nigeria",
+  "Benue, Nigeria",
+  "Borno, Nigeria",
+  "Cross River, Nigeria",
+  "Delta, Nigeria",
+  "Ebonyi, Nigeria",
+  "Edo, Nigeria",
+  "Ekiti, Nigeria",
+  "Enugu, Nigeria",
+  "FCT - Abuja, Nigeria",
+  "Gombe, Nigeria",
+  "Imo, Nigeria",
+  "Jigawa, Nigeria",
+  "Kaduna, Nigeria",
+  "Kano, Nigeria",
+  "Katsina, Nigeria",
+  "Kebbi, Nigeria",
+  "Kogi, Nigeria",
+  "Kwara, Nigeria",
+  "Lagos, Nigeria",
+  "Nasarawa, Nigeria",
+  "Niger, Nigeria",
+  "Ogun, Nigeria",
+  "Ondo, Nigeria",
+  "Osun, Nigeria",
+  "Oyo, Nigeria",
+  "Plateau, Nigeria",
+  "Rivers, Nigeria",
+  "Sokoto, Nigeria",
+  "Taraba, Nigeria",
+  "Yobe, Nigeria",
+  "Zamfara, Nigeria",
+];
+
+const POPULAR_BANKS = [
+  "OPay",
+  "Moniepoint Microfinance Bank",
+  "PalmPay",
+  "Kuda Bank",
+  "Guaranty Trust Bank (GTBank)",
+  "Access Bank",
+  "Zenith Bank",
+  "United Bank for Africa (UBA)",
+  "First Bank of Nigeria",
+  "Stanbic IBTC Bank",
+  "Fidelity Bank",
+  "Wema Bank / ALAT",
+  "Union Bank of Nigeria",
+  "Sterling Bank",
+  "Ecobank Nigeria",
+  "FCMB (First City Monument Bank)",
+  "Polaris Bank",
+  "Keystone Bank",
+  "Jaiz Bank",
+  "Taj Bank",
+];
+
 export default function EditStoreModal({
   store,
   onClose,
@@ -23,6 +86,11 @@ export default function EditStoreModal({
   const [badge, setBadge] = useState(store.badge || "OFFICIAL STORE");
   const [logo, setLogo] = useState(store.logo || "");
   const [banner, setBanner] = useState(store.banner || "");
+  const [phone, setPhone] = useState(store.phone || "");
+  const [whatsapp, setWhatsapp] = useState(store.whatsapp || store.phone || "");
+  const [bankName, setBankName] = useState(store.bankDetails?.bankName || "");
+  const [accountNumber, setAccountNumber] = useState(store.bankDetails?.accountNumber || "");
+  const [accountName, setAccountName] = useState(store.bankDetails?.accountName || "");
   const [isSaving, setIsSaving] = useState(false);
   const [isUploadingLogo, setIsUploadingLogo] = useState(false);
   const [isUploadingBanner, setIsUploadingBanner] = useState(false);
@@ -35,6 +103,21 @@ export default function EditStoreModal({
       return;
     }
 
+    const hasAnyBankField = Boolean(
+      bankName.trim() || accountNumber.trim() || accountName.trim()
+    );
+
+    if (hasAnyBankField) {
+      if (!bankName.trim() || !accountNumber.trim() || !accountName.trim()) {
+        setError("Please complete all bank fields (Bank Name, Account Number, and Account Name) or clear them.");
+        return;
+      }
+      if (accountNumber.trim().length !== 10) {
+        setError("NUBAN Account Number must be exactly 10 digits.");
+        return;
+      }
+    }
+
     const updated: Store = {
       ...store,
       name: name.trim(),
@@ -45,6 +128,16 @@ export default function EditStoreModal({
       badge: badge.trim() || undefined,
       logo: logo.trim() || store.logo,
       banner: banner.trim() || store.banner,
+      phone: phone.trim() || whatsapp.trim() || undefined,
+      whatsapp: whatsapp.trim() || phone.trim() || undefined,
+      bankDetails:
+        bankName.trim() && accountNumber.trim() && accountName.trim()
+          ? {
+              bankName: bankName.trim(),
+              accountNumber: accountNumber.trim(),
+              accountName: accountName.trim(),
+            }
+          : undefined,
     };
 
     setIsSaving(true);
@@ -59,7 +152,7 @@ export default function EditStoreModal({
 
   return (
     <div className={styles.modalOverlay} role="dialog" aria-modal="true">
-      <div className={styles.modalContent} style={{ maxWidth: "560px" }}>
+      <div className={styles.modalContent} style={{ maxWidth: "600px" }}>
         <div className={styles.modalHeader}>
           <h3 className={styles.modalHeaderTitle}>
             <span className="material-icons-round" style={{ color: "#4f46e5" }}>
@@ -90,6 +183,7 @@ export default function EditStoreModal({
               </div>
             )}
 
+            {/* Storefront Identity */}
             <div className={styles.formGroup}>
               <label className={styles.formLabel}>Store Name *</label>
               <input
@@ -143,15 +237,21 @@ export default function EditStoreModal({
 
             <div className={styles.twoColRow}>
               <div className={styles.formGroup}>
-                <label className={styles.formLabel}>Location</label>
+                <label className={styles.formLabel}>Location (State)</label>
                 <input
                   type="text"
+                  list="edit-store-states-list"
                   className={styles.formInput}
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
                   placeholder="e.g. Lagos, Nigeria"
                   disabled={isSaving}
                 />
+                <datalist id="edit-store-states-list">
+                  {NIGERIAN_STATES.map((state) => (
+                    <option key={state} value={state} />
+                  ))}
+                </datalist>
               </div>
 
               <div className={styles.formGroup}>
@@ -294,6 +394,128 @@ export default function EditStoreModal({
                     />
                   </label>
                 </div>
+              </div>
+            </div>
+
+            {/* Direct Contact & WhatsApp */}
+            <div className={styles.formSectionDivider}>
+              <h4 className={styles.formSectionTitle}>
+                <span className="material-icons-round" style={{ color: "#25d366", fontSize: "18px" }}>
+                  chat
+                </span>
+                Customer Contact &amp; WhatsApp
+              </h4>
+              <p className={styles.formFieldHint}>
+                Buyers receive order confirmation links and send payment proofs directly to this WhatsApp line.
+              </p>
+            </div>
+
+            <div className={styles.twoColRow}>
+              <div className={styles.formGroup}>
+                <label className={styles.formLabel}>WhatsApp Number</label>
+                <input
+                  type="tel"
+                  className={styles.formInput}
+                  value={whatsapp}
+                  onChange={(e) => {
+                    setWhatsapp(e.target.value);
+                    if (!phone) setPhone(e.target.value);
+                    setError("");
+                  }}
+                  placeholder="e.g. 08012345678 or 23480..."
+                  disabled={isSaving}
+                />
+              </div>
+
+              <div className={styles.formGroup}>
+                <label className={styles.formLabel}>Direct Phone / Call Line</label>
+                <input
+                  type="tel"
+                  className={styles.formInput}
+                  value={phone}
+                  onChange={(e) => {
+                    setPhone(e.target.value);
+                    if (!whatsapp) setWhatsapp(e.target.value);
+                    setError("");
+                  }}
+                  placeholder="e.g. 08012345678"
+                  disabled={isSaving}
+                />
+              </div>
+            </div>
+
+            {/* Payout & Customer Bank Transfer Details */}
+            <div className={styles.formSectionDivider}>
+              <h4 className={styles.formSectionTitle}>
+                <span className="material-icons-round" style={{ color: "#2563eb", fontSize: "18px" }}>
+                  account_balance
+                </span>
+                Settlement Bank Account
+              </h4>
+              <p className={styles.formFieldHint}>
+                When customers choose Direct Bank Transfer at checkout, funds will be transferred directly to this account.
+              </p>
+            </div>
+
+            <div className={styles.formNotice}>
+              <span className="material-icons-round">verified</span>
+              <div>
+                <strong>Direct Payout:</strong> Sellora is 100% peer-to-peer. Customers transfer directly into your nominated account with zero payment gateway fees.
+              </div>
+            </div>
+
+            <div className={styles.formGroup}>
+              <label className={styles.formLabel}>Settlement Bank Name</label>
+              <input
+                type="text"
+                list="edit-store-popular-banks"
+                className={styles.formInput}
+                value={bankName}
+                onChange={(e) => {
+                  setBankName(e.target.value);
+                  setError("");
+                }}
+                placeholder="Select or enter bank (e.g. OPay, Moniepoint, GTBank)"
+                disabled={isSaving}
+              />
+              <datalist id="edit-store-popular-banks">
+                {POPULAR_BANKS.map((b) => (
+                  <option key={b} value={b} />
+                ))}
+              </datalist>
+            </div>
+
+            <div className={styles.twoColRow}>
+              <div className={styles.formGroup}>
+                <label className={styles.formLabel}>10-Digit NUBAN Account Number</label>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  maxLength={10}
+                  className={styles.formInput}
+                  value={accountNumber}
+                  onChange={(e) => {
+                    setAccountNumber(e.target.value.replace(/\D/g, ""));
+                    setError("");
+                  }}
+                  placeholder="0123456789"
+                  disabled={isSaving}
+                />
+              </div>
+
+              <div className={styles.formGroup}>
+                <label className={styles.formLabel}>Account Holder Name</label>
+                <input
+                  type="text"
+                  className={styles.formInput}
+                  value={accountName}
+                  onChange={(e) => {
+                    setAccountName(e.target.value);
+                    setError("");
+                  }}
+                  placeholder="Exact account name on bank file"
+                  disabled={isSaving}
+                />
               </div>
             </div>
           </div>

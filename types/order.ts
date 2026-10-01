@@ -65,6 +65,13 @@ export interface Order {
     slug?: string;
     avatar?: string;
     isVerified?: boolean;
+    phone?: string;
+    whatsapp?: string;
+    bankDetails?: {
+      bankName: string;
+      accountNumber: string;
+      accountName: string;
+    };
   };
   items: OrderItem[];
   pricing: OrderPricing;

@@ -12,6 +12,7 @@ interface ProductGridProps {
   onAddToCart: (product: Pick<Product, "id" | "name">) => void;
   sortBy?: string;
   onSortChange?: (newSort: string) => void;
+  onShuffle?: () => void;
   onResetFilters?: () => void;
   searchQuery?: string;
 }
@@ -23,6 +24,7 @@ export default function ProductGrid({
   onAddToCart,
   sortBy = "FEATURED",
   onSortChange,
+  onShuffle,
   onResetFilters,
   searchQuery = "",
 }: ProductGridProps) {
@@ -40,24 +42,43 @@ export default function ProductGrid({
           </span>
         </div>
 
-        {!isLoading && products.length > 0 && onSortChange && (
+        {!isLoading && products.length > 0 && (
           <div className={styles.sortWrapper}>
-            <label htmlFor="product-sort-select" className={styles.sortLabel}>
-              Sort by:
-            </label>
-            <select
-              id="product-sort-select"
-              className={styles.sortSelect}
-              value={sortBy}
-              onChange={(e) => onSortChange(e.target.value)}
-              aria-label="Sort products catalog"
-            >
-              <option value="FEATURED">Featured</option>
-              <option value="PRICE_ASC">Price: Low to High</option>
-              <option value="PRICE_DESC">Price: High to Low</option>
-              <option value="RATING">Highest Rated</option>
-              <option value="NEWEST">Newest Arrivals</option>
-            </select>
+            {onShuffle && (
+              <button
+                type="button"
+                className={styles.shuffleBtn}
+                onClick={onShuffle}
+                title="Randomize product order"
+                aria-label="Randomize products"
+              >
+                <span className="material-icons-round" style={{ fontSize: "16px" }}>
+                  shuffle
+                </span>
+                <span>Randomize</span>
+              </button>
+            )}
+
+            {onSortChange && (
+              <>
+                <label htmlFor="product-sort-select" className={styles.sortLabel}>
+                  Sort by:
+                </label>
+                <select
+                  id="product-sort-select"
+                  className={styles.sortSelect}
+                  value={sortBy}
+                  onChange={(e) => onSortChange(e.target.value)}
+                  aria-label="Sort products catalog"
+                >
+                  <option value="FEATURED">Featured (Randomized)</option>
+                  <option value="PRICE_ASC">Price: Low to High</option>
+                  <option value="PRICE_DESC">Price: High to Low</option>
+                  <option value="RATING">Highest Rated</option>
+                  <option value="NEWEST">Newest Arrivals</option>
+                </select>
+              </>
+            )}
           </div>
         )}
       </div>

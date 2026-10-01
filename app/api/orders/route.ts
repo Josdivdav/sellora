@@ -53,7 +53,7 @@ export async function GET(request: NextRequest) {
 
 /**
  * POST /api/orders
- * Creates a new order in Firestore database.
+ * Creates a new order in Firestore database with full validation and sanitation.
  */
 export async function POST(request: NextRequest) {
   const authorization = request.headers.get("authorization");
@@ -80,22 +80,25 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Order items cannot be empty" }, { status: 400 });
     }
 
-    const items: OrderItem[] = body.items.map((item: any) => ({
-      productId: item.productId || item.id || `prod_${Date.now()}`,
-      name: item.name || "Product",
-      slug: item.slug || "",
-      image: item.image || (Array.isArray(item.images) ? item.images[0] : "") || "",
-      price: Number(item.price) || 0,
-      originalPrice: item.originalPrice ? Number(item.originalPrice) : null,
-      quantity: Math.max(1, Number(item.quantity) || 1),
-      variant: item.variant || undefined,
-      storeName: item.storeName || item.author || "Sellora Official",
-      storeId: item.storeId || undefined,
-      category: item.category || "General",
-    }));
+    const items: OrderItem[] = body.items.map((item: any) => {
+      const it: OrderItem = {
+        productId: String(item.productId || item.id || `prod_${Date.now()}`),
+        name: String(item.name || "Product"),
+        slug: String(item.slug || ""),
+        image: String(item.image || (Array.isArray(item.images) ? item.images[0] : "") || "/favico.png"),
+        price: Math.max(0, Number(item.price) || 0),
+        originalPrice: item.originalPrice ? Number(item.originalPrice) : null,
+        quantity: Math.max(1, Number(item.quantity) || 1),
+        storeName: String(item.storeName || item.author || "Sellora Official Store"),
+        category: String(item.category || "General"),
+      };
+      if (item.variant) it.variant = String(item.variant);
+      if (item.storeId) it.storeId = String(item.storeId);
+      return it;
+    });
 
     const subtotal = items.reduce((acc, it) => acc + it.price * it.quantity, 0);
-    const shippingFee = subtotal >= 50000 ? 0 : 1500;
+    const shippingFee = body.deliveryMethod === "express" ? 2500 : 0;
     const discount = Math.max(0, Number(body.discount) || 0);
     const tax = 0;
     const total = Math.max(0, subtotal + shippingFee - discount + tax);
@@ -105,43 +108,57 @@ export async function POST(request: NextRequest) {
     const deliveryDate = new Date(now.getTime() + 4 * 24 * 60 * 60 * 1000);
     const deliveryIso = deliveryDate.toISOString();
 
-    const orderId = body.id || `order_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+    const orderId = String(body.id || `order_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`);
     const randomSuffix = Math.floor(100000 + Math.random() * 900000);
-    const orderNumber = body.orderNumber || `ORD-${randomSuffix}`;
+    const orderNumber = String(body.orderNumber || `ORD-${randomSuffix}`);
     const trackingNumber = `SEL-${Math.floor(10000000 + Math.random() * 90000000)}`;
 
     const firstItem = items[0];
-    const storeInfo = body.store || {
-      id: firstItem?.storeId || "sellora-official",
-      name: firstItem?.storeName || "Sellora Official Store",
-      isVerified: true,
-      avatar: "",
+    const rawStore = body.store || {};
+    const storeInfo: Record<string, any> = {
+      id: String(rawStore.id || firstItem?.storeId || "sellora-store"),
+      name: String(rawStore.name || firstItem?.storeName || "Sellora Official Store"),
+      isVerified: Boolean(rawStore.isVerified ?? true),
     };
+    if (rawStore.phone) storeInfo.phone = String(rawStore.phone);
+    if (rawStore.whatsapp) storeInfo.whatsapp = String(rawStore.whatsapp);
+    if (rawStore.bankDetails && typeof rawStore.bankDetails === "object") {
+      storeInfo.bankDetails = {
+        bankName: String(rawStore.bankDetails.bankName || ""),
+        accountNumber: String(rawStore.bankDetails.accountNumber || ""),
+        accountName: String(rawStore.bankDetails.accountName || ""),
+      };
+    }
 
-    const shippingAddress: ShippingAddress = body.shippingAddress || {
-      fullName: body.customerName || "Customer",
-      phone: body.phone || "+234 800 123 4567",
-      street: body.street || "Plot 14 Victoria Island Commercial District",
-      city: body.city || "Lagos",
-      state: body.state || "Lagos",
-      postalCode: body.postalCode || "101241",
+    const shippingAddress: ShippingAddress = {
+      fullName: String(body.shippingAddress?.fullName || body.customerName || "Customer"),
+      phone: String(body.shippingAddress?.phone || body.phone || "+234 800 000 0000"),
+      street: String(body.shippingAddress?.street || body.street || "Delivery Address"),
+      city: String(body.shippingAddress?.city || body.city || "Lagos"),
+      state: String(body.shippingAddress?.state || body.state || "Lagos"),
+      postalCode: String(body.shippingAddress?.postalCode || body.postalCode || "101241"),
       country: "Nigeria",
     };
 
+    const paymentMethod = String(body.payment?.method || "Cash / POS on Delivery (Pay on Arrival)");
+    const isTransfer = paymentMethod.toLowerCase().includes("transfer");
     const payment: PaymentDetails = {
-      method: body.payment?.method || "Paystack (Debit Card)",
-      status: "PAID",
-      transactionId:
+      method: paymentMethod,
+      status: String(body.payment?.status || (isTransfer ? "PENDING" : "PAID")) as "PAID" | "PENDING",
+      transactionId: String(
         body.payment?.transactionId ||
-        `TXN_${Date.now()}_${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
-      cardLast4: body.payment?.cardLast4 || "4242",
+        `TXN_${Date.now()}_${Math.random().toString(36).substring(2, 8).toUpperCase()}`
+      ),
+      cardLast4: String(body.payment?.cardLast4 || "4242"),
     };
 
     const trackingEvents = [
       {
         status: "ORDER_PLACED" as const,
         title: "Order Placed & Verified",
-        description: "Payment confirmed. Merchant notified to prepare shipment package.",
+        description: isTransfer
+          ? "Direct bank transfer order initiated. Awaiting confirmation by seller."
+          : "Order verified. Merchant notified to prepare shipment package.",
         location: "Sellora Order Processing Center",
         timestamp: nowIso,
         completed: true,
@@ -150,7 +167,7 @@ export async function POST(request: NextRequest) {
       {
         status: "PROCESSING" as const,
         title: "Merchant Packaging Items",
-        description: "Merchant is inspecting items and sealing with Sellora security tape.",
+        description: "Merchant is inspecting items and sealing package.",
         location: storeInfo.name,
         timestamp: new Date(now.getTime() + 2 * 60 * 60 * 1000).toISOString(),
         completed: false,
@@ -189,7 +206,7 @@ export async function POST(request: NextRequest) {
       status: "PROCESSING",
       createdAt: nowIso,
       estimatedDelivery: deliveryIso,
-      store: storeInfo,
+      store: storeInfo as any,
       items,
       pricing: {
         subtotal,
@@ -200,13 +217,16 @@ export async function POST(request: NextRequest) {
         currency: "NGN",
       },
       shippingAddress,
-      shippingMethod: body.shippingMethod || "Sellora Express Delivery (Priority)",
+      shippingMethod: String(
+        body.shippingMethod ||
+        (body.deliveryMethod === "express" ? "Sellora Express Delivery (Priority)" : "Sellora Standard Delivery")
+      ),
       trackingNumber,
-      carrier: body.carrier || "GIG Logistics",
+      carrier: String(body.carrier || "GIG Logistics"),
       carrierPhone: "+234 1 800 735 567",
       payment,
       trackingEvents,
-      notes: body.notes || "",
+      notes: String(body.notes || body.deliveryNotes || ""),
       storeIds,
     };
 
@@ -230,7 +250,7 @@ export async function POST(request: NextRequest) {
           }
         })
       );
-    } else if (storeInfo.id && storeInfo.id !== "sellora-official") {
+    } else if (storeInfo.id && storeInfo.id !== "sellora-official" && storeInfo.id !== "sellora-store") {
       try {
         await db
           .collection("stores")
@@ -244,8 +264,11 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({ success: true, order: orderDocData }, { status: 201 });
-  } catch (error) {
-    console.error("Error creating order in Firestore:", error);
-    return NextResponse.json({ error: "Failed to place order in database" }, { status: 500 });
+  } catch (error: any) {
+    console.error("Error creating order in Firestore:", error?.message || error, error?.stack);
+    return NextResponse.json(
+      { error: error?.message || "Failed to place order in database" },
+      { status: 500 }
+    );
   }
 }

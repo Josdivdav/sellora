@@ -9,6 +9,7 @@ export const RESERVED_PATHS = new Set([
   "register",
   "signup",
   "cart",
+  "checkout",
   "account",
   "products",
   "api",
