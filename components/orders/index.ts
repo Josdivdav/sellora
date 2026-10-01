@@ -4,6 +4,7 @@ export { default as OrderDetailModal } from "./OrderDetailModal";
 export { default as CancelOrderModal } from "./CancelOrderModal";
 export { default as OrderStatsHeader } from "./OrderStatsHeader";
 export { default as OrderFilterBar } from "./OrderFilterBar";
+export type { TabFilter } from "./OrderFilterBar";
 export { default as HomeHeader } from "@/components/home/HomeHeader";
 export { default as Sidebar } from "@/components/SidebarN";
 export { default as Toast } from "@/components/home/Toast";

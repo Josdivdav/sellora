@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { Store } from "@/types/store";
+import { getStoreFullUrl } from "@/lib/storeUrl";
 import styles from "./tabs.module.css";
 
 interface Props {
@@ -75,7 +76,9 @@ export default function MerchantSettingsTab({ store, onSave, onShowToast }: Prop
               onChange={(e) => set("slug", e.target.value.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, ""))}
               placeholder="your-store-handle"
             />
-            <span className={styles.formHint}>{host}/@{form.slug || "your-handle"}</span>
+            <span className={styles.formHint}>
+              {getStoreFullUrl({ slug: form.slug || "your-handle", name: form.name || "Store" }).replace(/^https?:\/\//, "")}
+            </span>
           </div>
           <div className={styles.formGroup}>
             <label className={styles.formLabel}>Category</label>

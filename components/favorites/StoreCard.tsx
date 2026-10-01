@@ -12,6 +12,7 @@ const currency = new Intl.NumberFormat("en-NG", {
 interface StoreCardProps {
   store: Store;
   isFavorite: boolean;
+  isOwner?: boolean;
   onToggleFavorite: (store: Store) => void;
   onVisitStore: (store: Store) => void;
   onMessageStore: (store: Store) => void;
@@ -21,6 +22,7 @@ interface StoreCardProps {
 export default function StoreCard({
   store,
   isFavorite,
+  isOwner = false,
   onToggleFavorite,
   onVisitStore,
   onMessageStore,
@@ -44,23 +46,41 @@ export default function StoreCard({
         />
         {store.badge && <span className={styles.badgeTag}>{store.badge}</span>}
 
-        <button
-          type="button"
-          className={styles.favoriteBtn}
-          onClick={() => onToggleFavorite(store)}
-          aria-label={isFavorite ? "Unfollow store" : "Follow store"}
-          title={isFavorite ? "Remove from favorite stores" : "Add to favorite stores"}
-        >
-          <span
-            className="material-icons-round"
-            style={{
-              fontSize: "20px",
-              color: isFavorite ? "#e11d48" : "#9ca3af",
-            }}
+        {!isOwner ? (
+          <button
+            type="button"
+            className={styles.favoriteBtn}
+            onClick={() => onToggleFavorite(store)}
+            aria-label={isFavorite ? "Unfollow store" : "Follow store"}
+            title={isFavorite ? "Remove from favorite stores" : "Add to favorite stores"}
           >
-            {isFavorite ? "favorite" : "favorite_border"}
+            <span
+              className="material-icons-round"
+              style={{
+                fontSize: "20px",
+                color: isFavorite ? "#e11d48" : "#9ca3af",
+              }}
+            >
+              {isFavorite ? "favorite" : "favorite_border"}
+            </span>
+          </button>
+        ) : (
+          <span
+            className={styles.favoriteBtn}
+            style={{ cursor: "default" }}
+            title="You own this store"
+          >
+            <span
+              className="material-icons-round"
+              style={{
+                fontSize: "18px",
+                color: "#2b6dff",
+              }}
+            >
+              store
+            </span>
           </span>
-        </button>
+        )}
       </div>
 
       {/* Header with Logo */}

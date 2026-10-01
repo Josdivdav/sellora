@@ -1,11 +1,12 @@
 "use client";
 
-import { useMemo, useState, useEffect, useCallback } from "react";
+import { useMemo, useState, useEffect, useCallback, useRef } from "react";
 import styles from "@/app/home.module.css";
 import { useAuth } from "@/context/AuthContext";
-import { fetchUserData, SignOut } from "@/functions/home.func";
+import { SignOut } from "@/functions/home.func";
 import { useRouter, useSearchParams } from "next/navigation";
 import type { Product } from "@/types/product";
+import { useStoreStatus } from "@/hooks/useStoreStatus";
 import {
   HomeHeader,
   Sidebar,
@@ -20,18 +21,14 @@ import {
 import storesData from "@/data/stores.json";
 import type { Store } from "@/types/store";
 import type { StoreFilterItem } from "@/components/home/StoreFilter";
+import { useCart } from "@/context/CartContext";
 
-function readCartCount(): number {
-  try {
-    const cartObj = JSON.parse(localStorage.getItem("sellora_cart") || "{}");
-    return Object.values(cartObj).reduce(
-      (acc: number, cur) => acc + (typeof cur === "number" ? cur : 1),
-      0
-    );
-  } catch {
-    return 0;
-  }
-}
+export type SortOption =
+  | "FEATURED"
+  | "PRICE_ASC"
+  | "PRICE_DESC"
+  | "RATING"
+  | "NEWEST";
 
 interface HomeClientProps {
   initialProducts?: Product[];
@@ -47,21 +44,26 @@ export default function HomeClient({
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user } = useAuth();
+  const hasStore = useStoreStatus();
 
+  // Read initial states from URL or props
   const initialSearch = searchParams?.get("search") || "";
   const initialCat = searchParams?.get("category") || "All";
-  const initialStore = searchParams?.get("store") || "";
+  const initialStore = searchParams?.get("store") || "All";
+  const initialMode =
+    (searchParams?.get("mode") as "category" | "store") ||
+    (initialStore !== "All" ? "store" : "category");
+  const initialSort = (searchParams?.get("sort") as SortOption) || "FEATURED";
 
   const [search, setSearch] = useState(initialSearch);
   const [category, setCategory] = useState(initialCat);
-  const [classificationMode, setClassificationMode] = useState<"category" | "store">(
-    initialStore ? "store" : "category"
-  );
-  const [selectedStore, setSelectedStore] = useState<string>(initialStore || "All");
+  const [classificationMode, setClassificationMode] = useState<"category" | "store">(initialMode);
+  const [selectedStore, setSelectedStore] = useState<string>(initialStore);
+  const [sortBy, setSortBy] = useState<SortOption>(initialSort);
+
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [toast, setToast] = useState("");
-  const [cartCount, setCartCount] = useState<number>(0);
-  const [hasStore, setHasStore] = useState<boolean>(false);
+  const { cartCount, addToCart } = useCart();
 
   // Initialize directly from server pre-rendered products for instant loading
   const [products, setProducts] = useState<Product[]>(initialProducts);
@@ -69,6 +71,8 @@ export default function HomeClient({
   const [stores, setStores] = useState<Store[]>(initialStores);
   const [isLoading, setIsLoading] = useState<boolean>(initialProducts.length === 0);
   const [fetchError, setFetchError] = useState<string | null>(null);
+
+  const isFirstRender = useRef(true);
 
   // Background refresh or fallback if initialProducts was empty
   const fetchProducts = useCallback(async () => {
@@ -102,17 +106,82 @@ export default function HomeClient({
   }, [products.length]);
 
   useEffect(() => {
-    // Only fetch client-side if server returned no products
     if (initialProducts.length === 0) {
       void fetchProducts();
     }
   }, [fetchProducts, initialProducts.length]);
 
+
+  // Sync URL search parameters whenever filter states change
   useEffect(() => {
-    const update = () => setCartCount(readCartCount());
-    update();
-    window.addEventListener("storage", update);
-    return () => window.removeEventListener("storage", update);
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      if (typeof window === "undefined") return;
+      const url = new URL(window.location.href);
+
+      // Search
+      if (search.trim()) {
+        url.searchParams.set("search", search.trim());
+      } else {
+        url.searchParams.delete("search");
+      }
+
+      // Category
+      if (category && category !== "All") {
+        url.searchParams.set("category", category);
+      } else {
+        url.searchParams.delete("category");
+      }
+
+      // Mode
+      if (classificationMode === "store") {
+        url.searchParams.set("mode", "store");
+      } else {
+        url.searchParams.delete("mode");
+      }
+
+      // Store
+      if (selectedStore && selectedStore !== "All") {
+        url.searchParams.set("store", selectedStore);
+      } else {
+        url.searchParams.delete("store");
+      }
+
+      // Sort
+      if (sortBy && sortBy !== "FEATURED") {
+        url.searchParams.set("sort", sortBy);
+      } else {
+        url.searchParams.delete("sort");
+      }
+
+      const newRelativePath = url.pathname + (url.search ? url.search : "");
+      window.history.replaceState(null, "", newRelativePath);
+    }, 250);
+
+    return () => clearTimeout(timer);
+  }, [search, category, classificationMode, selectedStore, sortBy]);
+
+  // Handle browser back/forward buttons
+  useEffect(() => {
+    const handlePopState = () => {
+      if (typeof window === "undefined") return;
+      const params = new URLSearchParams(window.location.search);
+      setSearch(params.get("search") || "");
+      setCategory(params.get("category") || "All");
+      setSelectedStore(params.get("store") || "All");
+      setClassificationMode(
+        (params.get("mode") as "category" | "store") ||
+          (params.get("store") ? "store" : "category")
+      );
+      setSortBy((params.get("sort") as SortOption) || "FEATURED");
+    };
+
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
   }, []);
 
   // Compute dynamic categories based on database products
@@ -147,8 +216,8 @@ export default function HomeClient({
     return result.sort((a, b) => b.count - a.count);
   }, [products, stores]);
 
-  // Compute visible products according to active category and search input
-  const visibleProducts = useMemo(() => {
+  // Filter products according to category and search query
+  const filteredProducts = useMemo(() => {
     return products.filter((product) => {
       const matchesCategory =
         category === "All" ||
@@ -166,7 +235,29 @@ export default function HomeClient({
     });
   }, [products, category, search]);
 
-  // Compute products grouped by store for "All Stores" classification view
+  // Sort filtered products
+  const visibleProducts = useMemo(() => {
+    const list = [...filteredProducts];
+    switch (sortBy) {
+      case "PRICE_ASC":
+        return list.sort((a, b) => a.price - b.price);
+      case "PRICE_DESC":
+        return list.sort((a, b) => b.price - a.price);
+      case "RATING":
+        return list.sort((a, b) => (Number(b.rating) || 5) - (Number(a.rating) || 5));
+      case "NEWEST":
+        return list.sort((a, b) => {
+          const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+          const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+          return timeB - timeA;
+        });
+      case "FEATURED":
+      default:
+        return list;
+    }
+  }, [filteredProducts, sortBy]);
+
+  // Products grouped by store for "By Store -> All Stores"
   const productsByStore = useMemo(() => {
     const groups: Record<string, Product[]> = {};
     const q = search.trim().toLowerCase();
@@ -190,12 +281,12 @@ export default function HomeClient({
     return groups;
   }, [products, search]);
 
-  // Compute products for single selected store
+  // Products for a single selected store
   const storeProducts = useMemo(() => {
     if (selectedStore === "All") return [];
     const q = search.trim().toLowerCase();
 
-    return products.filter((product) => {
+    const filtered = products.filter((product) => {
       const author = product.author?.trim() || "Sellora";
       const matchesStore = author.toLowerCase() === selectedStore.toLowerCase();
       const matchesSearch =
@@ -208,7 +299,25 @@ export default function HomeClient({
 
       return matchesStore && matchesSearch;
     });
-  }, [products, selectedStore, search]);
+
+    switch (sortBy) {
+      case "PRICE_ASC":
+        return filtered.sort((a, b) => a.price - b.price);
+      case "PRICE_DESC":
+        return filtered.sort((a, b) => b.price - a.price);
+      case "RATING":
+        return filtered.sort((a, b) => (Number(b.rating) || 5) - (Number(a.rating) || 5));
+      case "NEWEST":
+        return filtered.sort((a, b) => {
+          const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+          const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+          return timeB - timeA;
+        });
+      case "FEATURED":
+      default:
+        return filtered;
+    }
+  }, [products, selectedStore, search, sortBy]);
 
   useEffect(() => {
     if (!toast) return;
@@ -216,25 +325,14 @@ export default function HomeClient({
     return () => clearTimeout(timer);
   }, [toast]);
 
-  function handleAddToCart(product: Pick<Product, "id" | "name">) {
-    try {
-      const existing = JSON.parse(localStorage.getItem("sellora_cart") || "{}");
-      existing[product.id] = (existing[product.id] || 0) + 1;
-      localStorage.setItem("sellora_cart", JSON.stringify(existing));
-
-      setCartCount(readCartCount());
-      window.dispatchEvent(new Event("storage"));
-      setToast(`Added "${product.name}" to cart!`);
-    } catch {
-      setToast(`Added "${product.name}" to cart!`);
-    }
-  }
+  const handleAddToCart = (product: Pick<Product, "id" | "name">) => {
+    void addToCart(product.id, 1);
+    setToast(`Added "${product.name}" to cart!`);
+  };
 
   const handleSignOut = async () => {
-    const success = await SignOut();
-    if (success) {
-      router.refresh();
-    }
+    await SignOut();
+    router.refresh();
   };
 
   const handleSignIn = () => {
@@ -242,32 +340,25 @@ export default function HomeClient({
   };
 
   const handleCartClick = () => {
-    router.push("/account/orders");
+    router.push("/cart");
   };
 
-  const checkStore = async () => {
-    try {
-      if (typeof window !== "undefined" && localStorage.getItem("sellora_my_store")) {
-        setHasStore(true);
-        return;
-      }
-    } catch {}
-    if (user) {
-      const res = await fetchUserData(user);
-      if (res?.has_store) {
-        setHasStore(true);
-      }
+  const handleResetAllFilters = () => {
+    setSearch("");
+    setCategory("All");
+    setSelectedStore("All");
+    setClassificationMode("category");
+    setSortBy("FEATURED");
+    if (typeof window !== "undefined") {
+      window.history.replaceState(null, "", window.location.pathname);
     }
   };
 
-  useEffect(() => {
-    checkStore();
-  }, [user]);
-
-  const manageStore = () => {
-    setSidebarOpen(false);
-    router.push("/account/manage-store");
-  };
+  const hasActiveFilters =
+    search.trim() !== "" ||
+    category !== "All" ||
+    (classificationMode === "store" && selectedStore !== "All") ||
+    sortBy !== "FEATURED";
 
   return (
     <div className={styles.page}>
@@ -277,6 +368,7 @@ export default function HomeClient({
         cartCount={cartCount}
         onOpenSidebar={() => setSidebarOpen(true)}
         onCartClick={handleCartClick}
+        onLogoClick={handleResetAllFilters}
       />
 
       <div className={styles.contentArea}>
@@ -287,12 +379,19 @@ export default function HomeClient({
           onSignOut={handleSignOut}
           onSignIn={handleSignIn}
           hasStore={hasStore}
-          manageStore={manageStore}
+          manageStore={() => {
+            setSidebarOpen(false);
+            router.push("/account/manage-store");
+          }}
         />
 
         <main className={styles.main}>
           {/* Classification Mode Toggle */}
-          <div className={styles.classificationTabs} role="tablist" aria-label="Browse Classification">
+          <div
+            className={styles.classificationTabs}
+            role="tablist"
+            aria-label="Browse Classification"
+          >
             <button
               type="button"
               role="tab"
@@ -342,18 +441,101 @@ export default function HomeClient({
             />
           )}
 
+          {/* Active Filter Chips Bar */}
+          {hasActiveFilters && (
+            <div className={styles.activeFilterBar} aria-label="Active filters">
+              <span className={styles.activeFilterLabel}>Filters:</span>
+
+              {search.trim() !== "" && (
+                <button
+                  type="button"
+                  className={styles.filterChip}
+                  onClick={() => setSearch("")}
+                  title="Remove search query"
+                >
+                  <span>Search: &ldquo;{search.trim()}&rdquo;</span>
+                  <span className={`material-icons-round ${styles.filterChipRemove}`}>
+                    close
+                  </span>
+                </button>
+              )}
+
+              {category !== "All" && (
+                <button
+                  type="button"
+                  className={styles.filterChip}
+                  onClick={() => setCategory("All")}
+                  title="Remove category filter"
+                >
+                  <span>Category: {category}</span>
+                  <span className={`material-icons-round ${styles.filterChipRemove}`}>
+                    close
+                  </span>
+                </button>
+              )}
+
+              {classificationMode === "store" && selectedStore !== "All" && (
+                <button
+                  type="button"
+                  className={styles.filterChip}
+                  onClick={() => setSelectedStore("All")}
+                  title="View all stores"
+                >
+                  <span>Store: {selectedStore}</span>
+                  <span className={`material-icons-round ${styles.filterChipRemove}`}>
+                    close
+                  </span>
+                </button>
+              )}
+
+              {sortBy !== "FEATURED" && (
+                <button
+                  type="button"
+                  className={styles.filterChip}
+                  onClick={() => setSortBy("FEATURED")}
+                  title="Reset sort order"
+                >
+                  <span>
+                    Sort:{" "}
+                    {sortBy === "PRICE_ASC"
+                      ? "Price (Low-High)"
+                      : sortBy === "PRICE_DESC"
+                      ? "Price (High-Low)"
+                      : sortBy === "RATING"
+                      ? "Top Rated"
+                      : "Newest"}
+                  </span>
+                  <span className={`material-icons-round ${styles.filterChipRemove}`}>
+                    close
+                  </span>
+                </button>
+              )}
+
+              <button
+                type="button"
+                className={styles.clearAllFiltersBtn}
+                onClick={handleResetAllFilters}
+              >
+                <span className="material-icons-round" style={{ fontSize: "15px" }}>
+                  clear_all
+                </span>
+                Clear All
+              </button>
+            </div>
+          )}
+
           {fetchError && products.length === 0 ? (
             <div
               style={{
                 background: "#fff1f2",
                 border: "1px solid #fecdd3",
                 borderRadius: "16px",
-                padding: "24px",
+                padding: "28px",
                 textAlign: "center",
                 margin: "20px 0",
               }}
             >
-              <p style={{ color: "#e11d48", fontWeight: 600, margin: "0 0 10px" }}>
+              <p style={{ color: "#e11d48", fontWeight: 700, margin: "0 0 10px" }}>
                 {fetchError}
               </p>
               <button
@@ -363,13 +545,13 @@ export default function HomeClient({
                   background: "#e11d48",
                   color: "#fff",
                   border: 0,
-                  borderRadius: "8px",
-                  padding: "8px 16px",
+                  borderRadius: "10px",
+                  padding: "9px 18px",
                   fontWeight: 700,
                   cursor: "pointer",
                 }}
               >
-                Retry
+                Retry Loading
               </button>
             </div>
           ) : classificationMode === "category" ? (
@@ -393,6 +575,10 @@ export default function HomeClient({
                 products={visibleProducts}
                 isLoading={isLoading}
                 onAddToCart={handleAddToCart}
+                sortBy={sortBy}
+                onSortChange={(val) => setSortBy(val as SortOption)}
+                onResetFilters={handleResetAllFilters}
+                searchQuery={search}
               />
             </>
           ) : (
@@ -404,6 +590,7 @@ export default function HomeClient({
                   onSelectStore={(st) => setSelectedStore(st)}
                   onAddToCart={handleAddToCart}
                   stores={stores}
+                  onResetFilters={handleResetAllFilters}
                 />
               ) : (
                 <>
@@ -421,6 +608,10 @@ export default function HomeClient({
                     products={storeProducts}
                     isLoading={isLoading}
                     onAddToCart={handleAddToCart}
+                    sortBy={sortBy}
+                    onSortChange={(val) => setSortBy(val as SortOption)}
+                    onResetFilters={handleResetAllFilters}
+                    searchQuery={search}
                   />
                 </>
               )}

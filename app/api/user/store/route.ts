@@ -1,6 +1,7 @@
 import { getAuth } from 'firebase-admin/auth';
 import { NextResponse, NextRequest } from 'next/server';
 import { db } from '@/lib/firebaseAdmin';
+import { invalidateStoreCache } from '@/lib/getStore';
 
 export async function POST(request: NextRequest) {
   const authorization = request.headers.get('authorization');
@@ -38,6 +39,8 @@ export async function POST(request: NextRequest) {
       storeRef.set(storeData, { merge: true }),
       userRef.set({ has_store: true, updatedAt: new Date().toISOString() }, { merge: true }),
     ]);
+
+    invalidateStoreCache();
 
     return NextResponse.json({ success: true, data: storeData }, { status: 200 });
   } catch (error) {
@@ -99,6 +102,8 @@ export async function PUT(request: NextRequest) {
 
     const refreshedSnapshot = await storeRef.get();
     const finalStore = { id: storeSnapshot.id, ...refreshedSnapshot.data() };
+
+    invalidateStoreCache();
 
     return NextResponse.json({ success: true, data: finalStore }, { status: 200 });
   } catch (error) {

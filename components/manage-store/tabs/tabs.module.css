@@ -426,3 +426,410 @@
   gap: 12px;
   flex-wrap: wrap;
 }
+
+/* Orders List & Cards */
+.ordersList {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.orderCard {
+  background: #ffffff;
+  border: 1px solid #edf0f7;
+  border-radius: 18px;
+  box-shadow: 0 3px 14px rgba(11, 18, 48, 0.04);
+  padding: 22px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.orderCard:hover {
+  box-shadow: 0 6px 22px rgba(11, 18, 48, 0.07);
+}
+
+.orderHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.orderIdGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.orderNumber {
+  font-size: 16px;
+  font-weight: 800;
+  color: #0b1230;
+  letter-spacing: -0.2px;
+}
+
+.orderDate {
+  font-size: 12px;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 50px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+
+.statusProcessing {
+  background: #fffbeb;
+  color: #b45309;
+  border: 1px solid #fef3c7;
+}
+
+.statusInTransit {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #dbeafe;
+}
+
+.statusDelivered {
+  background: #ecfdf5;
+  color: #047857;
+  border: 1px solid #d1fae5;
+}
+
+.statusCancelled {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fee2e2;
+}
+
+.orderCustomerGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
+  padding: 16px 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.customerMetaItem {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.customerMetaLabel {
+  font-size: 11px;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.customerMetaValue {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.orderItemsList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.orderItemRow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.orderItemThumb {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  object-fit: cover;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  flex-shrink: 0;
+}
+
+.orderItemDetails {
+  flex: 1;
+  min-width: 0;
+}
+
+.orderItemName {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.orderItemMeta {
+  font-size: 12px;
+  color: #64748b;
+}
+
+.orderItemPrice {
+  font-size: 14px;
+  font-weight: 800;
+  color: #0f172a;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.orderFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  padding-top: 16px;
+}
+
+.orderTotalSummary {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.orderTotalLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.orderTotalAmount {
+  font-size: 18px;
+  font-weight: 800;
+  color: #0b1230;
+}
+
+.orderActionsRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.actionBtnSecondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 8px 14px;
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #334155;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.actionBtnSecondary:hover:not(:disabled) {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.actionBtnPrimary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  padding: 8px 16px;
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(79, 70, 229, 0.25);
+  transition: all 0.15s ease;
+}
+
+.actionBtnPrimary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(79, 70, 229, 0.35);
+}
+
+.actionBtnPrimary:disabled,
+.actionBtnSecondary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.actionBtnDanger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #fff1f2;
+  border: 1px solid #fecdd3;
+  border-radius: 10px;
+  padding: 8px 14px;
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #e11d48;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.actionBtnDanger:hover:not(:disabled) {
+  background: #ffe4e6;
+  border-color: #fda4af;
+}
+
+/* Promotions List */
+.promosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.promoCardItem {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+.promoCodeBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #eff6ff;
+  border: 1px dashed #3b82f6;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 14px;
+  font-weight: 800;
+  color: #1d4ed8;
+  letter-spacing: 0.5px;
+  width: fit-content;
+}
+
+.promoDiscountVal {
+  font-size: 18px;
+  font-weight: 800;
+  color: #0b1230;
+}
+
+.promoMetaRow {
+  font-size: 12px;
+  color: #64748b;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.promoCardFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 10px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.deleteIconBtn {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  transition: all 0.15s ease;
+}
+
+.deleteIconBtn:hover {
+  color: #ef4444;
+  background: #fee2e2;
+}
+
+.copyIconBtn {
+  background: transparent;
+  border: none;
+  color: #64748b;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11.5px;
+  font-weight: 600;
+  transition: all 0.15s ease;
+}
+
+.copyIconBtn:hover {
+  color: #4f46e5;
+  background: #eef2ff;
+}
+
+/* Analytics status breakdown bar */
+.statusBreakdownContainer {
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.breakdownBarTrack {
+  height: 12px;
+  border-radius: 50px;
+  background: #f1f5f9;
+  display: flex;
+  overflow: hidden;
+  gap: 2px;
+}
+
+.breakdownSegment {
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+.breakdownLegend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  font-size: 12px;
+  color: #475569;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legendDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}

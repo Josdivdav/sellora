@@ -1,11 +1,10 @@
 "use client";
 
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, useCallback } from "react";
 import styles from "@/components/orders/orders.module.css";
 import { useAuth } from "@/context/AuthContext";
 import { SignOut } from "@/functions/home.func";
 import { useRouter } from "next/navigation";
-import initialOrdersData from "@/data/orders.json";
 import type { Order } from "@/types/order";
 import { useStoreStatus } from "@/hooks/useStoreStatus";
 import {
@@ -17,29 +16,20 @@ import {
   CancelOrderModal,
   OrderStatsHeader,
   OrderFilterBar,
+  type TabFilter,
   Toast,
 } from "@/components/orders";
-import type { TabFilter } from "@/components/orders/OrderFilterBar";
-
-const STORAGE_ORDERS_KEY = "sellora_mock_orders";
+import { useCart } from "@/context/CartContext";
 
 export default function OrdersPage() {
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const hasStore = useStoreStatus();
+  const { cart, cartCount, addToCart, clearCart } = useCart();
 
-  const [orders, setOrders] = useState<Order[]>(() => {
-    if (typeof window === "undefined") return initialOrdersData as Order[];
-    try {
-      const stored = localStorage.getItem(STORAGE_ORDERS_KEY);
-      if (stored) {
-        return JSON.parse(stored);
-      }
-    } catch {
-      // ignore
-    }
-    return initialOrdersData as Order[];
-  });
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [ordersLoading, setOrdersLoading] = useState(true);
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
 
   const [headerSearch, setHeaderSearch] = useState("");
   const [orderSearchQuery, setOrderSearchQuery] = useState("");
@@ -53,44 +43,64 @@ export default function OrdersPage() {
   const [detailOrder, setDetailOrder] = useState<Order | null>(null);
   const [cancellingOrder, setCancellingOrder] = useState<Order | null>(null);
 
-  // Cart state
-  const [cartCount, setCartCount] = useState<number>(() => {
-    if (typeof window === "undefined") return 0;
-    try {
-      const cartObj = JSON.parse(localStorage.getItem("sellora_cart") || "{}");
-      return Object.values(cartObj).reduce(
-        (acc: number, cur) => acc + (typeof cur === "number" ? cur : 1),
-        0,
-      );
-    } catch {
-      return 0;
+  // Fetch orders from Firestore DB
+  const fetchOrders = useCallback(async () => {
+    if (!user) {
+      setOrders([]);
+      setOrdersLoading(false);
+      return;
     }
-  });
+
+    try {
+      setOrdersLoading(true);
+      const token = await user.getIdToken();
+      const res = await fetch("/api/orders", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (res.status === 401) {
+        window.dispatchEvent(new Event("sellora_session_expired"));
+        router.replace("/");
+        return;
+      }
+
+      if (res.ok) {
+        const data = await res.json();
+        setOrders(Array.isArray(data.orders) ? data.orders : []);
+      } else {
+        console.error("Failed to load orders:", res.statusText);
+        setOrders([]);
+      }
+    } catch (err) {
+      console.error("Error fetching user orders from Firestore:", err);
+      setOrders([]);
+    } finally {
+      setOrdersLoading(false);
+    }
+  }, [user, router]);
 
   useEffect(() => {
-    const handleStorage = () => {
-      try {
-        const cartObj = JSON.parse(localStorage.getItem("sellora_cart") || "{}");
-        const count = Object.values(cartObj).reduce(
-          (acc: number, cur) => acc + (typeof cur === "number" ? cur : 1),
-          0,
-        );
-        setCartCount(count);
-      } catch {}
-    };
-    window.addEventListener("storage", handleStorage);
-    return () => window.removeEventListener("storage", handleStorage);
-  }, []);
-
-  // Save orders to localStorage on mutation
-  const persistOrders = (updated: Order[]) => {
-    setOrders(updated);
-    try {
-      localStorage.setItem(STORAGE_ORDERS_KEY, JSON.stringify(updated));
-    } catch {
-      // ignore
+    if (!authLoading) {
+      if (!user) {
+        router.replace("/");
+      } else {
+        void fetchOrders();
+      }
     }
-  };
+  }, [authLoading, user, fetchOrders, router]);
+
+  // Check for newly placed order query param
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("newOrder") === "true") {
+        setToast("Order placed successfully! Saved to your account.");
+        window.history.replaceState({}, "", "/account/orders");
+      }
+    }
+  }, []);
 
   // Compute status counts
   const statusCounts = useMemo<Record<TabFilter, number>>(() => {
@@ -106,7 +116,7 @@ export default function OrdersPage() {
   // Filter orders by tab, search, and time
   const filteredOrders = useMemo(() => {
     const query = (orderSearchQuery || headerSearch).trim().toLowerCase();
-    const now = new Date("2026-09-20T19:00:00.000Z").getTime();
+    const now = Date.now();
 
     return orders.filter((order) => {
       // Tab filter
@@ -129,10 +139,10 @@ export default function OrdersPage() {
 
       // Search query (Order #, item name, store name)
       if (query) {
-        const matchNumber = order.orderNumber.toLowerCase().includes(query);
-        const matchStore = order.store.name.toLowerCase().includes(query);
-        const matchItems = order.items.some((item) =>
-          item.name.toLowerCase().includes(query),
+        const matchNumber = order.orderNumber?.toLowerCase().includes(query);
+        const matchStore = order.store?.name?.toLowerCase().includes(query);
+        const matchItems = order.items?.some((item) =>
+          item.name?.toLowerCase().includes(query)
         );
         if (!matchNumber && !matchStore && !matchItems) {
           return false;
@@ -144,75 +154,152 @@ export default function OrdersPage() {
   }, [orders, currentTab, timeFilter, orderSearchQuery, headerSearch]);
 
   const handleSignOut = async () => {
-    const success = await SignOut();
-    if (success) {
-      router.refresh();
-    }
+    await SignOut();
+    router.replace("/");
   };
 
   const handleSignIn = () => {
-    router.push("/login");
+    router.push("/login?redirect=/account/orders");
   };
 
-  const handleBuyAgain = (order: Order) => {
+  const handleCreateStore = () => {
+    setSidebarOpen(false);
+    router.push("/account/create-store");
+  };
+
+  const handleManageStore = () => {
+    setSidebarOpen(false);
+    router.push("/account/manage-store");
+  };
+
+  const handleBuyAgain = async (order: Order) => {
     try {
-      const existingCart = JSON.parse(
-        localStorage.getItem("sellora_cart") || "{}",
-      );
-      order.items.forEach((item) => {
-        existingCart[item.productId] =
-          (existingCart[item.productId] || 0) + item.quantity;
-      });
-      localStorage.setItem("sellora_cart", JSON.stringify(existingCart));
-      const newCount = Object.values(existingCart).reduce(
-        (acc: number, cur) => acc + (typeof cur === "number" ? cur : 1),
-        0,
-      );
-      setCartCount(newCount);
+      for (const item of order.items) {
+        await addToCart(item.productId, item.quantity);
+      }
       setToast(`Added ${order.items.length} item(s) back to cart!`);
     } catch {
       setToast("Item added to cart");
     }
   };
 
-  const handleConfirmCancel = (orderId: string, reason: string) => {
-    const updated = orders.map((o) => {
-      if (o.id === orderId) {
-        return {
-          ...o,
-          status: "CANCELLED" as const,
-          cancelledAt: new Date().toISOString(),
-          cancellationReason: reason,
-          payment: {
-            ...o.payment,
-            status: "REFUNDED" as const,
-          },
-          trackingEvents: [
-            ...o.trackingEvents,
-            {
-              status: "CANCELLED" as const,
-              title: "Order Cancelled & Refund Initiated",
-              description: `Reason: ${reason}. Full refund processed to ${o.payment.method}.`,
-              location: "Sellora Payment Operations",
-              timestamp: new Date().toISOString(),
-              completed: true,
-              current: true,
-            },
-          ],
-        };
-      }
-      return o;
-    });
+  const handleConfirmCancel = async (orderId: string, reason: string) => {
+    if (!user) return;
+    try {
+      const token = await user.getIdToken();
+      const res = await fetch(`/api/orders/${orderId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ action: "cancel", reason }),
+      });
 
-    persistOrders(updated);
-    setToast("Order cancelled. Full refund has been initiated.");
+      const data = await res.json();
+      if (res.ok && data.success && data.order) {
+        setOrders((prev) =>
+          prev.map((o) => (o.id === orderId ? data.order : o))
+        );
+        setToast("Order cancelled. Full refund has been initiated.");
+      } else {
+        setToast(data.error || "Failed to cancel order.");
+      }
+    } catch (err) {
+      console.error("Cancel order error:", err);
+      setToast("Failed to cancel order. Please try again.");
+    }
+  };
+
+  // Checkout items currently held in cart
+  const handleCheckoutCart = async () => {
+    if (!user) {
+      router.push("/login?redirect=/account/orders");
+      return;
+    }
+
+    try {
+      setIsCheckingOut(true);
+      const productIds = Object.keys(cart);
+
+      if (productIds.length === 0) {
+        setToast("Your cart is currently empty.");
+        setIsCheckingOut(false);
+        return;
+      }
+
+      // Retrieve product details for cart items
+      let productsList: any[] = [];
+      try {
+        const prodRes = await fetch("/api/products");
+        if (prodRes.ok) {
+          const prodData = await prodRes.json();
+          productsList = prodData.products || [];
+        }
+      } catch (prodErr) {
+        console.warn("Could not fetch product catalog for cart checkout:", prodErr);
+      }
+
+      const items = productIds.map((id) => {
+        const found = productsList.find((p) => p.id === id);
+        const qty = cart[id] || 1;
+        return {
+          productId: id,
+          name: found?.name || "Order Item",
+          slug: found?.slug || "",
+          image: (Array.isArray(found?.images) ? found.images[0] : found?.image) || "",
+          price: Number(found?.price) || 5000,
+          originalPrice: (found?.oldPrice ?? found?.originalPrice) ? Number(found?.oldPrice ?? found?.originalPrice) : null,
+          quantity: qty,
+          storeName: found?.author || "Sellora Official",
+          storeId: found?.storeId || "sellora-store",
+          category: found?.category || "General",
+        };
+      });
+
+      const firstItem = items[0];
+      const token = await user.getIdToken();
+      const orderRes = await fetch("/api/orders", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          items,
+          store: {
+            id: firstItem?.storeId || "sellora-store",
+            name: firstItem?.storeName || "Sellora Official",
+            isVerified: true,
+          },
+        }),
+      });
+
+      const orderData = await orderRes.json();
+      if (orderRes.ok && orderData.success && orderData.order) {
+        await clearCart();
+        setOrders((prev) => [orderData.order, ...prev]);
+        setToast(`Order #${orderData.order.orderNumber} placed successfully!`);
+      } else {
+        setToast(orderData.error || "Failed to place order.");
+      }
+    } catch (err) {
+      console.error("Cart checkout error:", err);
+      setToast("Failed to place order. Please try again.");
+    } finally {
+      setIsCheckingOut(false);
+    }
   };
 
   const handleOrderHelp = (order: Order) => {
     setToast(
-      `Support for ${order.orderNumber}: Call +234 1 800 735 567 or email support@${typeof window !== "undefined" ? window.location.hostname : "sellora.ng"}`,
+      `Support for ${order.orderNumber}: Call +234 1 800 735 567 or email support@${
+        typeof window !== "undefined" ? window.location.hostname : "sellora.ng"
+      }`
     );
   };
+
+  const isPageLoading = authLoading || ordersLoading;
 
   return (
     <div className={styles.page}>
@@ -221,7 +308,7 @@ export default function OrdersPage() {
         onSearchChange={setHeaderSearch}
         cartCount={cartCount}
         onOpenSidebar={() => setSidebarOpen(true)}
-        onCartClick={() => router.push("/")}
+        onCartClick={() => router.push("/cart")}
       />
 
       <div className={styles.contentArea}>
@@ -232,6 +319,8 @@ export default function OrdersPage() {
           onSignOut={handleSignOut}
           onSignIn={handleSignIn}
           hasStore={hasStore}
+          onCreateStore={handleCreateStore}
+          manageStore={handleManageStore}
         />
 
         <main className={styles.main}>
@@ -241,19 +330,22 @@ export default function OrdersPage() {
                 <span className="material-icons-round">receipt_long</span>
                 My Orders
               </h1>
-              <span
-                style={{
-                  fontSize: "13px",
-                  background: "#ffffff",
-                  padding: "6px 14px",
-                  borderRadius: "50px",
-                  border: "1px solid #e5e7eb",
-                  fontWeight: 600,
-                  color: "#374151",
-                }}
-              >
-                {filteredOrders.length} {filteredOrders.length === 1 ? "order" : "orders"} displayed
-              </span>
+              {!isPageLoading && user && (
+                <span
+                  style={{
+                    fontSize: "13px",
+                    background: "#ffffff",
+                    padding: "6px 14px",
+                    borderRadius: "50px",
+                    border: "1px solid #e5e7eb",
+                    fontWeight: 600,
+                    color: "#374151",
+                  }}
+                >
+                  {filteredOrders.length}{" "}
+                  {filteredOrders.length === 1 ? "order" : "orders"} displayed
+                </span>
+              )}
             </div>
             <p className={styles.subtitle}>
               Track deliveries, view itemized receipts, and manage your e-commerce purchases.
@@ -274,8 +366,100 @@ export default function OrdersPage() {
             counts={statusCounts}
           />
 
-          {/* Orders List */}
-          {filteredOrders.length > 0 ? (
+          {/* Cart Checkout Banner if cart has items */}
+          {cartCount > 0 && user && !isPageLoading && (
+            <div className={styles.cartCheckoutBanner}>
+              <div className={styles.cartCheckoutLeft}>
+                <div className={styles.cartCheckoutIcon}>
+                  <span className="material-icons-round">shopping_bag</span>
+                </div>
+                <div>
+                  <h3 className={styles.cartCheckoutTitle}>
+                    You have items ready for checkout
+                  </h3>
+                  <p className={styles.cartCheckoutSubtitle}>
+                    Turn your active cart into an official order saved directly to your account.
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                className={styles.cartCheckoutBtn}
+                onClick={handleCheckoutCart}
+                disabled={isCheckingOut}
+              >
+                <span className="material-icons-round">bolt</span>
+                {isCheckingOut
+                  ? "Placing Order..."
+                  : `Checkout Now (${cartCount} ${
+                      cartCount === 1 ? "item" : "items"
+                    })`}
+              </button>
+            </div>
+          )}
+
+          {/* Main Orders Display */}
+          {isPageLoading ? (
+            <div className={styles.ordersSkeletonList}>
+              {[1, 2, 3].map((i) => (
+                <div key={i} className={styles.skeletonCard}>
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      gap: "16px",
+                    }}
+                  >
+                    <div
+                      className={styles.skeletonLine}
+                      style={{ height: "24px", width: "180px" }}
+                    />
+                    <div
+                      className={styles.skeletonLine}
+                      style={{ height: "24px", width: "90px" }}
+                    />
+                  </div>
+                  <div
+                    className={styles.skeletonLine}
+                    style={{ height: "36px", width: "100%" }}
+                  />
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: "16px",
+                      alignItems: "center",
+                    }}
+                  >
+                    <div
+                      className={styles.skeletonLine}
+                      style={{
+                        height: "64px",
+                        width: "64px",
+                        borderRadius: "12px",
+                      }}
+                    />
+                    <div
+                      style={{
+                        flex: 1,
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "8px",
+                      }}
+                    >
+                      <div
+                        className={styles.skeletonLine}
+                        style={{ height: "18px", width: "45%" }}
+                      />
+                      <div
+                        className={styles.skeletonLine}
+                        style={{ height: "14px", width: "25%" }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : !user ? null : filteredOrders.length > 0 ? (
             <div className={styles.ordersList}>
               {filteredOrders.map((order) => (
                 <OrderCard
@@ -297,9 +481,13 @@ export default function OrdersPage() {
               <h3 className={styles.emptyStateTitle}>No orders found</h3>
               <p className={styles.emptyStateText}>
                 {orderSearchQuery || headerSearch
-                  ? `No orders matching "${orderSearchQuery || headerSearch}". Try adjusting your search or filters.`
+                  ? `No orders matching "${
+                      orderSearchQuery || headerSearch
+                    }". Try adjusting your search or filters.`
                   : currentTab !== "ALL"
-                  ? `You have no ${currentTab.toLowerCase().replace("_", " ")} orders at this time.`
+                  ? `You have no ${currentTab
+                      .toLowerCase()
+                      .replace("_", " ")} orders at this time.`
                   : "You haven't placed any orders yet. Start exploring verified stores today!"}
               </p>
               {orderSearchQuery || headerSearch || currentTab !== "ALL" ? (

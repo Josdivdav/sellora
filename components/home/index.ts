@@ -8,6 +8,7 @@ export { default as StoreGroupSection } from "./StoreGroupSection";
 export { default as StoreQuickBar } from "./StoreQuickBar";
 export { default as ProductCard } from "./ProductCard";
 export { default as ProductGrid } from "./ProductGrid";
+export { default as EmptyState } from "./EmptyState";
 export { default as Toast } from "./Toast";
 
 

@@ -88,7 +88,7 @@ export default function StoreIdentityStep({ store, onUpdate }: StoreIdentityStep
           Your personalized shareable Sellora store URL.
         </p>
         <div className={styles.textInputWrap}>
-          <span className={styles.slugPrefix}>{host}/@</span>
+          <span className={styles.slugPrefix}>{host ? `${host}/` : "devico.online/"}</span>
           <input
             id="store-slug-input"
             type="text"

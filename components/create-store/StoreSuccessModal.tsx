@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./create-store.module.css";
 import type { Store } from "@/types/store";
+import { getStoreFullUrl, getStoreRelativePath } from "@/lib/storeUrl";
 
 interface StoreSuccessModalProps {
   store: Store;
@@ -14,7 +15,7 @@ export default function StoreSuccessModal({ store, onClose }: StoreSuccessModalP
   const router = useRouter();
   const [copied, setCopied] = useState(false);
 
-  const fullUrl = `https://${window.location.hostname}/@${store.slug}`;
+  const fullUrl = getStoreFullUrl(store);
 
   const handleCopy = () => {
     if (typeof navigator !== "undefined" && navigator.clipboard) {
@@ -64,10 +65,13 @@ export default function StoreSuccessModal({ store, onClose }: StoreSuccessModalP
             className={styles.continueShoppingBtn}
             onClick={() => {
               onClose();
-              router.push("/account/favorites");
+              router.push(getStoreRelativePath(store));
             }}
           >
-            View Storefront in Favorites
+            <span className="material-icons-round" style={{ fontSize: "16px", marginRight: "6px" }}>
+              storefront
+            </span>
+            View Live Storefront
           </button>
         </div>
       </div>

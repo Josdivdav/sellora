@@ -4,6 +4,7 @@ import { db } from '@/lib/firebaseAdmin';
 import { FieldValue } from 'firebase-admin/firestore';
 import type { Product } from '@/types/product';
 import { invalidateProductsCache } from '@/lib/getProduct';
+import { invalidateStoreCache } from '@/lib/getStore';
 
 export async function GET(request: NextRequest) {
   const authorization = request.headers.get('authorization');
@@ -48,6 +49,7 @@ export async function GET(request: NextRequest) {
         image: data.image || '',
         images: Array.isArray(data.images) ? data.images : [data.image].filter(Boolean),
         author: data.author || storeSnap.data()?.name || 'My Store',
+        storeId: data.storeId || uid,
         description: data.description || '',
         stock: Number(data.stock ?? 0),
         inStock: Number(data.stock ?? 0) > 0,
@@ -161,6 +163,7 @@ export async function POST(request: NextRequest) {
       });
 
       invalidateProductsCache();
+      invalidateStoreCache();
       return NextResponse.json({ success: true, count: createdProducts.length, products: createdProducts }, { status: 201 });
     }
 
@@ -194,6 +197,7 @@ export async function POST(request: NextRequest) {
       image: body.image || '',
       images: Array.isArray(body.images) && body.images.length > 0 ? body.images : [body.image].filter(Boolean),
       author: storeData.name || body.author || 'My Store',
+      storeId: uid,
       description: body.description || '',
       stock: numStock,
       inStock: numStock > 0,
@@ -224,6 +228,7 @@ export async function POST(request: NextRequest) {
     }
 
     invalidateProductsCache();
+    invalidateStoreCache();
     return NextResponse.json({ success: true, product: newProduct }, { status: 201 });
   } catch (error) {
     console.error('Error in POST /api/user/store/products:', error);

@@ -6,6 +6,7 @@ import styles from "@/components/create-store/create-store.module.css";
 import { useAuth } from "@/context/AuthContext";
 import { SignOut } from "@/functions/home.func";
 import { useStoreStatus } from "@/hooks/useStoreStatus";
+import { useCart } from "@/context/CartContext";
 import {
   CreateStoreSetup,
   HomeHeader,
@@ -15,43 +16,19 @@ import {
 
 export default function CreateStorePage() {
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const hasStore = useStoreStatus();
+  const { cartCount } = useCart();
+
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.replace("/");
+    }
+  }, [authLoading, user, router]);
 
   const [headerSearch, setHeaderSearch] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [toast, setToast] = useState("");
-
-  // Cart count from localStorage
-  const [cartCount, setCartCount] = useState<number>(() => {
-    if (typeof window === "undefined") return 0;
-    try {
-      const cartObj = JSON.parse(localStorage.getItem("sellora_cart") || "{}");
-      return Object.values(cartObj).reduce(
-        (acc: number, cur) => acc + (typeof cur === "number" ? cur : 1),
-        0
-      );
-    } catch {
-      return 0;
-    }
-  });
-
-  useEffect(() => {
-    const handleStorage = () => {
-      try {
-        const cartObj = JSON.parse(localStorage.getItem("sellora_cart") || "{}");
-        const count = Object.values(cartObj).reduce(
-          (acc: number, cur) => acc + (typeof cur === "number" ? cur : 1),
-          0
-        );
-        setCartCount(count);
-      } catch {
-        // ignore
-      }
-    };
-    window.addEventListener("storage", handleStorage);
-    return () => window.removeEventListener("storage", handleStorage);
-  }, []);
 
   // Toast timer
   useEffect(() => {
@@ -61,15 +38,17 @@ export default function CreateStorePage() {
   }, [toast]);
 
   const handleSignOut = async () => {
-    const success = await SignOut();
-    if (success) {
-      router.refresh();
-    }
+    await SignOut();
+    router.replace("/");
   };
 
   const handleSignIn = () => {
     router.push("/login");
   };
+
+  if (!authLoading && !user) {
+    return null;
+  }
 
   return (
     <div className={styles.page}>
@@ -78,10 +57,7 @@ export default function CreateStorePage() {
         onSearchChange={setHeaderSearch}
         cartCount={cartCount}
         onOpenSidebar={() => setSidebarOpen(true)}
-        onCartClick={() => {
-          setToast("Your cart is accessible from the home catalog");
-          router.push("/");
-        }}
+        onCartClick={() => router.push("/cart")}
       />
 
       <div className={styles.contentArea}>
@@ -98,7 +74,7 @@ export default function CreateStorePage() {
           user={user}
           onShowToast={(msg) => setToast(msg)}
           onStoreCreated={() => {
-            // useStoreStatus will auto-update from localStorage after store is cached
+            // useStoreStatus and navigation will reflect the newly created store
             router.push("/account/manage-store");
           }}
         />

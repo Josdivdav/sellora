@@ -866,3 +866,276 @@
     background: #dbeafe;
     color: #1d4ed8;
 }
+
+/* Active Filters Chips Bar */
+.activeFilterBar {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 18px;
+    padding: 10px 16px;
+    background: #ffffff;
+    border-radius: 14px;
+    border: 1px solid #eef2f6;
+    box-shadow: 0 1px 4px rgba(11, 18, 48, 0.04);
+}
+
+.activeFilterLabel {
+    font-size: 12px;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-right: 4px;
+}
+
+.filterChip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 50px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #1d4ed8;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.filterChip:hover {
+    background: #dbeafe;
+    border-color: #93c5fd;
+}
+
+.filterChipRemove {
+    font-size: 15px;
+    color: #2b6dff;
+    display: grid;
+    place-items: center;
+    margin-left: 2px;
+}
+
+.clearAllFiltersBtn {
+    margin-left: auto;
+    background: transparent;
+    border: 0;
+    color: #dc2626;
+    font-size: 12.5px;
+    font-weight: 700;
+    cursor: pointer;
+    padding: 5px 10px;
+    border-radius: 8px;
+    transition: background 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.clearAllFiltersBtn:hover {
+    background: #fef2f2;
+}
+
+/* Heading with Sort Controls */
+.headingLeft {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.itemCountBadge {
+    font-size: 12px;
+    font-weight: 700;
+    color: #4b5563;
+    background: #ffffff;
+    padding: 3px 12px;
+    border-radius: 50px;
+    border: 1px solid #e5e7eb;
+}
+
+.sortWrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sortLabel {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #64748b;
+    white-space: nowrap;
+}
+
+.sortSelect {
+    padding: 6px 12px;
+    border-radius: 10px;
+    border: 1px solid #d1d5db;
+    background: #ffffff;
+    color: #1f2937;
+    font: inherit;
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.15s ease;
+}
+
+.sortSelect:focus {
+    border-color: #2b6dff;
+    box-shadow: 0 0 0 3px rgba(43, 109, 255, 0.15);
+}
+
+/* Production-Ready Empty State */
+.emptyStateCard {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 50px 24px;
+    text-align: center;
+    border: 1.5px dashed #cbd5e1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    margin: 20px 0;
+    box-shadow: 0 2px 8px rgba(11, 18, 48, 0.03);
+}
+
+.emptyStateIcon {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: #edf3ff;
+    color: #2b6dff;
+    display: grid;
+    place-items: center;
+    font-size: 32px;
+}
+
+.emptyStateTitle {
+    font-size: 18px;
+    font-weight: 800;
+    color: #0b1230;
+    margin: 0;
+}
+
+.emptyStateText {
+    font-size: 13.5px;
+    color: #64748b;
+    max-width: 440px;
+    margin: 0;
+    line-height: 1.5;
+}
+
+.emptyStateActions {
+    margin-top: 8px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.emptyResetBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 22px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #2b6dff, #7b2ff7);
+    color: #ffffff;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    border: 0;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(43, 109, 255, 0.3);
+    transition: filter 0.15s ease;
+}
+
+.emptyResetBtn:hover {
+    filter: brightness(1.08);
+}
+
+/* Product Card Enhancements */
+.cardOutOfStockBadge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(4px);
+    color: #ffffff;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 10.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.cardDiscountBadge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #dc2626;
+    color: #ffffff;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 800;
+    box-shadow: 0 2px 6px rgba(220, 38, 38, 0.3);
+}
+
+.cardAddedBtn {
+    background: #16a34a !important;
+    color: #ffffff !important;
+}
+
+.cardDisabledBtn {
+    opacity: 0.55 !important;
+    cursor: not-allowed !important;
+    background: #94a3b8 !important;
+}
+
+/* Search bar clear button */
+.headerSearchClear {
+    background: transparent;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+    color: #9ca3af;
+    display: grid;
+    place-items: center;
+}
+
+.headerSearchClear:hover {
+    color: #374151;
+}
+
+.logoLink {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+@media (max-width: 640px) {
+    .heading {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    .sortWrapper {
+        justify-content: space-between;
+        width: 100%;
+    }
+
+    .clearAllFiltersBtn {
+        margin-left: 0;
+        width: 100%;
+        justify-content: center;
+    }
+}

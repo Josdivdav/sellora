@@ -18,6 +18,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 1,
     },
     {
+      url: `${baseUrl}/cart`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.5,
+    },
+    {
       url: `${baseUrl}/login`,
       lastModified: now,
       changeFrequency: 'yearly',
@@ -53,8 +59,26 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       };
     });
   } catch (err) {
-    console.error('sitemap: failed to fetch products from Firestore', err);
+    console.warn('sitemap: failed to fetch products from Firestore', err);
   }
 
-  return [...staticRoutes, ...productRoutes];
+  // Dynamic store storefront routes
+  let storeRoutes: MetadataRoute.Sitemap = [];
+  try {
+    const storesSnap = await db.collection('stores').select('slug', 'updatedAt', 'joinedDate').get();
+    storeRoutes = storesSnap.docs.map((doc) => {
+      const data = doc.data();
+      const slug = data.slug || doc.id;
+      return {
+        url: `${baseUrl}/${slug}`,
+        lastModified: new Date(data.updatedAt || data.joinedDate || now.toISOString()),
+        changeFrequency: 'daily' as const,
+        priority: 0.9,
+      };
+    });
+  } catch (err) {
+    console.warn('sitemap: failed to fetch stores from Firestore', err);
+  }
+
+  return [...staticRoutes, ...storeRoutes, ...productRoutes];
 }

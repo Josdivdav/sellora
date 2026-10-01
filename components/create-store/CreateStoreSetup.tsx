@@ -55,21 +55,41 @@ export default function CreateStoreSetup({
 
   const [host, setHost] = useState("");
 
-  // Check if user already has a store
+  // Check if current user already has a store
   useEffect(() => {
-    setHost(window.location.hostname);
-    try {
-      const existing = localStorage.getItem("sellora_my_store");
-      if (existing) {
-        const parsed = JSON.parse(existing);
-        if (parsed && parsed.name) {
-          setExistingStore(parsed);
-        }
-      }
-    } catch {
-      // ignore
+    if (typeof window !== "undefined") {
+      setHost(window.location.hostname);
     }
-  }, []);
+    if (!user) {
+      setExistingStore(null);
+      return;
+    }
+
+    let isMounted = true;
+    async function checkExistingStore() {
+      try {
+        const token = await user?.getIdToken();
+        if (!token) return;
+        const res = await fetch("/api/user/store", {
+          headers: { authorization: `Bearer ${token}` },
+        });
+        if (res.ok) {
+          const json = await res.json();
+          if (isMounted && json?.data) {
+            setExistingStore(json.data);
+          }
+        } else {
+          if (isMounted) setExistingStore(null);
+        }
+      } catch {
+        if (isMounted) setExistingStore(null);
+      }
+    }
+    void checkExistingStore();
+    return () => {
+      isMounted = false;
+    };
+  }, [user]);
 
   const handleUpdate = (fields: Partial<Store>) => {
     setStore((prev) => ({ ...prev, ...fields }));
@@ -205,7 +225,7 @@ export default function CreateStoreSetup({
             <div>
               <strong>You already have an active storefront: {existingStore.name}</strong>
               <div style={{ fontSize: "12px", opacity: 0.9 }}>
-                {host}/@{existingStore.slug} • Add, edit, or delete products and manage inventory in your Store Dashboard.
+                {existingStore.slug}.devico.online • Add, edit, or delete products and manage inventory in your Store Dashboard.
               </div>
             </div>
           </div>

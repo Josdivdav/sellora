@@ -6,6 +6,7 @@ import styles from "@/components/manage-store/manage-store.module.css";
 import { useAuth } from "@/context/AuthContext";
 import { SignOut } from "@/functions/home.func";
 import { useStoreStatus } from "@/hooks/useStoreStatus";
+import { useCart } from "@/context/CartContext";
 import {
   ManageStoreDashboard,
   HomeHeader,
@@ -20,6 +21,7 @@ function ManageStoreInner() {
   const searchParams = useSearchParams();
   const { user, loading: isAuthLoading } = useAuth();
   const hasStore = useStoreStatus();
+  const { cartCount } = useCart();
 
   const activeTab = (searchParams.get("tab") as MerchantTab) || "dashboard";
 
@@ -27,36 +29,11 @@ function ManageStoreInner() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [toast, setToast] = useState("");
 
-  // Cart count from localStorage
-  const [cartCount, setCartCount] = useState<number>(() => {
-    if (typeof window === "undefined") return 0;
-    try {
-      const cartObj = JSON.parse(localStorage.getItem("sellora_cart") || "{}");
-      return Object.values(cartObj).reduce(
-        (acc: number, cur) => acc + (typeof cur === "number" ? cur : 1),
-        0
-      );
-    } catch {
-      return 0;
-    }
-  });
-
   useEffect(() => {
-    const handleStorage = () => {
-      try {
-        const cartObj = JSON.parse(localStorage.getItem("sellora_cart") || "{}");
-        const count = Object.values(cartObj).reduce(
-          (acc: number, cur) => acc + (typeof cur === "number" ? cur : 1),
-          0
-        );
-        setCartCount(count);
-      } catch {
-        // ignore
-      }
-    };
-    window.addEventListener("storage", handleStorage);
-    return () => window.removeEventListener("storage", handleStorage);
-  }, []);
+    if (!isAuthLoading && !user) {
+      router.replace("/");
+    }
+  }, [isAuthLoading, user, router]);
 
   useEffect(() => {
     if (!toast) return;
@@ -65,9 +42,13 @@ function ManageStoreInner() {
   }, [toast]);
 
   const handleSignOut = async () => {
-    const success = await SignOut();
-    if (success) router.refresh();
+    await SignOut();
+    router.replace("/");
   };
+
+  if (!isAuthLoading && !user) {
+    return null;
+  }
 
   return (
     <div className={styles.page}>
@@ -76,7 +57,7 @@ function ManageStoreInner() {
         onSearchChange={setHeaderSearch}
         cartCount={cartCount}
         onOpenSidebar={() => setSidebarOpen(true)}
-        onCartClick={() => { setToast("Opening cart"); router.push("/"); }}
+        onCartClick={() => router.push("/cart")}
       />
 
       <div className={styles.contentArea}>

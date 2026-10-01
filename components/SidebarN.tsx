@@ -8,6 +8,7 @@ import buyerNav from "@/config/BuyerNav";
 import type { User } from "firebase/auth";
 import { useRouter, usePathname } from "next/navigation";
 import storesData from "@/data/stores.json";
+import { getStoreRelativePath } from "@/lib/storeUrl";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -71,24 +72,38 @@ export default function Sidebar({
   const [favCount, setFavCount] = useState(0);
 
   useEffect(() => {
-    const sync = () => {
+    let isMounted = true;
+    const sync = async () => {
+      if (!user) {
+        if (isMounted) setFavCount(0);
+        return;
+      }
       try {
-        const stored = localStorage.getItem("sellora_favorite_stores");
-        if (stored) {
-          const parsed = JSON.parse(stored);
-          if (Array.isArray(parsed)) { setFavCount(parsed.length); return; }
+        const token = await user.getIdToken();
+        const res = await fetch("/api/user/followed-stores", {
+          headers: { authorization: `Bearer ${token}` },
+        });
+        if (res.ok) {
+          const json = await res.json();
+          if (isMounted && Array.isArray(json.followedIds)) {
+            setFavCount(json.followedIds.length);
+            return;
+          }
         }
-      } catch { /* ignore */ }
-      setFavCount(storesData.filter((s) => s.isFavorite).length);
+      } catch {
+        // ignore
+      }
     };
-    sync();
+
+    void sync();
     window.addEventListener("sellora_favorites_updated", sync);
-    window.addEventListener("storage", sync);
+    window.addEventListener("sellora_store_follow_changed", sync);
     return () => {
+      isMounted = false;
       window.removeEventListener("sellora_favorites_updated", sync);
-      window.removeEventListener("storage", sync);
+      window.removeEventListener("sellora_store_follow_changed", sync);
     };
-  }, []);
+  }, [user]);
 
   const visibleBuyerNav = buyerNav.filter((item) => user || !item.requiresAuth);
 
@@ -300,7 +315,7 @@ export default function Sidebar({
                     <button
                       type="button"
                       className={sideStyles.productContextBtn}
-                      onClick={() => navigate(`/?search=${encodeURIComponent(product.author || "")}`)}
+                      onClick={() => navigate(getStoreRelativePath(product.author || ""))}
                     >
                       <span className="material-icons-round">store</span>
                       Browse Store Items

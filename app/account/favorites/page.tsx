@@ -8,6 +8,9 @@ import { useRouter } from "next/navigation";
 import initialStoresData from "@/data/stores.json";
 import type { Store } from "@/types/store";
 import { useStoreStatus } from "@/hooks/useStoreStatus";
+import { getStoreRelativePath } from "@/lib/storeUrl";
+import { toggleStoreFollow } from "@/lib/followStore";
+import { useCart } from "@/context/CartContext";
 import {
   HomeHeader,
   Sidebar,
@@ -17,30 +20,20 @@ import {
   Toast,
 } from "@/components/favorites";
 
-const STORAGE_FAVORITES_KEY = "sellora_favorite_stores";
-
 export default function FavoritesPage() {
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const hasStore = useStoreStatus();
+  const { cartCount } = useCart();
 
-  const allStores = initialStoresData as Store[];
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.replace("/");
+    }
+  }, [authLoading, user, router]);
 
-  const [favoriteIds, setFavoriteIds] = useState<string[]>(() => {
-    if (typeof window === "undefined") {
-      return allStores.filter((s) => s.isFavorite).map((s) => s.id);
-    }
-    try {
-      const stored = localStorage.getItem(STORAGE_FAVORITES_KEY);
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        if (Array.isArray(parsed)) return parsed;
-      }
-    } catch {
-      // ignore
-    }
-    return allStores.filter((s) => s.isFavorite).map((s) => s.id);
-  });
+  const [allStores, setAllStores] = useState<Store[]>(initialStoresData as Store[]);
+  const [favoriteIds, setFavoriteIds] = useState<string[]>([]);
 
   const [headerSearch, setHeaderSearch] = useState("");
   const [storeSearchQuery, setStoreSearchQuery] = useState("");
@@ -49,58 +42,126 @@ export default function FavoritesPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [toast, setToast] = useState("");
 
-  // Cart count state
-  const [cartCount, setCartCount] = useState<number>(() => {
-    if (typeof window === "undefined") return 0;
-    try {
-      const cartObj = JSON.parse(localStorage.getItem("sellora_cart") || "{}");
-      return Object.values(cartObj).reduce(
-        (acc: number, cur) => acc + (typeof cur === "number" ? cur : 1),
-        0,
-      );
-    } catch {
-      return 0;
-    }
-  });
-
+  // Load followed stores and live stores from database
   useEffect(() => {
-    const handleStorage = () => {
+    if (!user) return;
+    let isMounted = true;
+
+    async function loadFollowedStoresFromDb() {
       try {
-        const cartObj = JSON.parse(localStorage.getItem("sellora_cart") || "{}");
-        const count = Object.values(cartObj).reduce(
-          (acc: number, cur) => acc + (typeof cur === "number" ? cur : 1),
-          0,
-        );
-        setCartCount(count);
-      } catch {
-        // ignore
+        const token = await user?.getIdToken();
+        if (!token) return;
+        const res = await fetch("/api/user/followed-stores", {
+          headers: { authorization: `Bearer ${token}` },
+        });
+        if (res.ok && isMounted) {
+          const json = await res.json();
+          if (Array.isArray(json.followedIds)) {
+            setFavoriteIds(json.followedIds);
+          }
+          if (Array.isArray(json.stores) && json.stores.length > 0) {
+            setAllStores(json.stores);
+          }
+        }
+      } catch (err) {
+        console.warn("Could not load followed stores from DB:", err);
+      }
+    }
+
+    loadFollowedStoresFromDb();
+
+    const handleFollowChanged = (e: Event) => {
+      const detail = (e as CustomEvent)?.detail;
+      if (detail && (detail.storeId || detail.storeSlug)) {
+        if (typeof detail.isFollowing === "boolean") {
+          setFavoriteIds((prev) => {
+            const target = detail.storeId || detail.storeSlug;
+            if (detail.isFollowing) {
+              return prev.includes(target) ? prev : [...prev, target];
+            } else {
+              return prev.filter((id) => id !== target && id !== detail.storeId && id !== detail.storeSlug);
+            }
+          });
+        }
+        if (typeof detail.followersCount === "number") {
+          setAllStores((prev) =>
+            prev.map((s) =>
+              s.id === detail.storeId || s.slug === detail.storeSlug
+                ? { ...s, followersCount: detail.followersCount }
+                : s
+            )
+          );
+        }
       }
     };
-    window.addEventListener("storage", handleStorage);
-    return () => window.removeEventListener("storage", handleStorage);
-  }, []);
+
+    window.addEventListener("sellora_store_follow_changed", handleFollowChanged);
+    return () => {
+      isMounted = false;
+      window.removeEventListener("sellora_store_follow_changed", handleFollowChanged);
+    };
+  }, [user]);
 
   const saveFavorites = (newIds: string[]) => {
     setFavoriteIds(newIds);
-    try {
-      localStorage.setItem(STORAGE_FAVORITES_KEY, JSON.stringify(newIds));
+    if (typeof window !== "undefined") {
       window.dispatchEvent(new Event("sellora_favorites_updated"));
-    } catch {
-      // ignore
     }
   };
 
-  const handleToggleFavorite = (store: Store) => {
-    const isCurrentlyFav = favoriteIds.includes(store.id);
-    let updated: string[];
-    if (isCurrentlyFav) {
-      updated = favoriteIds.filter((id) => id !== store.id);
-      setToast(`Removed ${store.name} from favorite stores`);
-    } else {
-      updated = [...favoriteIds, store.id];
-      setToast(`Followed ${store.name}! You will receive new arrival updates.`);
+  const handleToggleFavorite = async (store: Store) => {
+    // 1. Guard: Check if logged in
+    if (!user) {
+      setToast("Please sign in to follow this store.");
+      router.push("/login");
+      return;
     }
-    saveFavorites(updated);
+
+    // 2. Guard: Check if owner
+    const isOwner = user.uid === store.id || (store as any).userId === user.uid;
+    if (isOwner) {
+      setToast("You cannot follow your own store.");
+      return;
+    }
+
+    try {
+      const token = await user.getIdToken();
+      const res = await toggleStoreFollow({
+        storeSlug: store.slug || store.id,
+        storeId: store.id,
+        storeName: store.name,
+        token,
+        isLoggedIn: true,
+        isOwner: false,
+      });
+
+      if (!res.success) {
+        setToast(res.message || "Failed to update follow status.");
+      } else {
+        const isNowFollowing = Boolean(res.isFollowing);
+        let updated: string[];
+        if (isNowFollowing) {
+          updated = Array.from(new Set([...favoriteIds, store.id]));
+        } else {
+          updated = favoriteIds.filter((id) => id !== store.id);
+        }
+        saveFavorites(updated);
+
+        // Update live follower count in allStores list
+        if (typeof res.followersCount === "number") {
+          setAllStores((prev) =>
+            prev.map((s) => (s.id === store.id ? { ...s, followersCount: res.followersCount! } : s))
+          );
+        }
+
+        setToast(
+          res.message ||
+            (isNowFollowing ? `Followed ${store.name}!` : `Unfollowed ${store.name}`)
+        );
+      }
+    } catch {
+      setToast("Error updating follow status.");
+    }
   };
 
   // Categories list
@@ -161,10 +222,8 @@ export default function FavoritesPage() {
   }, [allStores, favoriteIds]);
 
   const handleSignOut = async () => {
-    const success = await SignOut();
-    if (success) {
-      router.refresh();
-    }
+    await SignOut();
+    router.replace("/");
   };
 
   const handleSignIn = () => {
@@ -172,7 +231,7 @@ export default function FavoritesPage() {
   };
 
   const handleVisitStore = (store: Store) => {
-    router.push(`/?store=${encodeURIComponent(store.name)}`);
+    router.push(getStoreRelativePath(store));
   };
 
   const handleMessageStore = (store: Store) => {
@@ -180,9 +239,12 @@ export default function FavoritesPage() {
   };
 
   const handleProductClick = (store: Store, productId: string) => {
-    setToast(`Viewing product from ${store.name}...`);
-    router.push(`/?search=${encodeURIComponent(store.name)}`);
+    router.push(`/products/${productId}`);
   };
+
+  if (!authLoading && !user) {
+    return null;
+  }
 
   return (
     <div className={styles.page}>
@@ -191,7 +253,7 @@ export default function FavoritesPage() {
         onSearchChange={setHeaderSearch}
         cartCount={cartCount}
         onOpenSidebar={() => setSidebarOpen(true)}
-        onCartClick={() => router.push("/")}
+        onCartClick={() => router.push("/cart")}
       />
 
       <div className={styles.contentArea}>
@@ -252,6 +314,7 @@ export default function FavoritesPage() {
                   key={store.id}
                   store={store}
                   isFavorite={true}
+                  isOwner={user?.uid === store.id || (store as any).userId === user?.uid}
                   onToggleFavorite={handleToggleFavorite}
                   onVisitStore={handleVisitStore}
                   onMessageStore={handleMessageStore}
@@ -309,6 +372,7 @@ export default function FavoritesPage() {
                     key={store.id}
                     store={store}
                     isFavorite={false}
+                    isOwner={user?.uid === store.id || (store as any).userId === user?.uid}
                     onToggleFavorite={handleToggleFavorite}
                     onVisitStore={handleVisitStore}
                     onMessageStore={handleMessageStore}

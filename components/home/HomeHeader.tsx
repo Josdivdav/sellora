@@ -1,3 +1,4 @@
+import Link from "next/link";
 import styles from "@/app/home.module.css";
 
 interface HomeHeaderProps {
@@ -6,6 +7,7 @@ interface HomeHeaderProps {
   cartCount: number;
   onOpenSidebar: () => void;
   onCartClick: () => void;
+  onLogoClick?: () => void;
 }
 
 export default function HomeHeader({
@@ -14,6 +16,7 @@ export default function HomeHeader({
   cartCount,
   onOpenSidebar,
   onCartClick,
+  onLogoClick,
 }: HomeHeaderProps) {
   return (
     <header className={styles.header}>
@@ -25,25 +28,45 @@ export default function HomeHeader({
         <span className="material-icons-round">menu</span>
       </button>
 
-      <div className={styles.logo}>
-        <img src="/favico.png" width="35" height="35" alt="Sellora" />
-        <img src="/logo-text.png" width="75" height="26" alt="Sellora" />
-      </div>
+      <Link
+        href="/"
+        onClick={onLogoClick}
+        className={styles.logoLink}
+        title="Sellora — Home"
+      >
+        <div className={styles.logo}>
+          <img src="/favico.png" width="35" height="35" alt="Sellora icon" />
+          <img src="/logo-text.png" width="75" height="26" alt="Sellora logo" />
+        </div>
+      </Link>
 
       <label className={styles.search}>
         <span className="material-icons-round">search</span>
         <input
           value={search}
           onChange={(event) => onSearchChange(event.target.value)}
-          placeholder="Search products…"
+          placeholder="Search products by name, store, category…"
           aria-label="Search products"
         />
+        {search.trim().length > 0 && (
+          <button
+            type="button"
+            className={styles.headerSearchClear}
+            onClick={() => onSearchChange("")}
+            aria-label="Clear search"
+            title="Clear search"
+          >
+            <span className="material-icons-round" style={{ fontSize: "17px" }}>
+              close
+            </span>
+          </button>
+        )}
       </label>
 
       <button
         className={styles.cart}
         onClick={onCartClick}
-        aria-label="View cart"
+        aria-label={`View cart with ${cartCount} items`}
       >
         <span className="material-icons-round">shopping_cart</span>
         {cartCount > 0 && <span>{cartCount}</span>}

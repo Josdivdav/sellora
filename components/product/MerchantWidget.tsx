@@ -4,12 +4,14 @@ import Link from "next/link";
 import styles from "./product.module.css";
 import storesData from "@/data/stores.json";
 import type { Store } from "@/types/store";
+import { getStoreRelativePath } from "@/lib/storeUrl";
 
 interface MerchantWidgetProps {
   authorName?: string;
   onFollowToggle?: () => void;
   isFollowing?: boolean;
   isAuthor?: boolean;
+  followersCount?: number;
   id?: string;
 }
 
@@ -18,6 +20,7 @@ export default function MerchantWidget({
   onFollowToggle,
   isFollowing,
   isAuthor = false,
+  followersCount,
   id,
 }: MerchantWidgetProps) {
   const store = (storesData as Store[]).find(
@@ -88,7 +91,7 @@ export default function MerchantWidget({
             </div>
             <div>
               <div className={styles.merchantStatVal}>
-                {formatFollowers(store.followersCount)}
+                {formatFollowers(followersCount !== undefined ? followersCount : (store.followersCount ?? 0))}
               </div>
               <div style={{ color: "#6b7280", fontSize: "11px" }}>Followers</div>
             </div>
@@ -102,7 +105,7 @@ export default function MerchantWidget({
 
         <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
           <Link
-            href={`/?search=${encodeURIComponent(authorName || "")}`}
+            href={getStoreRelativePath(store || authorName || "")}
             className={styles.merchantVisitBtn}
             style={{ flex: 1 }}
           >

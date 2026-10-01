@@ -1,0 +1,251 @@
+import { getAuth } from "firebase-admin/auth";
+import { NextResponse, NextRequest } from "next/server";
+import { db } from "@/lib/firebaseAdmin";
+import type { Order, OrderItem, ShippingAddress, PaymentDetails } from "@/types/order";
+
+export const dynamic = "force-dynamic";
+
+/**
+ * GET /api/orders
+ * Returns all orders belonging to the authenticated user from Firestore.
+ */
+export async function GET(request: NextRequest) {
+  const authorization = request.headers.get("authorization");
+  const idToken = authorization?.startsWith("Bearer ") ? authorization.slice(7) : null;
+
+  if (!idToken) {
+    return NextResponse.json({ error: "Unauthorized: Missing authentication token" }, { status: 401 });
+  }
+
+  let uid: string;
+  try {
+    const decoded = await getAuth().verifyIdToken(idToken);
+    uid = decoded.uid;
+  } catch (error) {
+    console.error("Invalid token in GET /api/orders:", error);
+    return NextResponse.json({ error: "Unauthorized: Invalid token" }, { status: 401 });
+  }
+
+  try {
+    const ordersSnap = await db
+      .collection("orders")
+      .where("userId", "==", uid)
+      .get();
+
+    const orders: Order[] = [];
+    ordersSnap.forEach((doc) => {
+      orders.push({ id: doc.id, ...doc.data() } as Order);
+    });
+
+    // Sort newest orders first
+    orders.sort((a, b) => {
+      const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return dateB - dateA;
+    });
+
+    return NextResponse.json({ success: true, orders, total: orders.length }, { status: 200 });
+  } catch (error) {
+    console.error("Error fetching orders from Firestore:", error);
+    return NextResponse.json({ error: "Failed to fetch orders from database" }, { status: 500 });
+  }
+}
+
+/**
+ * POST /api/orders
+ * Creates a new order in Firestore database.
+ */
+export async function POST(request: NextRequest) {
+  const authorization = request.headers.get("authorization");
+  const idToken = authorization?.startsWith("Bearer ") ? authorization.slice(7) : null;
+
+  if (!idToken) {
+    return NextResponse.json({ error: "Unauthorized: Please sign in to place an order" }, { status: 401 });
+  }
+
+  let uid: string;
+  let email: string | undefined;
+  try {
+    const decoded = await getAuth().verifyIdToken(idToken);
+    uid = decoded.uid;
+    email = decoded.email;
+  } catch (error) {
+    console.error("Invalid token in POST /api/orders:", error);
+    return NextResponse.json({ error: "Unauthorized: Invalid authentication session" }, { status: 401 });
+  }
+
+  try {
+    const body = await request.json();
+    if (!body || !Array.isArray(body.items) || body.items.length === 0) {
+      return NextResponse.json({ error: "Order items cannot be empty" }, { status: 400 });
+    }
+
+    const items: OrderItem[] = body.items.map((item: any) => ({
+      productId: item.productId || item.id || `prod_${Date.now()}`,
+      name: item.name || "Product",
+      slug: item.slug || "",
+      image: item.image || (Array.isArray(item.images) ? item.images[0] : "") || "",
+      price: Number(item.price) || 0,
+      originalPrice: item.originalPrice ? Number(item.originalPrice) : null,
+      quantity: Math.max(1, Number(item.quantity) || 1),
+      variant: item.variant || undefined,
+      storeName: item.storeName || item.author || "Sellora Official",
+      storeId: item.storeId || undefined,
+      category: item.category || "General",
+    }));
+
+    const subtotal = items.reduce((acc, it) => acc + it.price * it.quantity, 0);
+    const shippingFee = subtotal >= 50000 ? 0 : 1500;
+    const discount = Math.max(0, Number(body.discount) || 0);
+    const tax = 0;
+    const total = Math.max(0, subtotal + shippingFee - discount + tax);
+
+    const now = new Date();
+    const nowIso = now.toISOString();
+    const deliveryDate = new Date(now.getTime() + 4 * 24 * 60 * 60 * 1000);
+    const deliveryIso = deliveryDate.toISOString();
+
+    const orderId = body.id || `order_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+    const randomSuffix = Math.floor(100000 + Math.random() * 900000);
+    const orderNumber = body.orderNumber || `ORD-${randomSuffix}`;
+    const trackingNumber = `SEL-${Math.floor(10000000 + Math.random() * 90000000)}`;
+
+    const firstItem = items[0];
+    const storeInfo = body.store || {
+      id: firstItem?.storeId || "sellora-official",
+      name: firstItem?.storeName || "Sellora Official Store",
+      isVerified: true,
+      avatar: "",
+    };
+
+    const shippingAddress: ShippingAddress = body.shippingAddress || {
+      fullName: body.customerName || "Customer",
+      phone: body.phone || "+234 800 123 4567",
+      street: body.street || "Plot 14 Victoria Island Commercial District",
+      city: body.city || "Lagos",
+      state: body.state || "Lagos",
+      postalCode: body.postalCode || "101241",
+      country: "Nigeria",
+    };
+
+    const payment: PaymentDetails = {
+      method: body.payment?.method || "Paystack (Debit Card)",
+      status: "PAID",
+      transactionId:
+        body.payment?.transactionId ||
+        `TXN_${Date.now()}_${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
+      cardLast4: body.payment?.cardLast4 || "4242",
+    };
+
+    const trackingEvents = [
+      {
+        status: "ORDER_PLACED" as const,
+        title: "Order Placed & Verified",
+        description: "Payment confirmed. Merchant notified to prepare shipment package.",
+        location: "Sellora Order Processing Center",
+        timestamp: nowIso,
+        completed: true,
+        current: true,
+      },
+      {
+        status: "PROCESSING" as const,
+        title: "Merchant Packaging Items",
+        description: "Merchant is inspecting items and sealing with Sellora security tape.",
+        location: storeInfo.name,
+        timestamp: new Date(now.getTime() + 2 * 60 * 60 * 1000).toISOString(),
+        completed: false,
+      },
+      {
+        status: "IN_TRANSIT" as const,
+        title: "Dispatched with Carrier",
+        description: "Carrier picked up shipment for transit to local destination hub.",
+        location: "Regional Sorting Facility",
+        timestamp: new Date(now.getTime() + 24 * 60 * 60 * 1000).toISOString(),
+        completed: false,
+      },
+      {
+        status: "DELIVERED" as const,
+        title: "Package Delivered",
+        description: "Delivered to buyer shipping address.",
+        location: shippingAddress.city || "Customer Address",
+        timestamp: deliveryIso,
+        completed: false,
+      },
+    ];
+
+    const storeIds = Array.from(
+      new Set(
+        [storeInfo.id, ...items.map((it) => it.storeId)].filter(
+          (id): id is string => Boolean(id) && id !== "sellora-official" && id !== "sellora-store"
+        )
+      )
+    );
+
+    const orderDocData: Order & { userId: string; customerEmail: string; storeIds: string[] } = {
+      id: orderId,
+      orderNumber,
+      userId: uid,
+      customerEmail: email || "",
+      status: "PROCESSING",
+      createdAt: nowIso,
+      estimatedDelivery: deliveryIso,
+      store: storeInfo,
+      items,
+      pricing: {
+        subtotal,
+        shippingFee,
+        discount,
+        tax,
+        total,
+        currency: "NGN",
+      },
+      shippingAddress,
+      shippingMethod: body.shippingMethod || "Sellora Express Delivery (Priority)",
+      trackingNumber,
+      carrier: body.carrier || "GIG Logistics",
+      carrierPhone: "+234 1 800 735 567",
+      payment,
+      trackingEvents,
+      notes: body.notes || "",
+      storeIds,
+    };
+
+    // 1. Write to root orders collection
+    const orderDocRef = db.collection("orders").doc(orderId);
+    await orderDocRef.set(orderDocData);
+
+    // 2. Also save to participating stores' subcollections
+    if (storeIds.length > 0) {
+      await Promise.allSettled(
+        storeIds.map(async (sId) => {
+          try {
+            await db
+              .collection("stores")
+              .doc(sId)
+              .collection("orders")
+              .doc(orderId)
+              .set(orderDocData);
+          } catch (storeOrderErr) {
+            console.warn(`Could not write order ${orderId} to store ${sId}:`, storeOrderErr);
+          }
+        })
+      );
+    } else if (storeInfo.id && storeInfo.id !== "sellora-official") {
+      try {
+        await db
+          .collection("stores")
+          .doc(storeInfo.id)
+          .collection("orders")
+          .doc(orderId)
+          .set(orderDocData);
+      } catch (storeOrderErr) {
+        console.warn("Could not write order to store subcollection:", storeOrderErr);
+      }
+    }
+
+    return NextResponse.json({ success: true, order: orderDocData }, { status: 201 });
+  } catch (error) {
+    console.error("Error creating order in Firestore:", error);
+    return NextResponse.json({ error: "Failed to place order in database" }, { status: 500 });
+  }
+}

@@ -1,16 +1,21 @@
 "use client";
 
+import Link from "next/link";
 import styles from "@/app/home.module.css";
 import type { Product } from "@/types/product";
 import ProductCard from "./ProductCard";
 import storesData from "@/data/stores.json";
 import type { Store } from "@/types/store";
+import { getStoreRelativePath } from "@/lib/storeUrl";
+
+import EmptyState from "./EmptyState";
 
 interface StoreGroupSectionProps {
   productsByStore: Record<string, Product[]>;
   onSelectStore: (storeName: string) => void;
   onAddToCart: (product: Pick<Product, "id" | "name">) => void;
   stores?: Store[];
+  onResetFilters?: () => void;
 }
 
 export default function StoreGroupSection({
@@ -18,11 +23,19 @@ export default function StoreGroupSection({
   onSelectStore,
   onAddToCart,
   stores = [],
+  onResetFilters,
 }: StoreGroupSectionProps) {
   const storeNames = Object.keys(productsByStore);
 
   if (storeNames.length === 0) {
-    return <p className={styles.empty}>No store items match your filter.</p>;
+    return (
+      <EmptyState
+        title="No store items found"
+        description="No merchant store items match your current search or filters. Try resetting your search."
+        onReset={onResetFilters}
+        showReset={Boolean(onResetFilters)}
+      />
+    );
   }
 
   return (
@@ -83,16 +96,15 @@ export default function StoreGroupSection({
                 </div>
               </div>
 
-              <button
-                type="button"
+              <Link
+                href={getStoreRelativePath(store || storeName)}
                 className={styles.storeGroupViewBtn}
-                onClick={() => onSelectStore(storeName)}
               >
-                <span>View Store Collection</span>
+                <span>Visit Storefront</span>
                 <span className="material-icons-round" style={{ fontSize: "16px" }}>
                   arrow_forward
                 </span>
-              </button>
+              </Link>
             </div>
 
             <div className={styles.grid}>

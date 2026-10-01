@@ -8,6 +8,7 @@ export type NavItem = {
 
 const buyerNav: NavItem[] = [
   { label: "Browse", href: "/", icon: "storefront" },
+  { label: "Cart", href: "/cart", icon: "shopping_cart" },
   {
     label: "My orders",
     href: "/account/orders",

@@ -1,8 +1,10 @@
 "use client";
 
+import Link from "next/link";
 import styles from "@/app/home.module.css";
 import storesData from "@/data/stores.json";
 import type { Store } from "@/types/store";
+import { getStoreRelativePath } from "@/lib/storeUrl";
 
 interface StoreBannerProps {
   storeName: string;
@@ -79,17 +81,31 @@ export default function StoreBanner({
         </div>
       </div>
 
-      <button
-        type="button"
-        className={styles.storeSpotlightClear}
-        onClick={onClear}
-        title="View all stores"
-      >
-        <span className="material-icons-round" style={{ fontSize: "16px" }}>
-          arrow_back
-        </span>
-        All Stores
-      </button>
+      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+        <button
+          type="button"
+          className={styles.storeSpotlightClear}
+          onClick={onClear}
+          title="View all stores"
+        >
+          <span className="material-icons-round" style={{ fontSize: "16px" }}>
+            arrow_back
+          </span>
+          All Stores
+        </button>
+
+        <Link
+          href={getStoreRelativePath(store || storeName)}
+          className={styles.storeSpotlightClear}
+          style={{ background: "#2b6dff", color: "#ffffff", borderColor: "#2b6dff", textDecoration: "none" }}
+          title={`Visit ${storeName} storefront`}
+        >
+          <span className="material-icons-round" style={{ fontSize: "16px" }}>
+            storefront
+          </span>
+          Storefront
+        </Link>
+      </div>
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { db } from '@/lib/firebaseAdmin';
 import { FieldValue } from 'firebase-admin/firestore';
 import type { Product } from '@/types/product';
 import { invalidateProductsCache } from '@/lib/getProduct';
+import { invalidateStoreCache } from '@/lib/getStore';
 
 interface RouteContext {
   params: Promise<{ id: string }>;
@@ -72,6 +73,7 @@ export async function PUT(request: NextRequest, context: RouteContext) {
     ]);
 
     invalidateProductsCache();
+    invalidateStoreCache();
     return NextResponse.json({ success: true, product: updatedProduct }, { status: 200 });
   } catch (error) {
     console.error('Error in PUT /api/user/store/products/[id]:', error);
@@ -129,6 +131,7 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
     }
 
     invalidateProductsCache();
+    invalidateStoreCache();
     return NextResponse.json({ success: true, message: 'Product deleted successfully' }, { status: 200 });
   } catch (error) {
     console.error('Error in DELETE /api/user/store/products/[id]:', error);

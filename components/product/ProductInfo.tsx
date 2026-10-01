@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import styles from "./product.module.css";
 import type { Product } from "@/types/product";
+import { getStoreRelativePath } from "@/lib/storeUrl";
 
 const currency = new Intl.NumberFormat("en-NG", {
   style: "currency",
@@ -50,7 +51,7 @@ export default function ProductInfo({
       <div className={styles.sellerHeaderRow}>
         {product.author ? (
           <Link
-            href={`/?search=${encodeURIComponent(product.author)}`}
+            href={getStoreRelativePath(product.author)}
             className={styles.storeBannerLink}
           >
             <span className="material-icons-round" style={{ fontSize: "16px", color: "#2b6dff" }}>

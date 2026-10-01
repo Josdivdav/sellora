@@ -8,10 +8,22 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const categoryParam = searchParams.get("category");
     const searchParam = searchParams.get("search");
+    const idsParam = searchParams.get("ids");
 
     const { products, categories, stores } = await getAllProducts();
 
     let filtered = products;
+
+    if (idsParam && idsParam.trim()) {
+      const idsSet = new Set(
+        idsParam
+          .split(",")
+          .map((s) => s.trim())
+          .filter(Boolean)
+      );
+      filtered = filtered.filter((p) => idsSet.has(p.id));
+    }
+
     if (categoryParam && categoryParam !== "All") {
       filtered = filtered.filter(
         (p) => p.category.toLowerCase() === categoryParam.toLowerCase()

@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
 import styles from "@/app/home.module.css";
 import type { Product } from "@/types/product";
@@ -17,7 +20,38 @@ export default function ProductCard({
   product,
   onAddToCart,
 }: ProductCardProps) {
-  const roundedRating = Math.round(product.rating);
+  const initialImage =
+    product.image ||
+    (Array.isArray(product.images) && product.images.length > 0
+      ? product.images[0]
+      : "/favico.png");
+
+  const [imageSrc, setImageSrc] = useState(initialImage);
+  const [isAdded, setIsAdded] = useState(false);
+
+  const roundedRating = Math.round(Number(product.rating || 5));
+
+  // Determine discount percentage if on sale
+  const discount =
+    product.discountPercentage ||
+    (product.oldPrice && product.oldPrice > product.price
+      ? Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)
+      : null);
+
+  // Check inventory availability
+  const isOutOfStock =
+    product.inStock === false ||
+    (product.stock !== undefined && product.stock <= 0);
+
+  const handleAdd = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (isOutOfStock) return;
+
+    onAddToCart(product);
+    setIsAdded(true);
+    setTimeout(() => setIsAdded(false), 1400);
+  };
 
   return (
     <article className={styles.card}>
@@ -28,12 +62,21 @@ export default function ProductCard({
       >
         <div className={styles.image}>
           <img
-            src={product.image}
+            src={imageSrc}
             alt={product.name}
             loading="lazy"
             decoding="async"
+            onError={() => setImageSrc("/favico.png")}
           />
-          {product.oldPrice && <b>Sale</b>}
+          {discount && discount > 0 ? (
+            <span className={styles.cardDiscountBadge}>-{discount}%</span>
+          ) : product.oldPrice ? (
+            <b>Sale</b>
+          ) : null}
+
+          {isOutOfStock && (
+            <span className={styles.cardOutOfStockBadge}>Sold Out</span>
+          )}
         </div>
       </Link>
 
@@ -46,28 +89,52 @@ export default function ProductCard({
         >
           <h2>{product.name}</h2>
         </Link>
-        <small style={{ color: "#6b7280", textTransform: "none", fontSize: "12px", fontWeight: 500 }}>
-          {product.author || ""}
+        <small
+          style={{
+            color: "#6b7280",
+            textTransform: "none",
+            fontSize: "12px",
+            fontWeight: 500,
+          }}
+        >
+          {product.author || "Sellora Merchant"}
         </small>
 
         <p className={styles.rating}>
-          <i>
-            {"★".repeat(roundedRating)}
-            {"☆".repeat(5 - roundedRating)}
+          <i aria-hidden="true">
+            {"★".repeat(Math.min(5, Math.max(0, roundedRating)))}
+            {"☆".repeat(Math.max(0, 5 - roundedRating))}
           </i>
-          {product.rating.toFixed(1)}
+          <span>{(product.rating || 5.0).toFixed(1)}</span>
+          {Boolean(product.reviewsCount) && (
+            <span style={{ fontSize: "11px", color: "#9ca3af" }}>
+              ({product.reviewsCount})
+            </span>
+          )}
         </p>
 
         <p>
           <strong>{currency.format(product.price)}</strong>
-          {product.oldPrice && (
-            <del>{currency.format(product.oldPrice)}</del>
-          )}
+          {product.oldPrice && <del>{currency.format(product.oldPrice)}</del>}
         </p>
 
-        <button onClick={() => onAddToCart(product)}>
-          <span className="material-icons-round">shopping_cart</span>
-          Add to cart
+        <button
+          type="button"
+          onClick={handleAdd}
+          disabled={isOutOfStock}
+          className={`${isAdded ? styles.cardAddedBtn : ""} ${
+            isOutOfStock ? styles.cardDisabledBtn : ""
+          }`}
+          aria-label={
+            isOutOfStock
+              ? `${product.name} is out of stock`
+              : `Add ${product.name} to cart`
+          }
+        >
+          <span className="material-icons-round">
+            {isAdded ? "check" : isOutOfStock ? "block" : "shopping_cart"}
+          </span>
+          {isAdded ? "Added to Cart!" : isOutOfStock ? "Out of Stock" : "Add to Cart"}
         </button>
       </div>
     </article>

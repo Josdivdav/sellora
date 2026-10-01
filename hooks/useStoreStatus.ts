@@ -1,41 +1,60 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { useAuth } from "@/context/AuthContext";
 
 /**
- * Returns whether the current user has a store.
- * Always starts false (matches server render), then syncs from
- * localStorage in useEffect to avoid hydration mismatches.
+ * Returns whether the CURRENT authenticated user owns a store directly from the database.
+ * - If not logged in -> always false.
+ * - Queries backend /api/user/store to guarantee real-time accuracy across accounts.
+ * - Stores state in memory with ZERO localStorage usage.
  */
 export function useStoreStatus(): boolean {
+  const { user, loading: authLoading } = useAuth();
   const [hasStore, setHasStore] = useState(false);
 
-  useEffect(() => {
-    const sync = () => {
-      try {
-        const cached = localStorage.getItem("sellora_my_store");
-        if (cached) {
-          const parsed = JSON.parse(cached);
-          setHasStore(Boolean(parsed?.id || parsed?.name));
-        } else {
-          setHasStore(false);
-        }
-      } catch {
-        // ignore
+  const sync = useCallback(async () => {
+    if (authLoading) return;
+
+    if (!user) {
+      setHasStore(false);
+      return;
+    }
+
+    try {
+      const token = await user.getIdToken();
+      if (!token) return;
+
+      const res = await fetch("/api/user/store", {
+        headers: { authorization: `Bearer ${token}` },
+      });
+
+      if (res.ok) {
+        const json = await res.json();
+        setHasStore(Boolean(json?.data));
+      } else if (res.status === 404) {
+        setHasStore(false);
       }
+    } catch (err) {
+      console.warn("Could not verify store status with backend:", err);
+    }
+  }, [user, authLoading]);
+
+  useEffect(() => {
+    void sync();
+
+    const handleUpdate = () => {
+      void sync();
     };
 
-    // Run immediately after mount
-    sync();
+    window.addEventListener("sellora_store_status_changed", handleUpdate);
+    window.addEventListener("sellora_favorites_updated", handleUpdate);
 
-    // Keep in sync when store is created/deleted in any tab
-    window.addEventListener("storage", sync);
-    window.addEventListener("sellora_favorites_updated", sync);
     return () => {
-      window.removeEventListener("storage", sync);
-      window.removeEventListener("sellora_favorites_updated", sync);
+      window.removeEventListener("sellora_store_status_changed", handleUpdate);
+      window.removeEventListener("sellora_favorites_updated", handleUpdate);
     };
-  }, []);
+  }, [sync]);
 
   return hasStore;
 }

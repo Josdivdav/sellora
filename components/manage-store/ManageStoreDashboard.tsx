@@ -9,7 +9,9 @@ import EditStoreModal from "./EditStoreModal";
 import ProductDetailsModal from "./ProductDetailsModal";
 import type { Store } from "@/types/store";
 import type { Product } from "@/types/product";
+import type { Order } from "@/types/order";
 import type { User } from "firebase/auth";
+import { getStoreRelativePath, getStoreFullUrl } from "@/lib/storeUrl";
 
 const MerchantOrdersTab = lazy(() => import("./tabs/MerchantOrdersTab"));
 const MerchantAnalyticsTab = lazy(() => import("./tabs/MerchantAnalyticsTab"));
@@ -28,69 +30,6 @@ const currency = new Intl.NumberFormat("en-NG", {
   currency: "NGN",
   maximumFractionDigits: 0,
 });
-
-const DEFAULT_STARTER_PRODUCTS: Product[] = [
-  {
-    id: "p-init-1",
-    name: "Signature Streetwear Oversized Hoodie",
-    slug: "signature-streetwear-oversized-hoodie",
-    category: "Fashion & Apparel",
-    price: 38000,
-    oldPrice: 45000,
-    currency: "NGN",
-    rating: 4.8,
-    reviewsCount: 14,
-    image: "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=800&q=80",
-    images: ["https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=800&q=80"],
-    author: "My Store",
-    description: "Heavyweight 400GSM cotton fleece with drop shoulders and embroidered chest logo.",
-    stock: 24,
-    inStock: true,
-    sku: "SEL-STR-001",
-    tags: ["hoodie", "streetwear", "winter"],
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: "p-init-2",
-    name: "Minimalist Italian Leather Sneakers",
-    slug: "minimalist-italian-leather-sneakers",
-    category: "Fashion & Apparel",
-    price: 52000,
-    oldPrice: 65000,
-    currency: "NGN",
-    rating: 4.9,
-    reviewsCount: 28,
-    image: "https://images.unsplash.com/photo-1549298916-b41d501d3772?w=800&q=80",
-    images: ["https://images.unsplash.com/photo-1549298916-b41d501d3772?w=800&q=80"],
-    author: "My Store",
-    description: "Handcrafted white calfskin leather sneakers with vulcanized rubber cupsole.",
-    stock: 8,
-    inStock: true,
-    sku: "SEL-STR-002",
-    tags: ["sneakers", "footwear", "luxury"],
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: "p-init-3",
-    name: "Tactical Crossbody Utility Messenger",
-    slug: "tactical-crossbody-utility-messenger",
-    category: "Fashion & Apparel",
-    price: 24000,
-    oldPrice: 30000,
-    currency: "NGN",
-    rating: 4.7,
-    reviewsCount: 9,
-    image: "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=800&q=80",
-    images: ["https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=800&q=80"],
-    author: "My Store",
-    description: "Water-resistant Cordura ballistic nylon with Fidlock magnetic buckle closure.",
-    stock: 12,
-    inStock: true,
-    sku: "SEL-STR-003",
-    tags: ["bag", "accessories", "utility"],
-    createdAt: new Date().toISOString(),
-  },
-];
 
 function ManageStoreLoadingState() {
   return (
@@ -144,10 +83,9 @@ export default function ManageStoreDashboard({
 }: ManageStoreDashboardProps) {
   const [store, setStore] = useState<Store | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [isRefreshing, setIsRefreshing] = useState(false);
   const [isDeletingProduct, setIsDeletingProduct] = useState(false);
-  const [isSeeding, setIsSeeding] = useState(false);
 
   // Filters & Search
   const [searchQuery, setSearchQuery] = useState("");
@@ -163,122 +101,94 @@ export default function ManageStoreDashboard({
   const [deletingProduct, setDeletingProduct] = useState<Product | null>(null);
   const [isEditStoreModalOpen, setIsEditStoreModalOpen] = useState(false);
 
-  // Load store and products from backend
-  const loadData = useCallback(
-    async (showRefreshing = false) => {
-      if (showRefreshing) setIsRefreshing(true);
-      try {
-        const token = await user?.getIdToken(true).catch(() => user?.getIdToken());
-        if (!token) {
-          setIsLoaded(true);
-          return;
-        }
-
-        // Fetch store and products concurrently from backend
-        const [storeRes, prodsRes] = await Promise.all([
-          fetch("/api/user/store", {
-            method: "GET",
-            headers: {
-              authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-          }),
-          fetch("/api/user/store/products", {
-            method: "GET",
-            headers: {
-              authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-          }),
-        ]);
-
-        if (storeRes.status === 404) {
-          setStore(null);
-          setProducts([]);
-          return;
-        }
-
-        if (storeRes.status === 401) {
-          console.warn("Session expired or unauthorized in manage-store");
-          setStore(null);
-          setProducts([]);
-          return;
-        }
-
-        if (!storeRes.ok) {
-          const errData = await storeRes.json().catch(() => ({}));
-          console.error("Store fetch failed:", storeRes.status, errData);
-          if (showRefreshing) {
-            onShowToast(errData?.error || "Could not refresh store data");
-          }
-          return;
-        }
-
-        const storeJson = await storeRes.json();
-        const storeData: Store = storeJson.data;
-        setStore(storeData);
-
-        let fetchedProducts: Product[] = [];
-        if (prodsRes.ok) {
-          const prodsJson = await prodsRes.json();
-          fetchedProducts = prodsJson.products || [];
-        }
-
-        // If backend products are empty, check if user had products in localStorage to migrate
-        if (fetchedProducts.length === 0 && storeData?.id) {
-          try {
-            const localKey = `sellora_merchant_products_${storeData.id}`;
-            const local = localStorage.getItem(localKey);
-            if (local) {
-              const parsed = JSON.parse(local);
-              if (Array.isArray(parsed) && parsed.length > 0) {
-                // Auto-sync local products to backend
-                const syncRes = await fetch("/api/user/store/products", {
-                  method: "POST",
-                  headers: {
-                    authorization: `Bearer ${token}`,
-                    "Content-Type": "application/json",
-                  },
-                  body: JSON.stringify({ action: "batch", products: parsed }),
-                });
-                if (syncRes.ok) {
-                  const syncJson = await syncRes.json();
-                  fetchedProducts = syncJson.products || parsed;
-                  onShowToast(`Synced ${fetchedProducts.length} local items to backend`);
-                }
-              }
-            }
-          } catch {
-            // ignore
-          }
-        }
-
-        setProducts(fetchedProducts);
-
-        // Keep local cache in sync for offline/quick access
-        if (storeData) {
-          localStorage.setItem("sellora_my_store", JSON.stringify(storeData));
-          if (storeData.id) {
-            localStorage.setItem(
-              `sellora_merchant_products_${storeData.id}`,
-              JSON.stringify(fetchedProducts)
-            );
-          }
-        }
-
-        if (showRefreshing) {
-          onShowToast("Synced latest data from backend!");
-        }
-      } catch (error) {
-        console.error("Error loading store data from backend:", error);
-        onShowToast("Unable to load latest data from backend");
-      } finally {
+  // Load store, products, and customer orders from backend database
+  const loadData = useCallback(async () => {
+    try {
+      const token = await user?.getIdToken(true).catch(() => user?.getIdToken());
+      if (!token) {
         setIsLoaded(true);
-        setIsRefreshing(false);
+        return;
       }
-    },
-    [user, onShowToast]
-  );
+
+      // Fetch store, products, and orders concurrently from Firestore
+      const [storeRes, prodsRes, ordersRes] = await Promise.all([
+        fetch("/api/user/store", {
+          method: "GET",
+          headers: {
+            authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }),
+        fetch("/api/user/store/products", {
+          method: "GET",
+          headers: {
+            authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }),
+        fetch("/api/user/store/orders", {
+          method: "GET",
+          headers: {
+            authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }),
+      ]);
+
+      if (storeRes.status === 404) {
+        setStore(null);
+        setProducts([]);
+        setOrders([]);
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(new Event("sellora_store_status_changed"));
+        }
+        return;
+      }
+
+      if (storeRes.status === 401 || prodsRes.status === 401) {
+        console.warn("Session expired or unauthorized in manage-store");
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(new Event("sellora_session_expired"));
+        }
+        setStore(null);
+        setProducts([]);
+        setOrders([]);
+        return;
+      }
+
+      if (!storeRes.ok) {
+        const errData = await storeRes.json().catch(() => ({}));
+        console.error("Store fetch failed:", storeRes.status, errData);
+        onShowToast(errData?.error || "Could not load store data");
+        return;
+      }
+
+      const storeJson = await storeRes.json();
+      const storeData: Store = storeJson.data;
+      setStore(storeData);
+
+      let fetchedProducts: Product[] = [];
+      if (prodsRes.ok) {
+        const prodsJson = await prodsRes.json();
+        fetchedProducts = prodsJson.products || [];
+      }
+      setProducts(fetchedProducts);
+
+      let fetchedOrders: Order[] = [];
+      if (ordersRes.ok) {
+        const ordersJson = await ordersRes.json();
+        fetchedOrders = ordersJson.orders || [];
+      }
+      setOrders(fetchedOrders);
+
+
+    } catch (error) {
+      console.error("Error loading store data from backend:", error);
+      onShowToast("Unable to load latest data from backend");
+    } finally {
+      setIsLoaded(true);
+    }
+  }, [user, onShowToast]);
 
   useEffect(() => {
     if (isAuthLoading) return;
@@ -286,7 +196,7 @@ export default function ManageStoreDashboard({
       setIsLoaded(true);
       return;
     }
-    void loadData(false);
+    void loadData();
   }, [user, isAuthLoading, loadData]);
 
   // Add or Edit Product Handler synced to backend
@@ -318,10 +228,6 @@ export default function ManageStoreDashboard({
         p.id === savedProduct.id ? updatedProd : p
       );
       setProducts(updated);
-
-      if (store?.id) {
-        localStorage.setItem(`sellora_merchant_products_${store.id}`, JSON.stringify(updated));
-      }
       onShowToast(`Updated "${savedProduct.name}"`);
     } else {
       // Add new product to backend
@@ -349,10 +255,6 @@ export default function ManageStoreDashboard({
           productsCount: (store.productsCount ?? 0) + 1,
         };
         setStore(updatedStore);
-        localStorage.setItem("sellora_my_store", JSON.stringify(updatedStore));
-        if (store.id) {
-          localStorage.setItem(`sellora_merchant_products_${store.id}`, JSON.stringify(updated));
-        }
       }
       onShowToast(`Added "${savedProduct.name}" to store catalog`);
     }
@@ -393,10 +295,6 @@ export default function ManageStoreDashboard({
           productsCount: Math.max(0, (store.productsCount ?? 1) - 1),
         };
         setStore(updatedStore);
-        localStorage.setItem("sellora_my_store", JSON.stringify(updatedStore));
-        if (store.id) {
-          localStorage.setItem(`sellora_merchant_products_${store.id}`, JSON.stringify(updated));
-        }
       }
       onShowToast(`Deleted "${deletingProduct.name}"`);
       setIsDeleteModalOpen(false);
@@ -433,7 +331,6 @@ export default function ManageStoreDashboard({
     setStore(finalStore);
 
     try {
-      localStorage.setItem("sellora_my_store", JSON.stringify(finalStore));
       window.dispatchEvent(new Event("sellora_favorites_updated"));
     } catch {
       // ignore
@@ -453,60 +350,10 @@ export default function ManageStoreDashboard({
     onShowToast("Storefront details updated!");
   };
 
-  // Seed Starter Products Handler
-  const handleSeedSampleProducts = async () => {
-    const token = await user?.getIdToken();
-    if (!token || !store) return;
-
-    setIsSeeding(true);
-    try {
-      const sampleItems = DEFAULT_STARTER_PRODUCTS.map((p) => ({
-        ...p,
-        author: store.name,
-        category: store.category || p.category,
-      }));
-
-      const res = await fetch("/api/user/store/products", {
-        method: "POST",
-        headers: {
-          authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ action: "batch", products: sampleItems }),
-      });
-
-      const result = await res.json();
-      if (!res.ok) {
-        throw new Error(result.error || "Failed to seed sample products");
-      }
-
-      const newProds = result.products || sampleItems;
-      setProducts(newProds);
-
-      const updatedStore = {
-        ...store,
-        productsCount: newProds.length,
-      };
-      setStore(updatedStore);
-      localStorage.setItem("sellora_my_store", JSON.stringify(updatedStore));
-      if (store.id) {
-        localStorage.setItem(`sellora_merchant_products_${store.id}`, JSON.stringify(newProds));
-      }
-      onShowToast("Seeded 3 sample products to your store catalog!");
-    } catch (err: any) {
-      onShowToast(err?.message || "Failed to seed sample products");
-    } finally {
-      setIsSeeding(false);
-    }
-  };
-
   // Copy Store Link
   const handleCopyStoreLink = () => {
     if (!store) return;
-    const url =
-      typeof window !== "undefined"
-        ? `${window.location.origin}/@${store.slug}`
-        : `${process.env.NEXT_PUBLIC_SITE_URL || ""}/@${store.slug}`;
+    const url = getStoreFullUrl(store);
 
     if (typeof navigator !== "undefined" && navigator.clipboard) {
       navigator.clipboard.writeText(url);
@@ -636,12 +483,12 @@ export default function ManageStoreDashboard({
               Share Link
             </button>
             <Link
-              href="/account/favorites"
+              href={getStoreRelativePath(store)}
               className={styles.heroActionBtn}
-              title="View in favorite stores"
+              title="View public storefront"
             >
               <span className="material-icons-round" style={{ fontSize: "16px" }}>
-                favorite
+                storefront
               </span>
               Storefront View
             </Link>
@@ -678,7 +525,7 @@ export default function ManageStoreDashboard({
                   )}
                 </h1>
                 <div className={styles.storeSlugLine}>
-                  <span className={styles.slugTag}>{typeof window !== "undefined" ? window.location.host : (process.env.NEXT_PUBLIC_SITE_URL ? new URL(process.env.NEXT_PUBLIC_SITE_URL).host : "sellora")}/@{store.slug}</span>
+                  <span className={styles.slugTag}>{getStoreFullUrl(store).replace(/^https?:\/\//, "")}</span>
                   <span>•</span>
                   <span className={styles.categoryTag}>{store.category}</span>
                   <span>•</span>
@@ -744,13 +591,25 @@ export default function ManageStoreDashboard({
       {/* ── TAB CONTENT ── */}
       <Suspense fallback={<div style={{ padding: "40px", textAlign: "center", color: "#9ca3af" }}>Loading...</div>}>
         {activeTab === "orders" && (
-          <MerchantOrdersTab store={store} currency={currency} onShowToast={onShowToast} />
+          <MerchantOrdersTab
+            store={store}
+            orders={orders}
+            onOrdersChange={setOrders}
+            currency={currency}
+            user={user}
+            onShowToast={onShowToast}
+          />
         )}
         {activeTab === "analytics" && (
-          <MerchantAnalyticsTab store={store} products={products} currency={currency} />
+          <MerchantAnalyticsTab
+            store={store}
+            products={products}
+            orders={orders}
+            currency={currency}
+          />
         )}
         {activeTab === "promotions" && (
-          <MerchantPromotionsTab store={store} onShowToast={onShowToast} />
+          <MerchantPromotionsTab store={store} user={user} onShowToast={onShowToast} />
         )}
         {activeTab === "settings" && (
           <MerchantSettingsTab store={store} onSave={handleSaveStoreDetails} onShowToast={onShowToast} />
@@ -824,22 +683,6 @@ export default function ManageStoreDashboard({
               </div>
 
               <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-                <button
-                  type="button"
-                  className={styles.syncBtn}
-                  onClick={() => loadData(true)}
-                  disabled={isRefreshing}
-                  title="Sync store and products with backend"
-                >
-                  <span
-                    className={`material-icons-round ${isRefreshing ? styles.spinning : ""}`}
-                    style={{ fontSize: "16px" }}
-                  >
-                    sync
-                  </span>
-                  {isRefreshing ? "Syncing..." : "Sync"}
-                </button>
-
                 <button
                   type="button"
                   className={styles.addProductBtn}
@@ -1120,7 +963,7 @@ export default function ManageStoreDashboard({
                 <p className={styles.emptyStateSub}>
                   {searchQuery || statusFilter !== "ALL" || categoryFilter !== "ALL"
                     ? "No items match your current filter criteria. Try resetting filters."
-                    : "Your store catalog is currently empty. Click '+ Add New Product' or seed sample products to get started."}
+                    : "Your store catalog is currently empty. Click '+ Add First Product' to start building your catalog."}
                 </p>
                 <div style={{ display: "flex", gap: "10px", alignItems: "center", justifyContent: "center", marginTop: "12px", flexWrap: "wrap" }}>
                   <button
@@ -1131,19 +974,6 @@ export default function ManageStoreDashboard({
                     <span className="material-icons-round">add</span>
                     Add First Product
                   </button>
-                  {!searchQuery && statusFilter === "ALL" && categoryFilter === "ALL" && (
-                    <button
-                      type="button"
-                      className={styles.seedBtn}
-                      onClick={handleSeedSampleProducts}
-                      disabled={isSeeding}
-                    >
-                      <span className={`material-icons-round ${isSeeding ? styles.spinning : ""}`} style={{ fontSize: "16px" }}>
-                        auto_awesome
-                      </span>
-                      {isSeeding ? "Seeding Starter Catalog..." : "Add Sample Products"}
-                    </button>
-                  )}
                 </div>
               </div>
             )}
