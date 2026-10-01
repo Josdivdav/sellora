@@ -525,7 +525,16 @@ export default function AboutClient() {
           <div className={styles.footerBrand}>
             <Image src="/favico.png" alt="Sellora" width={28} height={28} />
             <p className={styles.footerCopy}>
-              &copy; {new Date().getFullYear()} Sellora Marketplace. Built for Nigerian commerce.
+              &copy; {new Date().getFullYear()} Sellora Marketplace. Engineered by{" "}
+              <a
+                href="https://divinie.web.app"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: "#4f46e5", fontWeight: 700, textDecoration: "none" }}
+              >
+                Divine David
+              </a>
+              . Built for Nigerian commerce.
             </p>
           </div>
           <div className={styles.footerLinks}>

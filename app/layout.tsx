@@ -17,9 +17,10 @@ export const metadata: Metadata = {
     template: "%s | Sellora",
   },
   description:
-    "Discover and buy products from verified Nigerian merchants on Sellora. Fast delivery, secure payments, and a seamless shopping experience.",
+    "Discover and buy products from verified Nigerian merchants on Sellora. Developed by Divine David (https://divinie.web.app). Fast delivery, secure payments, and a seamless shopping experience.",
   keywords: [
     "Sellora",
+    "Divine David",
     "online shopping",
     "Nigerian marketplace",
     "ecommerce Nigeria",
@@ -27,8 +28,9 @@ export const metadata: Metadata = {
     "verified merchants",
     "fast delivery",
   ],
-  authors: [{ name: "Sellora" }],
-  creator: "Sellora",
+  authors: [{ name: "Divine David", url: "https://divinie.web.app" }, { name: "Sellora" }],
+  creator: "Divine David",
+  publisher: "Divine David",
   robots: {
     index: true,
     follow: true,
@@ -39,14 +41,14 @@ export const metadata: Metadata = {
     siteName: "Sellora",
     title: "Sellora — Shop the Best Products Online",
     description:
-      "Discover and buy products from verified Nigerian merchants. Fast delivery, secure payments.",
+      "Discover and buy products from verified Nigerian merchants on Sellora. Developed by Divine David (https://divinie.web.app). Fast delivery, secure payments.",
     images: [{ url: "/logo.png", width: 800, height: 600, alt: "Sellora" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Sellora — Shop the Best Products Online",
     description:
-      "Discover and buy products from verified Nigerian merchants. Fast delivery, secure payments.",
+      "Discover and buy products from verified Nigerian merchants on Sellora. Developed by Divine David (https://divinie.web.app). Fast delivery, secure payments.",
     images: ["/logo.png"],
   },
   icons: {

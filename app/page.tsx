@@ -8,11 +8,13 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Sellora — Discover Verified Stores & Quality Products in Nigeria",
   description:
-    "Browse verified Nigerian merchants, discover top-rated fashion, electronics, and lifestyle products with fast express delivery across Nigeria.",
+    "Browse verified Nigerian merchants, discover top-rated fashion, electronics, and lifestyle products. Developed by Divine David (https://divinie.web.app) with fast express delivery across Nigeria.",
+  authors: [{ name: "Divine David", url: "https://divinie.web.app" }],
+  creator: "Divine David",
   openGraph: {
     title: "Sellora — Discover Verified Stores & Quality Products in Nigeria",
     description:
-      "Shop verified Nigerian stores with secure payments and fast delivery.",
+      "Shop verified Nigerian stores with secure payments and fast delivery. Built by Divine David (https://divinie.web.app).",
     url: "https://sellora.ng",
     siteName: "Sellora",
     type: "website",
@@ -30,7 +32,13 @@ export default async function HomePage() {
     "@type": "WebSite",
     name: "Sellora",
     url: "https://sellora.ng",
-    description: "Browse verified Nigerian merchants and quality products.",
+    description:
+      "Browse verified Nigerian merchants and quality products. Developed by Divine David (https://divinie.web.app).",
+    author: {
+      "@type": "Person",
+      name: "Divine David",
+      url: "https://divinie.web.app",
+    },
     potentialAction: {
       "@type": "SearchAction",
       target: "https://sellora.ng/?search={search_term_string}",
