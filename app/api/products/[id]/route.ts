@@ -66,6 +66,18 @@ export async function GET(request: NextRequest, context: RouteContext) {
       specifications: productData.specifications || {},
       createdAt: productData.createdAt || new Date().toISOString(),
       updatedAt: productData.updatedAt,
+      isAffiliateEnabled: Boolean(productData.isAffiliateEnabled),
+      affiliateCommissionPercentage:
+        productData.affiliateCommissionPercentage !== undefined
+          ? Number(productData.affiliateCommissionPercentage)
+          : undefined,
+      affiliateCommissionAmount:
+        productData.affiliateCommissionAmount !== undefined
+          ? Number(productData.affiliateCommissionAmount)
+          : undefined,
+      affiliateCode: productData.affiliateCode || '',
+      affiliateMarketingUrl: productData.affiliateMarketingUrl || '',
+      affiliateTerms: productData.affiliateTerms || '',
     };
 
     return NextResponse.json({ success: true, product }, { status: 200 });

@@ -81,6 +81,34 @@ export default function CheckoutClient() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [placedOrder, setPlacedOrder] = useState<Order | null>(null);
   const [copiedAccount, setCopiedAccount] = useState(false);
+  const [affiliateCode, setAffiliateCode] = useState<string | undefined>(undefined);
+
+  // Detect and preserve affiliate referral attribution
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlAff = urlParams.get("aff");
+      if (urlAff) {
+        setAffiliateCode(urlAff.trim());
+        return;
+      }
+      const stored = localStorage.getItem("sellora_last_aff_attribution");
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed?.code) {
+          setAffiliateCode(parsed.code);
+          return;
+        }
+      }
+      const match = document.cookie.match(/(?:^|;\s*)sellora_aff=([^;]+)/);
+      if (match && match[1]) {
+        setAffiliateCode(decodeURIComponent(match[1]));
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
 
   // Form Fields
   const [email, setEmail] = useState("");
@@ -358,6 +386,18 @@ export default function CheckoutClient() {
           method: paymentMethodNames[paymentMethod] || "Cash / POS on Delivery",
           status: paymentMethod === "transfer" ? "PENDING" : "PENDING",
         },
+        affiliateCode: affiliateCode || (() => {
+          try {
+            const stored = localStorage.getItem("sellora_last_aff_attribution");
+            if (stored) {
+              const parsed = JSON.parse(stored);
+              return parsed?.code || undefined;
+            }
+          } catch {
+            // ignore
+          }
+          return undefined;
+        })(),
       };
 
       const res = await fetch("/api/orders", {
@@ -995,6 +1035,31 @@ export default function CheckoutClient() {
                   </div>
                 )}
               </div>
+
+              {/* Partner Referral Notice */}
+              {affiliateCode && (
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    background: "#ecfdf5",
+                    border: "1.5px solid #a7f3d0",
+                    borderRadius: "10px",
+                    padding: "8px 12px",
+                    fontSize: "12.5px",
+                    color: "#065f46",
+                    marginBottom: "12px",
+                  }}
+                >
+                  <span className="material-icons-round" style={{ fontSize: "16px", color: "#059669" }}>
+                    handshake
+                  </span>
+                  <span>
+                    Partner Referral: <strong>{affiliateCode}</strong> applied
+                  </span>
+                </div>
+              )}
 
               {/* Breakdown */}
               <div className={styles.summaryRows}>

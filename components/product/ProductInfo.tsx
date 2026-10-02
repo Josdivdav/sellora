@@ -20,6 +20,7 @@ interface ProductInfoProps {
   onToggleWishlist: (product: Product) => void;
   isWishlisted: boolean;
   isAuthor?: boolean;
+  activeAffiliateCode?: string | null;
 }
 
 export default function ProductInfo({
@@ -30,6 +31,7 @@ export default function ProductInfo({
   onToggleWishlist,
   isWishlisted,
   isAuthor = false,
+  activeAffiliateCode = null,
 }: ProductInfoProps) {
   const [quantity, setQuantity] = useState(1);
   const roundedRating = Math.round(product.rating);
@@ -143,6 +145,23 @@ export default function ProductInfo({
           {product.category}
         </span>
       </div>
+
+      {/* Active Partner Referral Banner */}
+      {activeAffiliateCode && (
+        <div className={styles.affiliateAttributionBanner}>
+          <div className={styles.affiliateAttributionIcon}>
+            <span className="material-icons-round" style={{ fontSize: "18px" }}>
+              verified
+            </span>
+          </div>
+          <div className={styles.affiliateAttributionContent}>
+            <span className={styles.affiliateAttributionLabel}>Partner Referral Applied</span>
+            <span className={styles.affiliateAttributionDesc}>
+              You are shopping with referral code <strong>{activeAffiliateCode}</strong>.
+            </span>
+          </div>
+        </div>
+      )}
 
       {/* Pricing Box */}
       <div className={styles.pricingBox}>
@@ -288,6 +307,8 @@ export default function ProductInfo({
             <span className="material-icons-round">share</span>
           </button>
         </div>
+      )}
+
       {/* Affiliate Marketing Promotion Card */}
       {product.isAffiliateEnabled && (
         <div className={styles.affiliatePromoCard}>

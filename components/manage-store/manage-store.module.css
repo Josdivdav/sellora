@@ -2627,3 +2627,138 @@
   font-size: 11px;
   font-weight: 700;
 }
+
+/* Affiliate Promo Code Input Row with Regenerate button */
+.affiliateCodeInputRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.affiliateRefreshCodeBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  color: #475569;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.affiliateRefreshCodeBtn:hover {
+  background: #e2e8f0;
+  color: #1e293b;
+  border-color: #94a3b8;
+}
+
+/* Affiliate Success Modal / Celebratory Panel */
+.affiliateCelebrationHeader {
+  text-align: center;
+  padding: 12px 0 8px 0;
+}
+
+.affiliateCelebrationBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: #ecfdf5;
+  border: 2px solid #a7f3d0;
+  color: #059669;
+  margin-bottom: 12px;
+}
+
+.affiliateCelebrationTitle {
+  font-size: 20px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 6px 0;
+}
+
+.affiliateCelebrationSub {
+  font-size: 13.5px;
+  color: #64748b;
+  margin: 0 auto;
+  max-width: 480px;
+  line-height: 1.5;
+}
+
+.affiliateProductHero {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 14px;
+  margin: 12px 0;
+}
+
+.affiliateProductHeroImg {
+  width: 64px;
+  height: 64px;
+  border-radius: 10px;
+  object-fit: cover;
+  border: 1px solid #e2e8f0;
+  flex-shrink: 0;
+}
+
+.affiliateProductHeroInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.affiliateProductHeroTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 4px 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.affiliateProductHeroMeta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 13px;
+}
+
+.affiliateCommissionHeroTag {
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  color: #065f46;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.affiliateTipsBox {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 12.5px;
+  color: #166534;
+  line-height: 1.5;
+}
+
+.affiliateTipsList {
+  margin: 6px 0 0 0;
+  padding-left: 20px;
+}
+
+.affiliateTipsList li {
+  margin-bottom: 4px;
+}
+

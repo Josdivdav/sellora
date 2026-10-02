@@ -11,6 +11,7 @@ interface ProductDetailsModalProps {
   onClose: () => void;
   onEdit: (product: Product) => void;
   onDelete: (product: Product) => void;
+  onViewAffiliate?: (product: Product) => void;
 }
 
 export default function ProductDetailsModal({
@@ -19,6 +20,7 @@ export default function ProductDetailsModal({
   onClose,
   onEdit,
   onDelete,
+  onViewAffiliate,
 }: ProductDetailsModalProps) {
   const images = product.images && product.images.length > 0 ? product.images : [product.image];
   const [selectedImage, setSelectedImage] = useState(images[0] || product.image);
@@ -273,6 +275,20 @@ export default function ProductDetailsModal({
                       </span>
                       WhatsApp
                     </button>
+                    {onViewAffiliate && (
+                      <button
+                        type="button"
+                        className={styles.affiliateCopyBtn}
+                        style={{ background: "#4f46e5" }}
+                        onClick={() => onViewAffiliate(product)}
+                        title="Open Full Affiliate Share Hub"
+                      >
+                        <span className="material-icons-round" style={{ fontSize: "14px" }}>
+                          share
+                        </span>
+                        Affiliate Hub
+                      </button>
+                    )}
                   </div>
                 </div>
 

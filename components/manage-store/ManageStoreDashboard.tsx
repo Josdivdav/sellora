@@ -8,6 +8,7 @@ import DeleteProductModal from "./DeleteProductModal";
 import EditStoreModal from "./EditStoreModal";
 import UpgradeToPremiumModal from "./UpgradeToPremiumModal";
 import ProductDetailsModal from "./ProductDetailsModal";
+import AffiliateSuccessModal from "./AffiliateSuccessModal";
 import type { Store } from "@/types/store";
 import type { Product } from "@/types/product";
 import type { Order } from "@/types/order";
@@ -103,6 +104,7 @@ export default function ManageStoreDashboard({
   const [deletingProduct, setDeletingProduct] = useState<Product | null>(null);
   const [isEditStoreModalOpen, setIsEditStoreModalOpen] = useState(false);
   const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
+  const [affiliateSuccessProduct, setAffiliateSuccessProduct] = useState<Product | null>(null);
 
   // Load store, products, and customer orders from backend database
   const loadData = useCallback(async () => {
@@ -232,6 +234,9 @@ export default function ManageStoreDashboard({
       );
       setProducts(updated);
       onShowToast(`Updated "${savedProduct.name}"`);
+      if (updatedProd.isAffiliateEnabled && !editingProduct?.isAffiliateEnabled) {
+        setAffiliateSuccessProduct(updatedProd);
+      }
     } else {
       // Add new product to backend
       const res = await fetch("/api/user/store/products", {
@@ -260,6 +265,10 @@ export default function ManageStoreDashboard({
         setStore(updatedStore);
       }
       onShowToast(`Added "${savedProduct.name}" to store catalog`);
+
+      if (newProd.isAffiliateEnabled) {
+        setAffiliateSuccessProduct(newProd);
+      }
     }
 
     setIsProductModalOpen(false);
@@ -1179,10 +1188,10 @@ export default function ManageStoreDashboard({
                                   type="button"
                                   className={styles.editBtn}
                                   style={{ color: "#2563eb", background: "#eff6ff", borderColor: "#bfdbfe" }}
-                                  onClick={(e) => { e.stopPropagation(); handleCopyProductAffiliateLink(p); }}
-                                  title="Copy Unique Affiliate Link"
+                                  onClick={(e) => { e.stopPropagation(); setAffiliateSuccessProduct(p); }}
+                                  title="Affiliate Marketing Link & Share Hub"
                                 >
-                                  <span className="material-icons-round" style={{ fontSize: "16px" }}>link</span>
+                                  <span className="material-icons-round" style={{ fontSize: "16px" }}>campaign</span>
                                 </button>
                               )}
                               <button
@@ -1287,10 +1296,10 @@ export default function ManageStoreDashboard({
                                     type="button"
                                     className={styles.editBtn}
                                     style={{ color: "#2563eb", background: "#eff6ff", borderColor: "#bfdbfe" }}
-                                    onClick={(e) => { e.stopPropagation(); handleCopyProductAffiliateLink(p); }}
-                                    title="Copy Unique Affiliate Link"
+                                    onClick={(e) => { e.stopPropagation(); setAffiliateSuccessProduct(p); }}
+                                    title="Affiliate Marketing Link & Share Hub"
                                   >
-                                    <span className="material-icons-round" style={{ fontSize: "16px" }}>link</span>
+                                    <span className="material-icons-round" style={{ fontSize: "16px" }}>campaign</span>
                                   </button>
                                 )}
                                 <button
@@ -1345,7 +1354,6 @@ export default function ManageStoreDashboard({
         </>
       )}
 
-      {/* Modals — always mounted regardless of tab */}
       {selectedProductForDetails && (
         <ProductDetailsModal
           product={selectedProductForDetails}
@@ -1353,6 +1361,7 @@ export default function ManageStoreDashboard({
           onClose={() => setSelectedProductForDetails(null)}
           onEdit={(prod) => { setSelectedProductForDetails(null); setEditingProduct(prod); setIsProductModalOpen(true); }}
           onDelete={(prod) => { setSelectedProductForDetails(null); setDeletingProduct(prod); setIsDeleteModalOpen(true); }}
+          onViewAffiliate={(prod) => { setSelectedProductForDetails(null); setAffiliateSuccessProduct(prod); }}
         />
       )}
       {isProductModalOpen && (
@@ -1388,6 +1397,13 @@ export default function ManageStoreDashboard({
             setStore(updated);
             onShowToast(`🎉 Upgraded! ${updated.slug}.devico.online is now live.`);
           }}
+        />
+      )}
+      {affiliateSuccessProduct && (
+        <AffiliateSuccessModal
+          product={affiliateSuccessProduct}
+          currencyFormatter={currency}
+          onClose={() => setAffiliateSuccessProduct(null)}
         />
       )}
     </div>

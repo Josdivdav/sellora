@@ -262,6 +262,26 @@ export default function MerchantOrdersTab({
                       </span>
                       {formattedDate}
                     </span>
+                    {order.affiliateCode && (
+                      <span
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "4px",
+                          background: "#ecfdf5",
+                          border: "1px solid #a7f3d0",
+                          color: "#065f46",
+                          fontSize: "11.5px",
+                          fontWeight: 700,
+                          padding: "2px 8px",
+                          borderRadius: "6px",
+                        }}
+                        title={`Attributed to affiliate partner code ${order.affiliateCode}`}
+                      >
+                        <span className="material-icons-round" style={{ fontSize: "13px" }}>campaign</span>
+                        Affiliate: {order.affiliateCode}
+                      </span>
+                    )}
                   </div>
 
                   <span className={`${styles.statusBadge} ${getStatusClass(order.status)}`}>
