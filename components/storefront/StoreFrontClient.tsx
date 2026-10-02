@@ -337,10 +337,14 @@ export default function StoreFrontClient({
               )}
 
               <div className={styles.heroSubdomainTag}>
-                <span className="material-icons-round" style={{ fontSize: "14px", color: "#2b6dff" }}>
-                  link
+                <span className="material-icons-round" style={{ fontSize: "14px", color: initialStore.isPremium ? "#10b981" : "#2b6dff" }}>
+                  {initialStore.isPremium ? "verified" : "link"}
                 </span>
-                <span>{storeSlugFormatted}.devico.online</span>
+                <span>
+                  {initialStore.isPremium
+                    ? `${storeSlugFormatted}.devico.online`
+                    : `devico.online/${storeSlugFormatted}`}
+                </span>
               </div>
             </div>
 
@@ -362,12 +366,20 @@ export default function StoreFrontClient({
                   <div className={styles.storeTitles}>
                     <div className={styles.storeNameRow}>
                       <h1 className={styles.storeName}>{initialStore.name}</h1>
-                      {initialStore.isVerified && (
+                      {initialStore.isVerified ? (
                         <span
                           className={`material-icons-round ${styles.verifiedCheck}`}
                           title="Verified Merchant"
                         >
                           verified
+                        </span>
+                      ) : (
+                        <span
+                          className={styles.unverifiedCheckBadge}
+                          title="This store is not verified"
+                        >
+                          <span className="material-icons-round" style={{ fontSize: "14px" }}>warning</span>
+                          This store is not verified
                         </span>
                       )}
                     </div>
@@ -494,6 +506,25 @@ export default function StoreFrontClient({
               </div>
             </div>
           </section>
+
+          {/* Unverified Store Warning Notice for Buyers */}
+          {!initialStore.isVerified && (
+            <div className={styles.unverifiedStoreBanner}>
+              <div className={styles.unverifiedBannerLeft}>
+                <span className="material-icons-round" style={{ fontSize: "24px", color: "#d97706" }}>
+                  gpp_maybe
+                </span>
+                <div>
+                  <div className={styles.unverifiedBannerTitle}>
+                    This store is not verified
+                  </div>
+                  <p className={styles.unverifiedBannerDesc}>
+                    This merchant has not completed official identity and business verification with Sellora. Please verify products, contact info, and payment terms carefully before completing transactions.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Store Tabs */}
           <div className={styles.storeTabsRow}>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter } from "next/navigation";
 import styles from "@/components/create-store/create-store.module.css";
 import { useAuth } from "@/context/AuthContext";
@@ -14,7 +14,7 @@ import {
   Toast,
 } from "@/components/create-store";
 
-export default function CreateStorePage() {
+function CreateStoreInner() {
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
   const hasStore = useStoreStatus();
@@ -82,5 +82,13 @@ export default function CreateStorePage() {
 
       <Toast message={toast} />
     </div>
+  );
+}
+
+export default function CreateStorePage() {
+  return (
+    <Suspense fallback={null}>
+      <CreateStoreInner />
+    </Suspense>
   );
 }

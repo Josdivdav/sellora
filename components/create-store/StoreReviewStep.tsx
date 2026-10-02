@@ -23,7 +23,7 @@ export default function StoreReviewStep({
           <div>
             <h4 className={styles.checkTitle}>Store Identity & Handle Configured</h4>
             <p className={styles.checkDesc}>
-              <strong>{store.name}</strong> • {store.slug}.devico.online ({store.category})
+              <strong>{store.name}</strong> • devico.online/{store.slug} ({store.category})
             </p>
           </div>
         </div>

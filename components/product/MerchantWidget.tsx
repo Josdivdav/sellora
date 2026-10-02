@@ -66,17 +66,38 @@ export default function MerchantWidget({
           <div>
             <div className={styles.merchantName}>
               {authorName || "Sellora Official Store"}
-              {store?.isVerified && (
+              {store?.isVerified ? (
                 <span
                   className="material-icons-round"
                   style={{ color: "#2b6dff", fontSize: "17px" }}
+                  title="Verified Merchant"
                 >
                   verified
+                </span>
+              ) : (
+                <span
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "3px",
+                    background: "#fffbeb",
+                    color: "#b45309",
+                    border: "1px solid #fcd34d",
+                    padding: "2px 7px",
+                    borderRadius: "999px",
+                    fontSize: "10.5px",
+                    fontWeight: 700,
+                    marginLeft: "6px",
+                  }}
+                  title="This store is not verified"
+                >
+                  <span className="material-icons-round" style={{ fontSize: "13px" }}>warning</span>
+                  Not Verified
                 </span>
               )}
             </div>
             <span className={styles.merchantCategory}>
-              {store?.category || "Verified Merchant"} • {store?.location || "Nigeria"}
+              {store?.category || (store?.isVerified ? "Verified Merchant" : "Unverified Merchant")} • {store?.location || "Nigeria"}
             </span>
           </div>
         </div>

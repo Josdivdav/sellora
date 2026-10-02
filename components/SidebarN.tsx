@@ -41,6 +41,7 @@ const merchantNav = [
   { label: "Analytics", tab: "analytics", icon: "bar_chart" },
   { label: "Products", tab: "products", icon: "inventory_2" },
   { label: "Promotions", tab: "promotions", icon: "local_offer" },
+  { label: "Refer & Earn (₦1,000)", tab: "referrals", icon: "card_giftcard" },
   { label: "Store Settings", tab: "settings", icon: "settings" },
 ];
 

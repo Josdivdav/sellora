@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useSearchParams } from "next/navigation";
 import styles from "./create-store.module.css";
 import StoreSuccessModal from "./StoreSuccessModal";
 import type { Store } from "@/types/store";
@@ -149,7 +150,7 @@ const INITIAL_STORE: Store = {
   reviewsCount: 14,
   followersCount: 48,
   productsCount: 6,
-  isVerified: true,
+  isVerified: false,
   isFavorite: false,
   joinedDate: new Date().toISOString().split("T")[0],
   location: "Lagos, Nigeria",
@@ -172,6 +173,8 @@ export default function CreateStoreSetup({
   onShowToast,
   onStoreCreated = () => {},
 }: CreateStoreSetupProps) {
+  const searchParams = useSearchParams();
+  const refCode = (searchParams?.get("ref") || "").trim();
   const [activeTab, setActiveTab] = useState<StudioTab>("identity");
   const [store, setStore] = useState<Store>(INITIAL_STORE);
   const [customTagInput, setCustomTagInput] = useState("");
@@ -269,8 +272,9 @@ export default function CreateStoreSetup({
       const finalStore: Store = {
         ...store,
         id: user.uid,
-        isVerified: true,
+        isVerified: false,
         joinedDate: store.joinedDate || new Date().toISOString().split("T")[0],
+        referredBy: refCode || undefined,
       };
 
       const res = await fetch("/api/user/store", {
@@ -370,6 +374,32 @@ export default function CreateStoreSetup({
       <div className={styles.studioGrid}>
         {/* Left Column: Form Studio */}
         <div className={styles.formContainer}>
+          {refCode && (
+            <div style={{
+              background: "linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 100%)",
+              border: "1px solid #a7f3d0",
+              borderRadius: "14px",
+              padding: "12px 18px",
+              marginBottom: "16px",
+              display: "flex",
+              alignItems: "center",
+              gap: "12px",
+              color: "#065f46"
+            }}>
+              <span className="material-icons-round" style={{ fontSize: "24px", color: "#10b981" }}>
+                card_giftcard
+              </span>
+              <div>
+                <div style={{ fontWeight: 800, fontSize: "13.5px" }}>
+                  Invited by merchant: <span style={{ textDecoration: "underline" }}>{refCode}</span>
+                </div>
+                <div style={{ fontSize: "12px", color: "#047857" }}>
+                  Complete your store setup to join their verified network on Sellora!
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Segmented Tab Switcher */}
           <div className={styles.segmentedTabs}>
             <button
@@ -430,11 +460,14 @@ export default function CreateStoreSetup({
                   <span className="material-icons-round" style={{ fontSize: "16px" }}>
                     language
                   </span>
-                  Store URL:&nbsp;
+                  Free Store URL:&nbsp;
                   <span className={styles.subdomainText}>
-                    {store.slug || "your-store"}.devico.online
+                    devico.online/{store.slug || "your-store"}
                   </span>
                 </div>
+                <p style={{ fontSize: "11.5px", color: "#6b7280", margin: "6px 0 0" }}>
+                  ✨ You can optionally upgrade to your own standalone subdomain (<strong>{store.slug || "your-store"}.devico.online</strong>) anytime after launch.
+                </p>
               </div>
 
               {/* URL Handle / Slug */}
@@ -906,7 +939,7 @@ export default function CreateStoreSetup({
                 <div className={styles.dot} />
               </div>
               <div className={styles.previewUrlTag}>
-                {store.slug || "your-store"}.devico.online
+                devico.online/{store.slug || "your-store"}
               </div>
             </div>
 

@@ -337,10 +337,20 @@ export default function AccountMeClient() {
 
             <div className={styles.heroActions}>
               {hasStore ? (
-                <Link href="/account/manage-store" className={styles.storeActionBtn}>
-                  <span className="material-icons-round">dashboard</span>
-                  Manage Store
-                </Link>
+                <>
+                  <Link href="/account/manage-store" className={styles.storeActionBtn}>
+                    <span className="material-icons-round">dashboard</span>
+                    Manage Store
+                  </Link>
+                  <Link
+                    href="/account/manage-store?tab=referrals"
+                    className={styles.storeActionBtn}
+                    style={{ background: "#ecfdf5", color: "#065f46", border: "1px solid #a7f3d0" }}
+                  >
+                    <span className="material-icons-round" style={{ color: "#10b981" }}>card_giftcard</span>
+                    Refer &amp; Earn
+                  </Link>
+                </>
               ) : (
                 <Link href="/account/create-store" className={styles.storeActionBtn}>
                   <span className="material-icons-round">add_business</span>

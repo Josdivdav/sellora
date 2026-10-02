@@ -4,6 +4,19 @@ export interface BankDetails {
   accountName: string;
 }
 
+export interface ReferralRecord {
+  id: string;
+  referrerId: string;
+  referrerSlug: string;
+  referrerName: string;
+  referredStoreId: string;
+  referredStoreName: string;
+  referredStoreSlug: string;
+  createdAt: string;
+  status: "joined" | "premium_activated" | "rewarded";
+  rewardAmount: number;
+}
+
 export interface Store {
   id: string;
   name: string;
@@ -28,4 +41,11 @@ export interface Store {
   phone?: string;
   whatsapp?: string;
   bankDetails?: BankDetails;
+  isPremium?: boolean;
+  plan?: "free" | "premium";
+  premiumActivatedAt?: string;
+  premiumPaymentRef?: string;
+  referredBy?: string;
+  referralsCount?: number;
+  referralEarnings?: number;
 }

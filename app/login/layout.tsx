@@ -5,24 +5,30 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Sign In",
+  title: "Sign In — Access Your Store & Orders",
   description:
-    "Sign in to your Sellora account to manage your store, track orders, and shop from verified Nigerian merchants.",
+    "Sign in to your Sellora account to manage your store, track incoming customer orders, and shop from verified Nigerian merchants. Built by Divine David (https://divinie.web.app).",
+  authors: [{ name: "Divine David", url: "https://divinie.web.app" }],
+  creator: "Divine David",
   alternates: {
     canonical: "/login",
   },
   openGraph: {
     type: "website",
-    title: "Sign In | Sellora",
+    siteName: "Sellora",
+    locale: "en_NG",
+    title: "Sign In — Access Your Store & Orders | Sellora",
     description:
-      "Sign in to your Sellora account to manage your store, track orders, and shop.",
-    images: [{ url: "/logo.png", alt: "Sellora" }],
+      "Sign in to your Sellora account to manage your storefront, products, and orders. Built by Divine David (https://divinie.web.app).",
+    images: [{ url: "/logo.png", width: 1200, height: 630, alt: "Sellora Login" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Sign In | Sellora",
-    description: "Sign in to your Sellora account.",
+    description:
+      "Sign in to your Sellora account. Developed by Divine David (https://divinie.web.app).",
     images: ["/logo.png"],
+    creator: "@divinedavid",
   },
 };
 

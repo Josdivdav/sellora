@@ -14,7 +14,7 @@ import {
   Toast,
 } from "@/components/manage-store";
 
-export type MerchantTab = "dashboard" | "orders" | "analytics" | "products" | "promotions" | "settings";
+export type MerchantTab = "dashboard" | "orders" | "analytics" | "products" | "promotions" | "referrals" | "settings";
 
 function ManageStoreInner() {
   const router = useRouter();

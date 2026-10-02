@@ -9,6 +9,7 @@ interface Props {
   store: Store;
   onSave: (updated: Store) => Promise<void>;
   onShowToast: (msg: string) => void;
+  onOpenUpgradeModal?: () => void;
 }
 
 const CATEGORIES = [
@@ -86,7 +87,7 @@ const POPULAR_BANKS = [
   "Taj Bank",
 ];
 
-export default function MerchantSettingsTab({ store, onSave, onShowToast }: Props) {
+export default function MerchantSettingsTab({ store, onSave, onShowToast, onOpenUpgradeModal }: Props) {
   const [form, setForm] = useState({
     ...store,
     phone: store.phone || "",
@@ -164,6 +165,104 @@ export default function MerchantSettingsTab({ store, onSave, onShowToast }: Prop
       <div className={styles.tabHeader}>
         <h2 className={styles.tabTitle}>Store Settings</h2>
         <p className={styles.tabSubtitle}>Update your storefront identity, branding, contact and payout details</p>
+      </div>
+
+      {/* Domain & Plan Status */}
+      <div className={styles.card} style={{ borderLeft: form.isPremium ? "4px solid #10b981" : "4px solid #f59e0b" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "12px", marginBottom: "12px" }}>
+          <div>
+            <h3 className={styles.cardTitle} style={{ marginBottom: "2px" }}>Store Domain &amp; Plan</h3>
+            <p className={styles.tabSubtitle}>Manage your public web address and subdomain status</p>
+          </div>
+          {form.isPremium ? (
+            <span style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "6px",
+              padding: "6px 12px",
+              background: "#ecfdf5",
+              color: "#059669",
+              borderRadius: "999px",
+              fontSize: "12px",
+              fontWeight: 700,
+              letterSpacing: "0.4px"
+            }}>
+              <span className="material-icons-round" style={{ fontSize: "16px" }}>verified</span>
+              PRO SUBDOMAIN ACTIVE
+            </span>
+          ) : (
+            <span style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "6px",
+              padding: "6px 12px",
+              background: "#fef3c7",
+              color: "#d97706",
+              borderRadius: "999px",
+              fontSize: "12px",
+              fontWeight: 700
+            }}>
+              <span className="material-icons-round" style={{ fontSize: "16px" }}>info</span>
+              STANDARD FREE PLAN
+            </span>
+          )}
+        </div>
+
+        <div style={{
+          background: "#f8fafc",
+          border: "1px solid #e2e8f0",
+          borderRadius: "12px",
+          padding: "16px",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          flexWrap: "wrap",
+          gap: "14px"
+        }}>
+          <div>
+            <div style={{ fontSize: "11px", fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "4px" }}>
+              Active Storefront URL
+            </div>
+            <a
+              href={getStoreFullUrl(form)}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                fontSize: "15px",
+                fontWeight: 700,
+                color: "#2563eb",
+                textDecoration: "underline",
+                wordBreak: "break-all"
+              }}
+            >
+              {getStoreFullUrl(form)}
+            </a>
+          </div>
+
+          {!form.isPremium && onOpenUpgradeModal && (
+            <button
+              type="button"
+              onClick={onOpenUpgradeModal}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "8px",
+                padding: "10px 18px",
+                background: "linear-gradient(135deg, #1e1b4b 0%, #312e81 100%)",
+                color: "#ffffff",
+                border: "none",
+                borderRadius: "10px",
+                fontSize: "13px",
+                fontWeight: 700,
+                cursor: "pointer",
+                boxShadow: "0 4px 12px rgba(30, 27, 75, 0.25)"
+              }}
+            >
+              <span className="material-icons-round" style={{ fontSize: "18px", color: "#f59e0b" }}>workspace_premium</span>
+              Upgrade to {form.slug || "store"}.devico.online (₦5,000)
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Identity */}

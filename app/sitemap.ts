@@ -3,55 +3,45 @@ import { headers } from 'next/headers';
 import { db } from '@/lib/firebaseAdmin';
 import { getBaseUrlFromHeaders } from '@/lib/siteUrl';
 
+import { getStoreFullUrl } from '@/lib/storeUrl';
+
 export const dynamic = 'force-dynamic';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = getBaseUrlFromHeaders(await headers());
   const now = new Date();
 
-  // Static routes
+  // Static public routes
   const staticRoutes: MetadataRoute.Sitemap = [
     {
       url: baseUrl,
       lastModified: now,
       changeFrequency: 'daily',
-      priority: 1,
+      priority: 1.0,
     },
     {
       url: `${baseUrl}/about`,
       lastModified: now,
       changeFrequency: 'weekly',
-      priority: 0.8,
-    },
-    {
-      url: `${baseUrl}/cart`,
-      lastModified: now,
-      changeFrequency: 'monthly',
-      priority: 0.5,
-    },
-    {
-      url: `${baseUrl}/checkout`,
-      lastModified: now,
-      changeFrequency: 'monthly',
-      priority: 0.5,
-    },
-    {
-      url: `${baseUrl}/login`,
-      lastModified: now,
-      changeFrequency: 'yearly',
-      priority: 0.3,
+      priority: 0.9,
     },
     {
       url: `${baseUrl}/register`,
       lastModified: now,
-      changeFrequency: 'yearly',
-      priority: 0.3,
+      changeFrequency: 'monthly',
+      priority: 0.7,
     },
     {
       url: `${baseUrl}/signup`,
       lastModified: now,
-      changeFrequency: 'yearly',
-      priority: 0.3,
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    },
+    {
+      url: `${baseUrl}/login`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.6,
     },
   ];
 
@@ -77,12 +67,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Dynamic store storefront routes
   let storeRoutes: MetadataRoute.Sitemap = [];
   try {
-    const storesSnap = await db.collection('stores').select('slug', 'updatedAt', 'joinedDate').get();
+    const storesSnap = await db.collection('stores').select('slug', 'name', 'updatedAt', 'joinedDate', 'isPremium', 'plan').get();
     storeRoutes = storesSnap.docs.map((doc) => {
       const data = doc.data();
       const slug = data.slug || doc.id;
+      const storeUrl = getStoreFullUrl({
+        slug,
+        name: data.name || slug,
+        isPremium: data.isPremium,
+        plan: data.plan,
+      });
       return {
-        url: `${baseUrl}/${slug}`,
+        url: storeUrl,
         lastModified: new Date(data.updatedAt || data.joinedDate || now.toISOString()),
         changeFrequency: 'daily' as const,
         priority: 0.9,

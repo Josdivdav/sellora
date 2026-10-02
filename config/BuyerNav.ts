@@ -23,6 +23,12 @@ const buyerNav: NavItem[] = [
     badgeKey: "favoriteStores",
     requiresAuth: true,
   },
+  {
+    label: "Refer & Earn",
+    href: "/account/manage-store?tab=referrals",
+    icon: "card_giftcard",
+    requiresAuth: true,
+  },
   { label: "About Sellora", href: "/about", icon: "info" },
   { label: "How it works", href: "/about#tutorial", icon: "menu_book" },
   {

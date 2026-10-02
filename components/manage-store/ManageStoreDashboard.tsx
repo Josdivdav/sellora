@@ -6,6 +6,7 @@ import styles from "./manage-store.module.css";
 import ProductFormModal from "./ProductFormModal";
 import DeleteProductModal from "./DeleteProductModal";
 import EditStoreModal from "./EditStoreModal";
+import UpgradeToPremiumModal from "./UpgradeToPremiumModal";
 import ProductDetailsModal from "./ProductDetailsModal";
 import type { Store } from "@/types/store";
 import type { Product } from "@/types/product";
@@ -16,6 +17,7 @@ import { getStoreRelativePath, getStoreFullUrl } from "@/lib/storeUrl";
 const MerchantOrdersTab = lazy(() => import("./tabs/MerchantOrdersTab"));
 const MerchantAnalyticsTab = lazy(() => import("./tabs/MerchantAnalyticsTab"));
 const MerchantPromotionsTab = lazy(() => import("./tabs/MerchantPromotionsTab"));
+const MerchantReferralsTab = lazy(() => import("./tabs/MerchantReferralsTab"));
 const MerchantSettingsTab = lazy(() => import("./tabs/MerchantSettingsTab"));
 
 interface ManageStoreDashboardProps {
@@ -100,6 +102,7 @@ export default function ManageStoreDashboard({
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [deletingProduct, setDeletingProduct] = useState<Product | null>(null);
   const [isEditStoreModalOpen, setIsEditStoreModalOpen] = useState(false);
+  const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
 
   // Load store, products, and customer orders from backend database
   const loadData = useCallback(async () => {
@@ -471,6 +474,22 @@ export default function ManageStoreDashboard({
           {store.badge && <span className={styles.heroBadge}>{store.badge}</span>}
 
           <div className={styles.heroQuickActions}>
+            <Link
+              href="/account/manage-store?tab=referrals"
+              className={styles.heroActionBtn}
+              title="Refer other merchants and earn ₦1,000 per store"
+              style={{
+                background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+                color: "#ffffff",
+                border: "none",
+                fontWeight: 700,
+              }}
+            >
+              <span className="material-icons-round" style={{ fontSize: "16px" }}>
+                card_giftcard
+              </span>
+              Refer &amp; Earn (₦1,000)
+            </Link>
             <button
               type="button"
               className={styles.heroActionBtn}
@@ -526,6 +545,26 @@ export default function ManageStoreDashboard({
                 </h1>
                 <div className={styles.storeSlugLine}>
                   <span className={styles.slugTag}>{getStoreFullUrl(store).replace(/^https?:\/\//, "")}</span>
+                  {Boolean(store.isPremium || store.plan === "premium") ? (
+                    <span className={styles.premiumDomainBadge}>
+                      <span className="material-icons-round" style={{ fontSize: "14px", color: "#059669" }}>
+                        workspace_premium
+                      </span>
+                      PRO SUBDOMAIN ACTIVE
+                    </span>
+                  ) : (
+                    <button
+                      type="button"
+                      className={styles.upgradeUrlBtn}
+                      onClick={() => setIsUpgradeModalOpen(true)}
+                      title="Upgrade to unique subdomain: storename.devico.online"
+                    >
+                      <span className="material-icons-round" style={{ fontSize: "14px" }}>
+                        stars
+                      </span>
+                      Upgrade to {store.slug}.devico.online
+                    </button>
+                  )}
                   <span>•</span>
                   <span className={styles.categoryTag}>{store.category}</span>
                   <span>•</span>
@@ -540,6 +579,26 @@ export default function ManageStoreDashboard({
             </div>
 
             <div className={styles.heroButtonRight}>
+              {Boolean(store.isPremium || store.plan === "premium") ? (
+                <div className={styles.proActiveHeroBadge}>
+                  <span className="material-icons-round" style={{ fontSize: "16px", color: "#059669" }}>
+                    verified
+                  </span>
+                  <span>PRO SUBDOMAIN ACTIVE</span>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  className={styles.activatePremiumHeroBtn}
+                  onClick={() => setIsUpgradeModalOpen(true)}
+                  title="Activate your unique store subdomain (storename.devico.online)"
+                >
+                  <span className="material-icons-round" style={{ fontSize: "18px", color: "#f59e0b" }}>
+                    workspace_premium
+                  </span>
+                  <span>Activate Premium (₦5,000)</span>
+                </button>
+              )}
               <button
                 type="button"
                 className={styles.editStoreBtn}
@@ -587,6 +646,76 @@ export default function ManageStoreDashboard({
         </div>
       </section>
 
+      {/* ── MERCHANT HUB TAB NAVIGATION ── */}
+      <nav className={styles.merchantTabsNav} aria-label="Merchant Navigation">
+        <Link
+          href="/account/manage-store"
+          className={`${styles.merchantTabLink} ${(!activeTab || activeTab === "dashboard") ? styles.merchantTabLinkActive : ""}`}
+        >
+          <span className="material-icons-round" style={{ fontSize: "18px" }}>dashboard</span>
+          Dashboard
+        </Link>
+        <Link
+          href="/account/manage-store?tab=products"
+          className={`${styles.merchantTabLink} ${activeTab === "products" ? styles.merchantTabLinkActive : ""}`}
+        >
+          <span className="material-icons-round" style={{ fontSize: "18px" }}>inventory_2</span>
+          Products ({products.length})
+        </Link>
+        <Link
+          href="/account/manage-store?tab=orders"
+          className={`${styles.merchantTabLink} ${activeTab === "orders" ? styles.merchantTabLinkActive : ""}`}
+        >
+          <span className="material-icons-round" style={{ fontSize: "18px" }}>shopping_bag</span>
+          Orders ({orders.length})
+        </Link>
+        <Link
+          href="/account/manage-store?tab=analytics"
+          className={`${styles.merchantTabLink} ${activeTab === "analytics" ? styles.merchantTabLinkActive : ""}`}
+        >
+          <span className="material-icons-round" style={{ fontSize: "18px" }}>insights</span>
+          Analytics
+        </Link>
+        <Link
+          href="/account/manage-store?tab=promotions"
+          className={`${styles.merchantTabLink} ${activeTab === "promotions" ? styles.merchantTabLinkActive : ""}`}
+        >
+          <span className="material-icons-round" style={{ fontSize: "18px" }}>local_offer</span>
+          Promotions
+        </Link>
+        <Link
+          href="/account/manage-store?tab=referrals"
+          className={`${styles.merchantTabLink} ${activeTab === "referrals" ? styles.merchantTabLinkActive : ""}`}
+        >
+          <span className="material-icons-round" style={{ fontSize: "18px", color: activeTab === "referrals" ? "#ffffff" : "#10b981" }}>
+            card_giftcard
+          </span>
+          Refer &amp; Earn (₦1,000)
+        </Link>
+        <Link
+          href="/account/manage-store?tab=settings"
+          className={`${styles.merchantTabLink} ${activeTab === "settings" ? styles.merchantTabLinkActive : ""}`}
+        >
+          <span className="material-icons-round" style={{ fontSize: "18px" }}>settings</span>
+          Settings
+        </Link>
+        {!Boolean(store.isPremium || store.plan === "premium") ? (
+          <button
+            type="button"
+            className={styles.merchantTabUpgradeBtn}
+            onClick={() => setIsUpgradeModalOpen(true)}
+            title="Unlock your unique standalone subdomain (storename.devico.online)"
+          >
+            <span className="material-icons-round" style={{ fontSize: "17px", color: "#f59e0b" }}>workspace_premium</span>
+            Upgrade to Pro Subdomain (₦5,000)
+          </button>
+        ) : (
+          <span className={styles.merchantTabProActiveBadge}>
+            <span className="material-icons-round" style={{ fontSize: "16px", color: "#059669" }}>verified</span>
+            Pro Subdomain Active
+          </span>
+        )}
+      </nav>
 
       {/* ── TAB CONTENT ── */}
       <Suspense fallback={<div style={{ padding: "40px", textAlign: "center", color: "#9ca3af" }}>Loading...</div>}>
@@ -611,17 +740,181 @@ export default function ManageStoreDashboard({
         {activeTab === "promotions" && (
           <MerchantPromotionsTab store={store} user={user} onShowToast={onShowToast} />
         )}
+        {activeTab === "referrals" && (
+          <MerchantReferralsTab
+            store={store}
+            user={user}
+            onShowToast={onShowToast}
+            onStoreUpdated={(updated) => setStore(updated)}
+          />
+        )}
         {activeTab === "settings" && (
-          <MerchantSettingsTab store={store} onSave={handleSaveStoreDetails} onShowToast={onShowToast} />
+          <MerchantSettingsTab
+            store={store}
+            onSave={handleSaveStoreDetails}
+            onShowToast={onShowToast}
+            onOpenUpgradeModal={() => setIsUpgradeModalOpen(true)}
+          />
         )}
       </Suspense>
 
       {/* Dashboard tab: stats + products catalog */}
       {(!activeTab || activeTab === "dashboard" || activeTab === "products") && (
         <>
-          {/* Stats Grid — only on dashboard */}
+          {/* Pro Subdomain Benefits Card / Active Banner — on dashboard overview */}
           {(!activeTab || activeTab === "dashboard") && (
-            <div className={styles.statsGrid}>
+            <>
+              {!Boolean(store.isPremium || store.plan === "premium") ? (
+                <div className={styles.premiumBannerCard}>
+                  <div className={styles.premiumBannerTop}>
+                    <div className={styles.premiumBannerBadge}>
+                      <span className="material-icons-round" style={{ fontSize: "16px", color: "#f59e0b" }}>
+                        stars
+                      </span>
+                      EXCLUSIVE STORE OWNER PERK
+                    </div>
+                    <span className={styles.premiumPricePill}>₦5,000 One-time Activation</span>
+                  </div>
+
+                  <div className={styles.premiumBannerMain}>
+                    <div className={styles.premiumBannerContent}>
+                      <h3 className={styles.premiumBannerHeading}>
+                        Unlock Your Standalone Subdomain: <span className={styles.premiumHighlight}>{store.slug}.devico.online</span>
+                      </h3>
+                      <p className={styles.premiumBannerDesc}>
+                        Upgrade from a standard shared link (<code className={styles.codeSnippet}>devico.online/{store.slug}</code>) to your own branded, professional storefront URL with instant self-activation.
+                      </p>
+
+                      {/* 4 Core Benefits Grid */}
+                      <div className={styles.premiumPerksGrid}>
+                        <div className={styles.premiumPerkItem}>
+                          <div className={styles.premiumPerkIconWrap}>
+                            <span className="material-icons-round">language</span>
+                          </div>
+                          <div>
+                            <h4 className={styles.premiumPerkTitle}>Standalone Subdomain</h4>
+                            <p className={styles.premiumPerkText}>
+                              Your dedicated address <strong>{store.slug}.devico.online</strong> separates your brand from the shared directory path.
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className={styles.premiumPerkItem}>
+                          <div className={styles.premiumPerkIconWrap}>
+                            <span className="material-icons-round">verified</span>
+                          </div>
+                          <div>
+                            <h4 className={styles.premiumPerkTitle}>Verified Pro Merchant Badge</h4>
+                            <p className={styles.premiumPerkText}>
+                              Display verified credentials on your storefront and listings to inspire buyer confidence.
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className={styles.premiumPerkItem}>
+                          <div className={styles.premiumPerkIconWrap}>
+                            <span className="material-icons-round">trending_up</span>
+                          </div>
+                          <div>
+                            <h4 className={styles.premiumPerkTitle}>Higher Sales &amp; Trust</h4>
+                            <p className={styles.premiumPerkText}>
+                              Branded standalone URLs look established and trustworthy, leading to fewer abandoned checkouts.
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className={styles.premiumPerkItem}>
+                          <div className={styles.premiumPerkIconWrap}>
+                            <span className="material-icons-round">savings</span>
+                          </div>
+                          <div>
+                            <h4 className={styles.premiumPerkTitle}>Lifetime Access — No Subscriptions</h4>
+                            <p className={styles.premiumPerkText}>
+                              Single ₦5,000 direct bank transfer. No monthly fees, no hosting charges, 0% platform commission on orders.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className={styles.premiumBannerCtaWrap}>
+                      <button
+                        type="button"
+                        className={styles.premiumBannerCtaBtn}
+                        onClick={() => setIsUpgradeModalOpen(true)}
+                      >
+                        <span className="material-icons-round" style={{ fontSize: "20px" }}>workspace_premium</span>
+                        Activate Pro Subdomain (₦5,000)
+                      </button>
+                      <Link
+                        href="/account/manage-store?tab=referrals"
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "6px",
+                          color: "#cbd5e1",
+                          fontSize: "12.5px",
+                          textDecoration: "underline",
+                          textUnderlineOffset: "3px",
+                        }}
+                      >
+                        <span className="material-icons-round" style={{ fontSize: "16px", color: "#f59e0b" }}>card_giftcard</span>
+                        Or refer 3 merchants to get it 100% FREE →
+                      </Link>
+                      <span className={styles.premiumCtaHint}>
+                        <span className="material-icons-round" style={{ fontSize: "14px", color: "#10b981" }}>bolt</span>
+                        Instant activation via direct transfer &amp; WhatsApp
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className={styles.premiumActiveBanner}>
+                  <div className={styles.premiumActiveLeft}>
+                    <div className={styles.premiumActiveIconWrap}>
+                      <span className="material-icons-round">verified</span>
+                    </div>
+                    <div>
+                      <div className={styles.premiumActiveTitle}>
+                        Pro Subdomain Plan Active
+                      </div>
+                      <div className={styles.premiumActiveSub}>
+                        Your standalone store is live at{" "}
+                        <a
+                          href={getStoreFullUrl(store)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={styles.premiumActiveLink}
+                        >
+                          {getStoreFullUrl(store)}
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                  <div className={styles.premiumActiveActions}>
+                    <button
+                      type="button"
+                      className={styles.premiumActiveBtn}
+                      onClick={handleCopyStoreLink}
+                    >
+                      <span className="material-icons-round" style={{ fontSize: "16px" }}>share</span>
+                      Copy Pro Link
+                    </button>
+                    <a
+                      href={getStoreFullUrl(store)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={styles.premiumActiveBtnOutline}
+                    >
+                      <span className="material-icons-round" style={{ fontSize: "16px" }}>open_in_new</span>
+                      Visit Storefront
+                    </a>
+                  </div>
+                </div>
+              )}
+
+              {/* Stats Grid — only on dashboard */}
+              <div className={styles.statsGrid}>
               <div className={styles.statCard}>
                 <div className={`${styles.statIconWrap} ${styles.statIconIndigo}`}>
                   <span className="material-icons-round">inventory_2</span>
@@ -671,8 +964,27 @@ export default function ManageStoreDashboard({
                   <span className={styles.statTitle}>{store.reviewsCount ?? 0} Customer Reviews</span>
                 </div>
               </div>
+
+              <Link
+                href="/account/manage-store?tab=referrals"
+                className={styles.statCard}
+                style={{ textDecoration: "none", cursor: "pointer", border: "1px solid #a7f3d0", background: "linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%)" }}
+              >
+                <div className={styles.statIconWrap} style={{ background: "#ecfdf5", color: "#059669" }}>
+                  <span className="material-icons-round">card_giftcard</span>
+                </div>
+                <div className={styles.statInfo}>
+                  <span className={styles.statValue} style={{ color: "#065f46" }}>
+                    ₦{(store.referralEarnings || (store.referralsCount || 0) * 1000).toLocaleString()}
+                  </span>
+                  <span className={styles.statTitle} style={{ color: "#047857", fontWeight: 700 }}>
+                    Refer &amp; Earn (₦1k/store) →
+                  </span>
+                </div>
+              </Link>
             </div>
-          )}
+          </>
+        )}
 
           {/* Catalog Management Card */}
           <section className={styles.catalogCard}>
@@ -1013,6 +1325,17 @@ export default function ManageStoreDashboard({
           store={store}
           onClose={() => setIsEditStoreModalOpen(false)}
           onSave={handleSaveStoreDetails}
+        />
+      )}
+      {isUpgradeModalOpen && (
+        <UpgradeToPremiumModal
+          store={store}
+          isOpen={isUpgradeModalOpen}
+          onClose={() => setIsUpgradeModalOpen(false)}
+          onUpgradeSuccess={(updated) => {
+            setStore(updated);
+            onShowToast(`🎉 Upgraded! ${updated.slug}.devico.online is now live.`);
+          }}
         />
       )}
     </div>

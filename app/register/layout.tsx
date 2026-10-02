@@ -5,24 +5,30 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Sign Up",
+  title: "Register — Start Selling Online in Nigeria",
   description:
-    "Create your free Sellora account. Start your online store, upload products, accept payments, and grow your business.",
+    "Create your free Sellora merchant account. Open your online store, list products, accept direct bank payments, and receive WhatsApp orders. Built by Divine David (https://divinie.web.app).",
+  authors: [{ name: "Divine David", url: "https://divinie.web.app" }],
+  creator: "Divine David",
   alternates: {
-    canonical: "/signup",
+    canonical: "/register",
   },
   openGraph: {
     type: "website",
-    title: "Sign Up | Sellora",
+    siteName: "Sellora",
+    locale: "en_NG",
+    title: "Register — Start Selling Online in Nigeria | Sellora",
     description:
-      "Create your free Sellora account and start selling online in minutes.",
-    images: [{ url: "/logo.png", alt: "Sellora" }],
+      "Create your free Sellora merchant account and start selling online in minutes with direct bank transfers and WhatsApp confirmations. Built by Divine David (https://divinie.web.app).",
+    images: [{ url: "/logo.png", width: 1200, height: 630, alt: "Sellora Register" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Sign Up | Sellora",
-    description: "Create your free Sellora account and start selling online.",
+    title: "Register — Start Selling Online | Sellora",
+    description:
+      "Create your free Sellora account and start selling online. Developed by Divine David (https://divinie.web.app).",
     images: ["/logo.png"],
+    creator: "@divinedavid",
   },
 };
 

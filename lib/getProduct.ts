@@ -274,6 +274,9 @@ export async function getAllProducts(): Promise<{
         phone: data.phone || "",
         whatsapp: data.whatsapp || data.phone || "",
         bankDetails: data.bankDetails || undefined,
+        isPremium: Boolean(data.isPremium || data.plan === "premium"),
+        plan: (data.plan as "free" | "premium") || (data.isPremium ? "premium" : "free"),
+        premiumActivatedAt: data.premiumActivatedAt || undefined,
       });
     });
 

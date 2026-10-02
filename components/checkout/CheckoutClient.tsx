@@ -65,12 +65,12 @@ const PROMO_CODES: Record<string, { type: "percent" | "fixed" | "freeship"; valu
 };
 
 const STORE_BANK = {
-  bankName: process.env.NEXT_PUBLIC_STORE_BANK_NAME || "OPay / Moniepoint",
-  accountNumber: process.env.NEXT_PUBLIC_STORE_ACCOUNT_NUMBER || "8012345678",
-  accountName: process.env.NEXT_PUBLIC_STORE_ACCOUNT_NAME || "Sellora Marketplace Orders",
+  bankName: process.env.NEXT_PUBLIC_STORE_BANK_NAME || "OPay",
+  accountNumber: process.env.NEXT_PUBLIC_STORE_ACCOUNT_NUMBER || "8038737198",
+  accountName: process.env.NEXT_PUBLIC_STORE_ACCOUNT_NAME || "Divine Joshua David",
 };
 
-const WHATSAPP_CONTACT = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "2348000000000";
+const WHATSAPP_CONTACT = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "2348038737198";
 
 export default function CheckoutClient() {
   const router = useRouter();

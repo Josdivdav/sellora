@@ -57,16 +57,20 @@ export function getStoreRelativePath(storeOrSlug: string | { slug?: string; name
 
 /**
  * Returns the full store URL:
- * - If on devico.online: returns `https://${slug}.devico.online`
- * - If on localhost: returns `http://${slug}.localhost:3000` (or `http://localhost:3000/${slug}`)
- * - In SSR/default: `https://${slug}.${mainDomain}`
+ * - If Premium: `https://${slug}.devico.online` (or `http://${slug}.localhost:3000` in dev)
+ * - If Free (Default): `https://devico.online/${slug}` (or `http://localhost:3000/${slug}` in dev)
  */
 export function getStoreFullUrl(
-  storeOrSlug: string | { slug?: string; name: string },
-  customHost?: string
+  storeOrSlug: string | { slug?: string; name: string; isPremium?: boolean; plan?: string },
+  customHost?: string,
+  isPremiumOverride?: boolean
 ): string {
   const slug = typeof storeOrSlug === "string" ? slugifyStoreName(storeOrSlug) : getStoreSlug(storeOrSlug);
-  const mainDomain = process.env.NEXT_PUBLIC_MAIN_DOMAIN || "devico.online";
+  const isPremium = typeof isPremiumOverride === "boolean"
+    ? isPremiumOverride
+    : typeof storeOrSlug === "object" && Boolean(storeOrSlug?.isPremium || storeOrSlug?.plan === "premium");
+
+  const mainDomain = (process.env.NEXT_PUBLIC_MAIN_DOMAIN || "devico.online").toLowerCase();
 
   let host = customHost;
   if (!host && typeof window !== "undefined") {
@@ -79,21 +83,34 @@ export function getStoreFullUrl(
 
     // If on localhost
     if (hostname === "localhost" || hostname.endsWith(".localhost") || hostname === "127.0.0.1") {
-      return `http://${slug}.localhost${port}`;
+      if (isPremium) {
+        return `http://${slug}.localhost${port}`;
+      }
+      return `http://localhost${port}/${slug}`;
     }
 
     // If on devico.online or custom production domain
     if (hostname === mainDomain || hostname.endsWith(`.${mainDomain}`)) {
-      return `https://${slug}.${mainDomain}`;
+      if (isPremium) {
+        return `https://${slug}.${mainDomain}`;
+      }
+      return `https://${mainDomain}/${slug}`;
     }
 
-    // Fallback to origin path
+    // Fallback using origin path
     if (typeof window !== "undefined") {
+      if (isPremium) {
+        return `https://${slug}.${mainDomain}`;
+      }
       return `${window.location.origin}/${slug}`;
     }
   }
 
-  return `https://${slug}.${mainDomain}`;
+  // SSR default fallback
+  if (isPremium) {
+    return `https://${slug}.${mainDomain}`;
+  }
+  return `https://${mainDomain}/${slug}`;
 }
 
 /**

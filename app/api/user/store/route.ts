@@ -40,6 +40,51 @@ export async function POST(request: NextRequest) {
       userRef.set({ has_store: true, updatedAt: new Date().toISOString() }, { merge: true }),
     ]);
 
+    // Record referral if store was created via a referral link
+    if (updated.referredBy && typeof updated.referredBy === 'string') {
+      try {
+        const refSlug = updated.referredBy.toLowerCase().trim();
+        const refQuery = await db.collection('stores').where('slug', '==', refSlug).limit(1).get();
+        if (!refQuery.empty) {
+          const referrerDoc = refQuery.docs[0];
+          const referrerData = referrerDoc.data();
+          const referrerId = referrerDoc.id;
+
+          if (referrerId !== uid) {
+            const existingRefQuery = await db.collection('referrals')
+              .where('referredStoreId', '==', uid)
+              .limit(1)
+              .get();
+
+            if (existingRefQuery.empty) {
+              const referralDocRef = db.collection('referrals').doc();
+              await referralDocRef.set({
+                id: referralDocRef.id,
+                referrerId,
+                referrerSlug: referrerData.slug || refSlug,
+                referrerName: referrerData.name || 'Merchant',
+                referredStoreId: uid,
+                referredStoreName: updated.name,
+                referredStoreSlug: updated.slug,
+                createdAt: new Date().toISOString(),
+                status: 'joined',
+                rewardAmount: 1000,
+              });
+
+              const newCount = (referrerData.referralsCount || 0) + 1;
+              const newEarnings = (referrerData.referralEarnings || 0) + 1000;
+              await referrerDoc.ref.update({
+                referralsCount: newCount,
+                referralEarnings: newEarnings,
+              });
+            }
+          }
+        }
+      } catch (refErr) {
+        console.warn('Error recording referral in POST /api/user/store:', refErr);
+      }
+    }
+
     invalidateStoreCache();
 
     return NextResponse.json({ success: true, data: storeData }, { status: 200 });

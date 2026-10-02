@@ -123,6 +123,10 @@ export async function getStoreBySlug(rawSlug: string): Promise<{
     phone: foundStore.phone || "",
     whatsapp: foundStore.whatsapp || foundStore.phone || "",
     bankDetails: foundStore.bankDetails || undefined,
+    isPremium: Boolean(foundStore.isPremium || foundStore.plan === "premium"),
+    plan: (foundStore.plan as "free" | "premium") || (foundStore.isPremium ? "premium" : "free"),
+    premiumActivatedAt: foundStore.premiumActivatedAt || undefined,
+    premiumPaymentRef: foundStore.premiumPaymentRef || undefined,
   };
 
   // 4. Fetch Products for this store
