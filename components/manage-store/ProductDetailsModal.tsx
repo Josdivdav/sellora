@@ -34,6 +34,28 @@ export default function ProductDetailsModal({
       ? Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)
       : undefined);
 
+  const [copiedLink, setCopiedLink] = useState(false);
+  const baseUrl = typeof window !== "undefined" ? window.location.origin : "https://devico.online";
+  const affiliateUrl =
+    product.affiliateMarketingUrl ||
+    `${baseUrl}/products/${product.id}?aff=${encodeURIComponent(product.affiliateCode || "partner")}`;
+  const affiliateCommission =
+    product.affiliateCommissionAmount ||
+    Math.round((product.price * (product.affiliateCommissionPercentage || 10)) / 100);
+
+  const handleCopyLink = () => {
+    if (typeof navigator !== "undefined" && navigator.clipboard) {
+      navigator.clipboard.writeText(affiliateUrl);
+      setCopiedLink(true);
+      setTimeout(() => setCopiedLink(false), 2200);
+    }
+  };
+
+  const handleShareWhatsApp = () => {
+    const text = `Earn ₦${affiliateCommission.toLocaleString()} (${product.affiliateCommissionPercentage || 10}%) commission by promoting "${product.name}" on Sellora! Marketing URL: ${affiliateUrl}`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank", "noopener,noreferrer");
+  };
+
   return (
     <div className={styles.modalOverlay} role="dialog" aria-modal="true">
       <div className={styles.modalContent} style={{ maxWidth: "620px" }}>
@@ -190,6 +212,76 @@ export default function ProductDetailsModal({
                     </span>
                   ))}
                 </div>
+              </div>
+            )}
+
+            {/* Affiliate Marketing Details if active */}
+            {product.isAffiliateEnabled && (
+              <div className={styles.affiliateSectionCard} style={{ marginTop: "16px" }}>
+                <div className={styles.affiliateToggleHeader}>
+                  <div className={styles.affiliateToggleTitleWrap}>
+                    <div className={styles.affiliateIconWrap} style={{ background: "#ecfdf5", borderColor: "#a7f3d0", color: "#059669" }}>
+                      <span className="material-icons-round" style={{ fontSize: "20px" }}>campaign</span>
+                    </div>
+                    <div>
+                      <h4 className={styles.affiliateToggleTitle} style={{ color: "#065f46" }}>
+                        Affiliate Marketing Active
+                      </h4>
+                      <p className={styles.affiliateToggleSubtitle}>
+                        Marketers earn <strong>{product.affiliateCommissionPercentage || 10}% (₦{affiliateCommission.toLocaleString()})</strong> per referred sale.
+                      </p>
+                    </div>
+                  </div>
+
+                  <span className={styles.affiliateBadgePill} style={{ background: "#dcfce7", color: "#15803d", borderColor: "#86efac" }}>
+                    <span className="material-icons-round" style={{ fontSize: "12px" }}>verified</span>
+                    Enabled
+                  </span>
+                </div>
+
+                <div className={styles.affiliateUrlPreviewBox}>
+                  <div className={styles.affiliateUrlPreviewHeader}>
+                    <span>Unique Marketing Link</span>
+                    {product.affiliateCode && (
+                      <span style={{ color: "#2563eb", fontWeight: 700 }}>Code: {product.affiliateCode}</span>
+                    )}
+                  </div>
+                  <div className={styles.affiliateUrlRow}>
+                    <span className={styles.affiliateUrlText} title={affiliateUrl}>
+                      {affiliateUrl}
+                    </span>
+                    <button
+                      type="button"
+                      className={`${styles.affiliateCopyBtn} ${
+                        copiedLink ? styles.affiliateCopyBtnSuccess : ""
+                      }`}
+                      onClick={handleCopyLink}
+                    >
+                      <span className="material-icons-round" style={{ fontSize: "14px" }}>
+                        {copiedLink ? "check" : "content_copy"}
+                      </span>
+                      {copiedLink ? "Copied!" : "Copy Link"}
+                    </button>
+                    <button
+                      type="button"
+                      className={styles.affiliateShareWhatsAppBtn}
+                      onClick={handleShareWhatsApp}
+                      title="Share link on WhatsApp"
+                    >
+                      <span className="material-icons-round" style={{ fontSize: "14px" }}>
+                        chat
+                      </span>
+                      WhatsApp
+                    </button>
+                  </div>
+                </div>
+
+                {product.affiliateTerms && (
+                  <div style={{ fontSize: "12px", color: "#64748b", background: "#f8fafc", padding: "8px 12px", borderRadius: "8px" }}>
+                    <strong style={{ color: "#334155" }}>Terms: </strong>
+                    {product.affiliateTerms}
+                  </div>
+                )}
               </div>
             )}
           </div>

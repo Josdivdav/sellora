@@ -753,3 +753,132 @@
   }
 }
 
+/* Affiliate Marketing Card on Public Product Page */
+.affiliatePromoCard {
+  background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+  border: 1.5px solid #a7f3d0;
+  border-radius: 16px;
+  padding: 16px;
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.affiliatePromoHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.affiliatePromoLeft {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.affiliateBadgeIcon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: #dcfce7;
+  border: 1px solid #86efac;
+  color: #059669;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.affiliatePromoTitle {
+  font-size: 14px;
+  font-weight: 800;
+  color: #065f46;
+  margin: 0 0 3px 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.affiliateCommissionTag {
+  background: #059669;
+  color: #ffffff;
+  border-radius: 999px;
+  padding: 1px 8px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.affiliatePromoDesc {
+  font-size: 12px;
+  color: #047857;
+  margin: 0;
+  line-height: 1.45;
+}
+
+.affiliatePromoActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.affiliateCopyLinkBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #059669;
+  color: #ffffff;
+  border: none;
+  border-radius: 999px;
+  padding: 8px 16px;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.affiliateCopyLinkBtn:hover {
+  background: #047857;
+  transform: translateY(-1px);
+}
+
+.affiliateCopyLinkBtnCopied {
+  background: #10b981;
+}
+
+.affiliateWhatsAppShareBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #ffffff;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+
+.affiliateWhatsAppShareBtn:hover {
+  background: #f0fdf4;
+  border-color: #6ee7b7;
+}
+
+.affiliateLinkDisplay {
+  font-family: monospace;
+  font-size: 11.5px;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid #a7f3d0;
+  border-radius: 8px;
+  padding: 6px 10px;
+  color: #065f46;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+

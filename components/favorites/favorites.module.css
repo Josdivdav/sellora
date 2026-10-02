@@ -608,6 +608,526 @@
   margin: 0;
 }
 
+/* ==========================================================================
+   VIEW SWITCHER TABS (Followed Stores vs New Arrivals Feed)
+   ========================================================================== */
+.tabsRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 16px 0 20px;
+  border-bottom: 2px solid #eef2f6;
+  padding-bottom: 4px;
+  overflow-x: auto;
+}
+
+.tabBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: 12px 12px 0 0;
+  border: none;
+  background: transparent;
+  color: #64748b;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.tabBtn:hover {
+  color: #0b1230;
+  background: rgba(43, 109, 255, 0.04);
+}
+
+.tabBtnActive {
+  color: #2b6dff;
+  background: #ffffff;
+  box-shadow: 0 -2px 10px rgba(43, 109, 255, 0.06);
+}
+
+.tabBtnActive::after {
+  content: "";
+  position: absolute;
+  bottom: -6px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: #2b6dff;
+  border-radius: 3px 3px 0 0;
+}
+
+.tabBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 700;
+  background: #e2e8f0;
+  color: #475569;
+}
+
+.tabBtnActive .tabBadge {
+  background: #eff6ff;
+  color: #2b6dff;
+}
+
+.tabBadgeNew {
+  background: linear-gradient(135deg, #f43f5e, #fb7185) !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 6px rgba(244, 63, 94, 0.35);
+  animation: pulseBadge 2s infinite;
+}
+
+@keyframes pulseBadge {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+  100% { transform: scale(1); }
+}
+
+/* ==========================================================================
+   GUEST USER INVITATION CARD
+   ========================================================================== */
+.guestCard {
+  background: linear-gradient(135deg, #ffffff, #f8faff);
+  border-radius: 20px;
+  padding: 32px 28px;
+  border: 1px solid #e0e7ff;
+  box-shadow: 0 4px 20px rgba(43, 109, 255, 0.08);
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.guestLeft {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  max-width: 600px;
+}
+
+.guestIconWrap {
+  width: 54px;
+  height: 54px;
+  border-radius: 16px;
+  background: #eff6ff;
+  color: #2b6dff;
+  display: grid;
+  place-items: center;
+  font-size: 28px;
+  flex-shrink: 0;
+}
+
+.guestTitle {
+  margin: 0 0 6px;
+  font-size: 18px;
+  font-weight: 800;
+  color: #0b1230;
+}
+
+.guestDesc {
+  margin: 0;
+  font-size: 13.5px;
+  color: #64748b;
+  line-height: 1.5;
+}
+
+.guestActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.guestSignInBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #2b6dff;
+  color: #ffffff;
+  padding: 10px 22px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 13.5px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(43, 109, 255, 0.25);
+}
+
+.guestSignInBtn:hover {
+  background: #1e56d9;
+  transform: translateY(-1px);
+}
+
+.guestRegisterBtn {
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 18px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 13.5px;
+  color: #475569;
+  background: #f1f5f9;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.guestRegisterBtn:hover {
+  background: #e2e8f0;
+}
+
+/* ==========================================================================
+   NEW ARRIVALS FEED STYLES
+   ========================================================================== */
+.feedFilterBar {
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 14px 18px;
+  box-shadow: 0 2px 8px rgba(11, 18, 48, 0.04);
+  border: 1px solid #f0f2f8;
+  margin-bottom: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.feedFilterLeft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  flex: 1;
+}
+
+.feedSearchBox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 8px 12px;
+  flex: 1;
+  min-width: 220px;
+  max-width: 380px;
+}
+
+.feedSearchBox input {
+  border: none;
+  background: transparent;
+  outline: none;
+  width: 100%;
+  font-size: 13.5px;
+  color: #1e293b;
+}
+
+.feedSelect {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #334155;
+  outline: none;
+  cursor: pointer;
+}
+
+.feedSelect:focus {
+  border-color: #2b6dff;
+}
+
+.arrivalsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.arrivalCard {
+  background: #ffffff;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid #f1f5f9;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
+}
+
+.arrivalCard:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.1);
+}
+
+/* Card Header: Merchant info */
+.arrivalCardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  background: #fafbfc;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.arrivalMerchantLink {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  text-decoration: none;
+  color: inherit;
+  min-width: 0;
+}
+
+.arrivalMerchantAvatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 1px solid #e2e8f0;
+  background: #eff6ff;
+  color: #2b6dff;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.arrivalMerchantMeta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.arrivalMerchantName {
+  font-size: 13px;
+  font-weight: 700;
+  color: #0b1230;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.arrivalMerchantName:hover {
+  color: #2b6dff;
+}
+
+.arrivalTime {
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+.arrivalVisitStoreBtn {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #2b6dff;
+  background: #eff6ff;
+  padding: 4px 10px;
+  border-radius: 999px;
+  text-decoration: none;
+  transition: background 0.15s ease;
+  flex-shrink: 0;
+}
+
+.arrivalVisitStoreBtn:hover {
+  background: #dbeafe;
+}
+
+/* Product Media */
+.arrivalImgWrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background: #f8fafc;
+  overflow: hidden;
+  display: block;
+}
+
+.arrivalImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.arrivalImgWrap:hover .arrivalImg {
+  transform: scale(1.04);
+}
+
+.arrivalDiscountBadge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: #e11d48;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(225, 29, 72, 0.3);
+}
+
+.arrivalStockBadge {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  background: rgba(15, 23, 42, 0.75);
+  color: #ffffff;
+  backdrop-filter: blur(4px);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+
+/* Card Body */
+.arrivalBody {
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.arrivalCategory {
+  font-size: 11.5px;
+  color: #64748b;
+  font-weight: 600;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.arrivalTitle {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: #0b1230;
+  text-decoration: none;
+  line-height: 1.35;
+  margin-bottom: 8px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.arrivalTitle:hover {
+  color: #2b6dff;
+}
+
+.arrivalRatingRow {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  color: #64748b;
+  margin-bottom: 10px;
+}
+
+.arrivalPriceRow {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-top: auto;
+  margin-bottom: 14px;
+}
+
+.arrivalPrice {
+  font-size: 17px;
+  font-weight: 800;
+  color: #0b1230;
+}
+
+.arrivalOldPrice {
+  font-size: 13px;
+  color: #94a3b8;
+  text-decoration: line-through;
+}
+
+/* Instant Action Buttons */
+.arrivalActionRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.arrivalAddToCartBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid #2b6dff;
+  background: #ffffff;
+  color: #2b6dff;
+  font-weight: 700;
+  font-size: 12.5px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.arrivalAddToCartBtn:hover {
+  background: #eff6ff;
+  transform: translateY(-1px);
+}
+
+.arrivalBuyNowBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: none;
+  background: #2b6dff;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 12.5px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-shadow: 0 3px 10px rgba(43, 109, 255, 0.25);
+}
+
+.arrivalBuyNowBtn:hover {
+  background: #1e56d9;
+  transform: translateY(-1px);
+}
+
+/* Skeleton Loading */
+.loadingSkeletonGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+  margin: 18px 0;
+}
+
+.skeletonStoreCard {
+  background: #ffffff;
+  border-radius: 20px;
+  height: 360px;
+  border: 1px solid #f0f2f8;
+  animation: pulseSkeleton 1.5s ease-in-out infinite;
+}
+
+@keyframes pulseSkeleton {
+  0% { opacity: 0.6; background-color: #f1f5f9; }
+  50% { opacity: 1; background-color: #e2e8f0; }
+  100% { opacity: 0.6; background-color: #f1f5f9; }
+}
+
 @media (max-width: 860px) {
   .contentArea {
     width: 100%;
@@ -615,5 +1135,26 @@
 
   .storesGrid {
     grid-template-columns: 1fr;
+  }
+
+  .arrivalsGrid {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 14px;
+  }
+
+  .guestCard {
+    padding: 20px;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .guestActions {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .guestSignInBtn, .guestRegisterBtn {
+    flex: 1;
+    justify-content: center;
   }
 }

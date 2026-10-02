@@ -37,9 +37,11 @@ export interface Store {
   responseRate: string;
   tags: string[];
   badge?: string;
-  topProducts: any;
+  topProducts?: any;
   phone?: string;
   whatsapp?: string;
+  whatsappPhone?: string;
+  email?: string;
   bankDetails?: BankDetails;
   isPremium?: boolean;
   plan?: "free" | "premium";

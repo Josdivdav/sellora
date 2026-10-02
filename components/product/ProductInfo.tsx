@@ -45,6 +45,29 @@ export default function ProductInfo({
 
   const discountAmount = product.oldPrice ? product.oldPrice - product.price : 0;
 
+  // Affiliate Marketing calculation & unique marketing link
+  const [copiedAffiliate, setCopiedAffiliate] = useState(false);
+  const baseUrl = typeof window !== "undefined" ? window.location.origin : "https://devico.online";
+  const affiliateMarketingUrl =
+    product.affiliateMarketingUrl ||
+    `${baseUrl}/products/${product.id}?aff=${encodeURIComponent(product.affiliateCode || "partner")}`;
+  const affiliateCommissionAmount =
+    product.affiliateCommissionAmount ||
+    Math.round((product.price * (product.affiliateCommissionPercentage || 10)) / 100);
+
+  const handleCopyAffiliate = () => {
+    if (typeof navigator !== "undefined" && navigator.clipboard) {
+      navigator.clipboard.writeText(affiliateMarketingUrl);
+      setCopiedAffiliate(true);
+      setTimeout(() => setCopiedAffiliate(false), 2200);
+    }
+  };
+
+  const handleShareAffiliateWhatsApp = () => {
+    const text = `Earn ₦${affiliateCommissionAmount.toLocaleString()} (${product.affiliateCommissionPercentage || 10}%) commission by promoting "${product.name}" on Sellora! Use this official affiliate link: ${affiliateMarketingUrl}`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank", "noopener,noreferrer");
+  };
+
   return (
     <div className={styles.infoWrap}>
       {/* Merchant / Author attribution & Contact */}
@@ -264,6 +287,62 @@ export default function ProductInfo({
           >
             <span className="material-icons-round">share</span>
           </button>
+        </div>
+      {/* Affiliate Marketing Promotion Card */}
+      {product.isAffiliateEnabled && (
+        <div className={styles.affiliatePromoCard}>
+          <div className={styles.affiliatePromoHeader}>
+            <div className={styles.affiliatePromoLeft}>
+              <div className={styles.affiliateBadgeIcon}>
+                <span className="material-icons-round" style={{ fontSize: "20px" }}>
+                  campaign
+                </span>
+              </div>
+              <div>
+                <h4 className={styles.affiliatePromoTitle}>
+                  Affiliate Program: Earn ₦{affiliateCommissionAmount.toLocaleString()} / sale
+                  <span className={styles.affiliateCommissionTag}>
+                    {product.affiliateCommissionPercentage || 10}% Commission
+                  </span>
+                </h4>
+                <p className={styles.affiliatePromoDesc}>
+                  {isAuthor
+                    ? "Your listing offers commission to promoters. Share your official unique affiliate marketing link below."
+                    : "Promote this product with your unique marketing link and earn commission on every customer who buys."}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.affiliateLinkDisplay} title={affiliateMarketingUrl}>
+            {affiliateMarketingUrl}
+          </div>
+
+          <div className={styles.affiliatePromoActions}>
+            <button
+              type="button"
+              className={`${styles.affiliateCopyLinkBtn} ${
+                copiedAffiliate ? styles.affiliateCopyLinkBtnCopied : ""
+              }`}
+              onClick={handleCopyAffiliate}
+            >
+              <span className="material-icons-round" style={{ fontSize: "16px" }}>
+                {copiedAffiliate ? "check" : "content_copy"}
+              </span>
+              {copiedAffiliate ? "Link Copied!" : "Copy Affiliate Link"}
+            </button>
+
+            <button
+              type="button"
+              className={styles.affiliateWhatsAppShareBtn}
+              onClick={handleShareAffiliateWhatsApp}
+            >
+              <span className="material-icons-round" style={{ fontSize: "16px", color: "#25d366" }}>
+                chat
+              </span>
+              Share on WhatsApp
+            </button>
+          </div>
         </div>
       )}
 

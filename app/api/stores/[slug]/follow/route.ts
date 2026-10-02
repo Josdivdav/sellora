@@ -8,6 +8,42 @@ interface RouteContext {
   params: Promise<{ slug: string }>;
 }
 
+async function isUserStoreOwner(uid: string, store: any): Promise<boolean> {
+  if (!uid || !store) return false;
+  if (
+    uid === store.id ||
+    uid === store.userId ||
+    uid === store.ownerId ||
+    uid === store.authorId
+  ) {
+    return true;
+  }
+
+  try {
+    const userStoreDoc = await db.collection("stores").doc(uid).get();
+    if (userStoreDoc.exists) {
+      const data = userStoreDoc.data();
+      const mySlug = (data?.slug || "").toLowerCase();
+      const myName = (data?.name || "").toLowerCase();
+      const targetSlug = (store.slug || "").toLowerCase();
+      const targetName = (store.name || "").toLowerCase();
+      const targetId = (store.id || "").toLowerCase();
+
+      if (
+        userStoreDoc.id.toLowerCase() === targetId ||
+        (mySlug && (mySlug === targetSlug || mySlug === targetName)) ||
+        (myName && (myName === targetName || myName === targetSlug))
+      ) {
+        return true;
+      }
+    }
+  } catch (err) {
+    console.warn("Could not check store owner document:", err);
+  }
+
+  return false;
+}
+
 export async function GET(request: NextRequest, context: RouteContext) {
   const { slug } = await context.params;
 
@@ -42,12 +78,21 @@ export async function GET(request: NextRequest, context: RouteContext) {
   if (idToken) {
     try {
       const uid = (await getAuth().verifyIdToken(idToken)).uid;
-      isOwner = uid === store.id || uid === (store as any).userId;
+      isOwner = await isUserStoreOwner(uid, store);
 
-      const userDoc = await db.collection('users').doc(uid).get();
-      if (userDoc.exists) {
-        const followedList: string[] = userDoc.data()?.followedStores || [];
-        isFollowing = followedList.includes(store.id) || followedList.includes(store.slug);
+      if (isOwner) {
+        // Store owner can NEVER follow their own store!
+        isFollowing = false;
+        // Clean up from userDoc if mistakenly added previously
+        db.collection('users').doc(uid).update({
+          followedStores: FieldValue.arrayRemove(store.id, store.slug)
+        }).catch(() => {});
+      } else {
+        const userDoc = await db.collection('users').doc(uid).get();
+        if (userDoc.exists) {
+          const followedList: string[] = userDoc.data()?.followedStores || [];
+          isFollowing = followedList.includes(store.id) || (Boolean(store.slug) && followedList.includes(store.slug));
+        }
       }
     } catch {
       // Invalid token, treat as guest
@@ -92,7 +137,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
   }
 
   // 2. Guard: Check if user is the store owner
-  if (uid === store.id || uid === (store as any).userId) {
+  if (await isUserStoreOwner(uid, store)) {
     return NextResponse.json(
       { error: 'You cannot follow your own store.', code: 'IS_OWNER' },
       { status: 400 }

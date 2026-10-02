@@ -7,12 +7,11 @@ import styles from "./storefront.module.css";
 import type { Store } from "@/types/store";
 import type { Product } from "@/types/product";
 import { useAuth } from "@/context/AuthContext";
-import { useStoreStatus } from "@/hooks/useStoreStatus";
-import HomeHeader from "@/components/home/HomeHeader";
-import Sidebar from "@/components/SidebarN";
+import StoreHeader from "./StoreHeader";
+import StoreFooter from "./StoreFooter";
+import StoreMobileMenu from "./StoreMobileMenu";
 import ProductCard from "@/components/home/ProductCard";
 import { getStoreFullUrl, getStoreSlug } from "@/lib/storeUrl";
-import { SignOut } from "@/functions/home.func";
 import { toggleStoreFollow } from "@/lib/followStore";
 import { useCart } from "@/context/CartContext";
 
@@ -20,6 +19,8 @@ interface StoreFrontClientProps {
   initialStore: Store;
   initialProducts: Product[];
   storeSlug: string;
+  isSubdomain?: boolean;
+  initialTab?: StoreTab;
 }
 
 type StoreTab = "products" | "about" | "policies";
@@ -29,18 +30,18 @@ export default function StoreFrontClient({
   initialStore,
   initialProducts,
   storeSlug,
+  isSubdomain = false,
+  initialTab = "products",
 }: StoreFrontClientProps) {
   const router = useRouter();
   const { user } = useAuth();
-  const hasStore = useStoreStatus();
 
   // Navigation & Drawer states
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [headerSearch, setHeaderSearch] = useState("");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { cartCount, addToCart } = useCart();
 
   // Store tab & filter states
-  const [activeTab, setActiveTab] = useState<StoreTab>("products");
+  const [activeTab, setActiveTab] = useState<StoreTab>(initialTab);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [sortBy, setSortBy] = useState<SortOption>("featured");
@@ -49,6 +50,7 @@ export default function StoreFrontClient({
   const [isFollowing, setIsFollowing] = useState(false);
   const [followersCount, setFollowersCount] = useState<number>(initialStore.followersCount || 0);
   const [isFollowSubmitting, setIsFollowSubmitting] = useState(false);
+  const [isOwnerFromApi, setIsOwnerFromApi] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // Fetch live follow status and follower count directly from database
@@ -66,6 +68,9 @@ export default function StoreFrontClient({
         );
         if (res.ok && isMounted) {
           const json = await res.json();
+          if (json.isOwner) {
+            setIsOwnerFromApi(true);
+          }
           if (typeof json.followersCount === "number") {
             setFollowersCount(json.followersCount);
           }
@@ -100,9 +105,15 @@ export default function StoreFrontClient({
 
   // Check if current user is the owner of this storefront
   const isOwner = useMemo(() => {
+    if (isOwnerFromApi) return true;
     if (!user || !initialStore) return false;
-    return user.uid === initialStore.id || (initialStore as any).userId === user.uid;
-  }, [user, initialStore]);
+    return (
+      user.uid === initialStore.id ||
+      (initialStore as any).userId === user.uid ||
+      (initialStore as any).ownerId === user.uid ||
+      (initialStore as any).authorId === user.uid
+    );
+  }, [user, initialStore, isOwnerFromApi]);
 
   // Toast Helper
   const showToast = (msg: string) => {
@@ -138,7 +149,7 @@ export default function StoreFrontClient({
         storeName: initialStore.name,
         token,
         isLoggedIn: true,
-        isOwner: false,
+        isOwner: isOwner,
       });
 
       if (!res.success) {
@@ -171,15 +182,14 @@ export default function StoreFrontClient({
     }
   };
 
-  // Contact Merchant
+  // Contact Merchant directly via WhatsApp
   const handleContactMerchant = () => {
-    showToast(`Connected with ${initialStore.name} customer service.`);
-  };
-
-  // Header Search: navigates to browse or filters storefront
-  const handleHeaderSearch = (val: string) => {
-    setHeaderSearch(val);
-    setSearchQuery(val);
+    const cleanPhone = (initialStore.whatsapp || initialStore.phone || initialStore.whatsappPhone || "08038737198").replace(/\D/g, "");
+    const formattedPhone = cleanPhone.startsWith("0") ? `234${cleanPhone.slice(1)}` : cleanPhone;
+    const whatsappUrl = `https://wa.me/${formattedPhone}?text=${encodeURIComponent(
+      `Hello ${initialStore.name}! I am browsing your official store and have an inquiry.`
+    )}`;
+    window.open(whatsappUrl, "_blank", "noopener,noreferrer");
   };
 
   // Add to cart
@@ -187,15 +197,6 @@ export default function StoreFrontClient({
     addToCart(product.id, 1);
     showToast(`Added "${product.name}" to cart`);
   };
-
-  // Auth & Sidebar Handlers
-  const handleSignOut = () => {
-    SignOut();
-    router.push("/");
-  };
-  const handleSignIn = () => router.push("/login");
-  const handleCreateStore = () => router.push("/account/create-store");
-  const handleManageStore = () => router.push("/account/manage-store");
 
   // Dynamic Categories from store's actual products
   const availableCategories = useMemo(() => {
@@ -211,15 +212,19 @@ export default function StoreFrontClient({
   const filteredProducts = useMemo(() => {
     let prods = [...initialProducts];
 
-    // Filter by search
+    // Filter by search (case-insensitive multi-word match)
     const q = searchQuery.trim().toLowerCase();
     if (q) {
-      prods = prods.filter(
-        (p) =>
-          p.name.toLowerCase().includes(q) ||
-          p.category.toLowerCase().includes(q) ||
-          (p.sku && p.sku.toLowerCase().includes(q)) ||
-          p.tags?.some((t) => t.toLowerCase().includes(q))
+      const words = q.split(/\s+/).filter(Boolean);
+      prods = prods.filter((p) =>
+        words.every(
+          (w) =>
+            p.name.toLowerCase().includes(w) ||
+            p.category.toLowerCase().includes(w) ||
+            (p.sku && p.sku.toLowerCase().includes(w)) ||
+            (p.description && p.description.toLowerCase().includes(w)) ||
+            p.tags?.some((t) => t.toLowerCase().includes(w))
+        )
       );
     }
 
@@ -257,27 +262,38 @@ export default function StoreFrontClient({
 
   return (
     <div className={styles.page}>
-      <HomeHeader
-        search={headerSearch}
-        onSearchChange={handleHeaderSearch}
+      <StoreHeader
+        store={initialStore}
+        isSubdomain={isSubdomain}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
         cartCount={cartCount}
-        onOpenSidebar={() => setSidebarOpen(true)}
         onCartClick={() => router.push("/cart")}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        onOpenMobileMenu={() => setMobileMenuOpen(true)}
+        availableCategories={availableCategories}
+        selectedCategory={selectedCategory}
+        onSelectCategory={setSelectedCategory}
+        isFollowing={isFollowing}
+        onToggleFollow={handleToggleFollow}
+        onShare={handleShare}
+        isOwner={isOwner}
+      />
+
+      <StoreMobileMenu
+        isOpen={mobileMenuOpen}
+        onClose={() => setMobileMenuOpen(false)}
+        store={initialStore}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        availableCategories={availableCategories}
+        selectedCategory={selectedCategory}
+        onSelectCategory={setSelectedCategory}
+        onShare={handleShare}
       />
 
       <div className={styles.contentArea}>
-        <Sidebar
-          isOpen={sidebarOpen}
-          onClose={() => setSidebarOpen(false)}
-          user={user}
-          hasStore={hasStore}
-          onCreateStore={handleCreateStore}
-          manageStore={handleManageStore}
-          onSignOut={handleSignOut}
-          onSignIn={handleSignIn}
-          isAuthor={isOwner}
-        />
-
         <main className={styles.main}>
           {/* Owner Notice Banner if viewing your own store */}
           {isOwner && (
@@ -296,24 +312,6 @@ export default function StoreFrontClient({
               </Link>
             </div>
           )}
-
-          {/* Breadcrumbs Row */}
-          <div className={styles.breadcrumbsRow}>
-            <nav className={styles.breadcrumbs} aria-label="Breadcrumb">
-              <Link href="/" className={styles.breadcrumbLink}>
-                Home
-              </Link>
-              <span>/</span>
-              <span className={styles.breadcrumbCurrent}>{initialStore.name}</span>
-            </nav>
-
-            <Link href="/" className={styles.backLink}>
-              <span className="material-icons-round" style={{ fontSize: "16px" }}>
-                arrow_back
-              </span>
-              Back to Marketplace
-            </Link>
-          </div>
 
           {/* Storefront Hero Card */}
           <section className={styles.storeHeroCard}>
@@ -752,6 +750,12 @@ export default function StoreFrontClient({
           )}
         </main>
       </div>
+
+      {/* Standalone Store Footer */}
+      <StoreFooter
+        store={initialStore}
+        onTabChange={(tab) => setActiveTab(tab)}
+      />
 
       {/* Floating Toast */}
       {toastMessage && (

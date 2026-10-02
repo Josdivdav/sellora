@@ -50,6 +50,42 @@ export async function PUT(request: NextRequest, context: RouteContext) {
     const numStock = body.stock !== undefined ? Number(body.stock) : Number(existingData.stock || 0);
     const numOldPrice = body.oldPrice !== undefined ? (body.oldPrice ? Number(body.oldPrice) : null) : (existingData.oldPrice ?? null);
 
+    // Handle affiliate marketing fields
+    const isAffiliateEnabled = body.isAffiliateEnabled !== undefined
+      ? Boolean(body.isAffiliateEnabled)
+      : Boolean(existingData.isAffiliateEnabled);
+
+    let affiliateCommissionPercentage = body.affiliateCommissionPercentage !== undefined
+      ? Number(body.affiliateCommissionPercentage)
+      : existingData.affiliateCommissionPercentage;
+    if (isAffiliateEnabled && !affiliateCommissionPercentage) {
+      affiliateCommissionPercentage = 10;
+    }
+
+    const affiliateCommissionAmount = isAffiliateEnabled
+      ? (body.affiliateCommissionAmount !== undefined
+          ? Number(body.affiliateCommissionAmount)
+          : Math.round((numPrice * (Number(affiliateCommissionPercentage) || 10)) / 100))
+      : undefined;
+
+    let affiliateCode = body.affiliateCode !== undefined
+      ? (body.affiliateCode ? String(body.affiliateCode).trim().toUpperCase() : existingData.affiliateCode)
+      : existingData.affiliateCode;
+
+    if (isAffiliateEnabled && !affiliateCode) {
+      const storePrefix = (existingData.author || 'SEL')
+        .replace(/[^a-zA-Z0-9]/g, '')
+        .slice(0, 4)
+        .toUpperCase();
+      affiliateCode = `AFF-${storePrefix}-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
+    }
+
+    const host = request.headers.get('host') || 'devico.online';
+    const protocol = host.includes('localhost') ? 'http' : 'https';
+    const affiliateMarketingUrl = isAffiliateEnabled && affiliateCode
+      ? `${protocol}://${host}/products/${id}?aff=${affiliateCode}`
+      : undefined;
+
     const updatedProduct: Product = {
       ...existingData,
       ...body,
@@ -62,6 +98,11 @@ export async function PUT(request: NextRequest, context: RouteContext) {
         numOldPrice && numOldPrice > numPrice
           ? Math.round(((numOldPrice - numPrice) / numOldPrice) * 100)
           : undefined,
+      isAffiliateEnabled,
+      affiliateCommissionPercentage: isAffiliateEnabled ? affiliateCommissionPercentage : undefined,
+      affiliateCommissionAmount: isAffiliateEnabled ? affiliateCommissionAmount : undefined,
+      affiliateCode: isAffiliateEnabled ? affiliateCode : undefined,
+      affiliateMarketingUrl: isAffiliateEnabled ? affiliateMarketingUrl : undefined,
       updatedAt: new Date().toISOString(),
     };
 

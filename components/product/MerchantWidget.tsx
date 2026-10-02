@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import styles from "./product.module.css";
-import storesData from "@/data/stores.json";
 import type { Store } from "@/types/store";
 import { getStoreRelativePath } from "@/lib/storeUrl";
 
@@ -13,6 +12,7 @@ interface MerchantWidgetProps {
   isAuthor?: boolean;
   followersCount?: number;
   id?: string;
+  store?: Store | null;
 }
 
 export default function MerchantWidget({
@@ -22,14 +22,25 @@ export default function MerchantWidget({
   isAuthor = false,
   followersCount,
   id,
+  store,
 }: MerchantWidgetProps) {
-  const store = (storesData as Store[]).find(
-    (s) => s.name.toLowerCase() === (authorName || "").toLowerCase(),
-  );
-
   const formatFollowers = (num: number) => {
     if (num >= 1000) return (num / 1000).toFixed(1) + "k";
     return String(num);
+  };
+
+  const handleChatWithSeller = () => {
+    const cleanPhone = (
+      store?.whatsapp ||
+      store?.phone ||
+      (store as any)?.whatsappPhone ||
+      "08038737198"
+    ).replace(/\D/g, "");
+    const formattedPhone = cleanPhone.startsWith("0") ? `234${cleanPhone.slice(1)}` : cleanPhone;
+    const whatsappUrl = `https://wa.me/${formattedPhone}?text=${encodeURIComponent(
+      `Hello ${authorName || store?.name || "Merchant"}! I found your product on Sellora and have an inquiry.`
+    )}`;
+    window.open(whatsappUrl, "_blank", "noopener,noreferrer");
   };
 
   return (
@@ -152,8 +163,9 @@ export default function MerchantWidget({
               <button
                 type="button"
                 className={styles.merchantChatBtn}
-                aria-label="Chat with seller"
-                title="Chat with seller"
+                onClick={handleChatWithSeller}
+                aria-label="Chat with seller via WhatsApp"
+                title="Chat with seller via WhatsApp"
               >
                 <span className="material-icons-round" style={{ fontSize: "16px" }}>
                   chat

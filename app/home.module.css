@@ -190,16 +190,22 @@
     object-fit: contain
 }
 
+.searchWrapper {
+    position: relative;
+    flex: 1;
+    max-width: 420px;
+    margin: auto;
+}
+
 .search {
     display: flex;
     align-items: center;
     gap: 10px;
-    flex: 1;
-    max-width: 420px;
-    margin: auto;
+    width: 100%;
     padding: 9px 16px;
     border: 1px solid #e5e7eb;
-    border-radius: 50px
+    border-radius: 50px;
+    background: #ffffff;
 }
 
 .search:focus-within {
@@ -455,8 +461,12 @@
         gap: 8px
     }
 
+    .searchWrapper {
+        margin: 0;
+    }
+
     .search {
-        margin: 0
+        margin: 0;
     }
 
     .main {

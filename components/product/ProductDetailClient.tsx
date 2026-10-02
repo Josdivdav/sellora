@@ -8,6 +8,8 @@ import { useAuth } from "@/context/AuthContext";
 import { SignOut } from "@/functions/home.func";
 import { useStoreStatus } from "@/hooks/useStoreStatus";
 import type { Product } from "@/types/product";
+import type { Store } from "@/types/store";
+import storesData from "@/data/stores.json";
 import {
   HomeHeader,
   Sidebar,
@@ -18,8 +20,11 @@ import {
   RelatedProducts,
   Toast,
 } from "@/components/product";
+import StoreHeader from "@/components/storefront/StoreHeader";
+import StoreFooter from "@/components/storefront/StoreFooter";
+import StoreMobileMenu from "@/components/storefront/StoreMobileMenu";
 import { toggleStoreFollow } from "@/lib/followStore";
-import { slugifyStoreName } from "@/lib/storeUrl";
+import { slugifyStoreName, getStoreRelativePath } from "@/lib/storeUrl";
 import { useCart } from "@/context/CartContext";
 
 interface ProductDetailClientProps {
@@ -80,7 +85,81 @@ export default function ProductDetailClient({
 
   const [headerSearch, setHeaderSearch] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [toast, setToast] = useState("");
+
+  // Subdomain & standalone store detection
+  const [isSubdomain, setIsSubdomain] = useState<boolean>(false);
+  const [activeStore, setActiveStore] = useState<Store | null>(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const hostname = window.location.hostname.toLowerCase();
+    const mainDomain = (process.env.NEXT_PUBLIC_MAIN_DOMAIN || "devico.online").toLowerCase();
+    const subCheck =
+      (hostname.endsWith(`.${mainDomain}`) && hostname !== `www.${mainDomain}`) ||
+      (hostname.endsWith(".localhost") && !hostname.startsWith("localhost"));
+
+    setIsSubdomain(subCheck);
+  }, []);
+
+  // Capture affiliate marketing referral tracking parameter
+  useEffect(() => {
+    if (typeof window === "undefined" || !product?.id) return;
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const affCode = urlParams.get("aff");
+      if (affCode) {
+        const attribution = {
+          code: affCode.trim(),
+          productId: product.id,
+          storeId: product.storeId,
+          timestamp: Date.now(),
+        };
+        localStorage.setItem(`sellora_aff_${product.id}`, JSON.stringify(attribution));
+        localStorage.setItem("sellora_last_aff_attribution", JSON.stringify(attribution));
+        document.cookie = `sellora_aff=${encodeURIComponent(affCode.trim())}; path=/; max-age=2592000; SameSite=Lax`;
+      }
+    } catch {
+      // ignore
+    }
+  }, [product?.id, product?.storeId]);
+
+  // Resolve store details for this product's author / merchant
+  useEffect(() => {
+    if (!product?.author) return;
+    const authorSlug = slugifyStoreName(product.author);
+
+    // 1. Check local static stores
+    const foundLocal = (storesData as Store[]).find(
+      (s) => s.name.toLowerCase() === product.author?.toLowerCase() || s.slug === authorSlug
+    );
+    if (foundLocal) {
+      setActiveStore(foundLocal);
+      return;
+    }
+
+    // 2. Fetch live store if from database
+    let isMounted = true;
+    async function fetchLiveStore() {
+      try {
+        const res = await fetch(`/api/stores/${encodeURIComponent(authorSlug)}`);
+        if (res.ok && isMounted) {
+          const json = await res.json();
+          if (json.data?.store) {
+            setActiveStore(json.data.store);
+          }
+        }
+      } catch {
+        // fallback
+      }
+    }
+
+    void fetchLiveStore();
+    return () => {
+      isMounted = false;
+    };
+  }, [product?.author]);
 
   // Store information of currently logged in user (if any)
   const [userStore, setUserStore] = useState<{ id?: string; name?: string } | null>(null);
@@ -119,8 +198,12 @@ export default function ProductDetailClient({
     };
   }, [user]);
 
+  // Flag if follow API confirms user is owner of the store
+  const [isOwnerFromApi, setIsOwnerFromApi] = useState<boolean>(false);
+
   // Check if current viewer is the author/seller of this product
   const isAuthor = useMemo(() => {
+    if (isOwnerFromApi) return true;
     if (!product || !user) return false;
 
     // 1. Direct storeId / userId match with logged in user uid
@@ -136,7 +219,7 @@ export default function ProductDetailClient({
     }
 
     return false;
-  }, [product, user, userStore]);
+  }, [product, user, userStore, isOwnerFromApi]);
 
   // Wishlist state initialized safely
   const [isWishlisted, setIsWishlisted] = useState<boolean>(false);
@@ -189,6 +272,9 @@ export default function ProductDetailClient({
         });
         if (res.ok && isMounted) {
           const json = await res.json();
+          if (json.isOwner) {
+            setIsOwnerFromApi(true);
+          }
           if (typeof json.followersCount === "number") {
             setMerchantFollowersCount(json.followersCount);
           }
@@ -322,7 +408,7 @@ export default function ProductDetailClient({
         storeName: product.author,
         token,
         isLoggedIn: true,
-        isOwner: false,
+        isOwner: isAuthor,
       });
 
       if (!res.success) {
@@ -512,6 +598,114 @@ export default function ProductDetailClient({
     );
   }
 
+  // Standalone Storefront View for custom subdomains (e.g. joshua.devico.online/products/123)
+  if (isSubdomain && activeStore) {
+    return (
+      <div className={styles.page}>
+        <StoreHeader
+          store={activeStore}
+          isSubdomain={true}
+          searchQuery=""
+          onSearchChange={(q) => router.push(`/?search=${encodeURIComponent(q)}`)}
+          cartCount={cartCount}
+          onCartClick={() => router.push("/cart")}
+          activeTab="products"
+          onTabChange={(tab) => router.push(`/?tab=${tab}`)}
+          onOpenMobileMenu={() => setMobileMenuOpen(true)}
+          availableCategories={[]}
+          selectedCategory="All"
+          onSelectCategory={(cat) => router.push(`/?category=${encodeURIComponent(cat)}`)}
+          isFollowing={isFollowingStore}
+          onToggleFollow={handleFollowStoreToggle}
+          onShare={() => handleShare(product)}
+          isOwner={isAuthor}
+        />
+
+        <StoreMobileMenu
+          isOpen={mobileMenuOpen}
+          onClose={() => setMobileMenuOpen(false)}
+          store={activeStore}
+          activeTab="products"
+          onTabChange={(tab) => router.push(`/?tab=${tab}`)}
+          availableCategories={[]}
+          selectedCategory="All"
+          onSelectCategory={(cat) => router.push(`/?category=${encodeURIComponent(cat)}`)}
+          onShare={() => handleShare(product)}
+        />
+
+        <div className={styles.contentArea}>
+          <main className={styles.main}>
+            {/* Standalone Breadcrumbs */}
+            <div className={styles.breadcrumbsRow}>
+              <nav className={styles.breadcrumbs} aria-label="Breadcrumb">
+                <Link href="/" className={styles.breadcrumbLink}>
+                  {activeStore.name}
+                </Link>
+                <span>/</span>
+                <Link
+                  href={`/?category=${encodeURIComponent(product.category)}`}
+                  className={styles.breadcrumbLink}
+                >
+                  {product.category}
+                </Link>
+                <span>/</span>
+                <span className={styles.breadcrumbCurrent}>{product.name}</span>
+              </nav>
+
+              <Link href="/" className={styles.backLink}>
+                <span className="material-icons-round" style={{ fontSize: "16px" }}>
+                  arrow_back
+                </span>
+                Back to {activeStore.name}
+              </Link>
+            </div>
+
+            {/* Product Hero Card (Gallery + Info) */}
+            <section id="product-overview" className={styles.productHeroCard}>
+              <ProductGallery product={product} />
+
+              <ProductInfo
+                product={product}
+                onAddToCart={handleAddToCart}
+                onBuyNow={handleBuyNow}
+                onShare={handleShare}
+                onToggleWishlist={handleToggleWishlist}
+                isWishlisted={isWishlisted}
+                isAuthor={isAuthor}
+              />
+            </section>
+
+            {/* Secondary Details: Specifications & Merchant Profile */}
+            <section className={styles.detailsGrid}>
+              <ProductSpecs id="product-specs" product={product} />
+
+              <MerchantWidget
+                id="product-seller"
+                authorName={product.author}
+                onFollowToggle={handleFollowStoreToggle}
+                isFollowing={isFollowingStore}
+                isAuthor={isAuthor}
+                followersCount={merchantFollowersCount}
+                store={activeStore}
+              />
+            </section>
+
+            {/* Related / Category Recommendations */}
+            <RelatedProducts
+              id="product-related"
+              products={relatedProducts}
+              currentProductId={product.id}
+              onAddToCart={(item) => handleAddToCart(item, 1)}
+            />
+          </main>
+        </div>
+
+        <StoreFooter store={activeStore} />
+        <Toast message={toast} />
+      </div>
+    );
+  }
+
   return (
     <div className={styles.page}>
       <HomeHeader
@@ -543,6 +737,17 @@ export default function ProductDetailClient({
               <Link href="/" className={styles.breadcrumbLink}>
                 Home
               </Link>
+              {product.author && (
+                <>
+                  <span>/</span>
+                  <Link
+                    href={getStoreRelativePath(product.author)}
+                    className={styles.breadcrumbLink}
+                  >
+                    {product.author}
+                  </Link>
+                </>
+              )}
               <span>/</span>
               <Link
                 href={`/?category=${encodeURIComponent(product.category)}`}
@@ -554,11 +759,14 @@ export default function ProductDetailClient({
               <span className={styles.breadcrumbCurrent}>{product.name}</span>
             </nav>
 
-            <Link href="/" className={styles.backLink}>
+            <Link
+              href={product.author ? getStoreRelativePath(product.author) : "/"}
+              className={styles.backLink}
+            >
               <span className="material-icons-round" style={{ fontSize: "16px" }}>
                 arrow_back
               </span>
-              Back to Browse
+              Back to {product.author || "Browse"}
             </Link>
           </div>
 

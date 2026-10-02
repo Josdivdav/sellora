@@ -45,23 +45,51 @@ export function proxy(request: NextRequest) {
 
   // If a store subdomain is present (e.g. storename.devico.online)
   if (subdomain && !isReservedRoute(subdomain)) {
-    // If request is root path on the subdomain (e.g. `https://storename.devico.online/`),
-    // rewrite internally to the storefront page `/${subdomain}`
+    const requestHeaders = new Headers(request.headers);
+    requestHeaders.set('x-store-subdomain', subdomain);
+
+    // Root storefront: rewrite to /storename
     if (pathname === '/' || pathname === '') {
       const rewriteUrl = new URL(`/${subdomain}${search}`, request.url);
-      return NextResponse.rewrite(rewriteUrl);
+      return NextResponse.rewrite(rewriteUrl, {
+        request: { headers: requestHeaders },
+      });
     }
 
-    // If navigating to a product or asset directly on the subdomain (e.g. `/products/123`),
-    // keep the path so the product page loads seamlessly
+    // Direct standalone pages on the subdomain
+    if (pathname === '/about' || pathname === '/about-us') {
+      const rewriteUrl = new URL(`/${subdomain}?tab=about`, request.url);
+      return NextResponse.rewrite(rewriteUrl, {
+        request: { headers: requestHeaders },
+      });
+    }
+
+    if (pathname === '/policies' || pathname === '/shipping' || pathname === '/returns') {
+      const rewriteUrl = new URL(`/${subdomain}?tab=policies`, request.url);
+      return NextResponse.rewrite(rewriteUrl, {
+        request: { headers: requestHeaders },
+      });
+    }
+
+    if (pathname === '/products' || pathname === '/catalog' || pathname === '/shop') {
+      const rewriteUrl = new URL(`/${subdomain}?tab=products`, request.url);
+      return NextResponse.rewrite(rewriteUrl, {
+        request: { headers: requestHeaders },
+      });
+    }
+
+    // Pass through product detail, search, cart, checkout, and account with store context
     if (
       pathname.startsWith('/products/') ||
+      pathname.startsWith('/search') ||
       pathname.startsWith('/api/') ||
       pathname.startsWith('/account/') ||
       pathname.startsWith('/cart') ||
       pathname.startsWith('/checkout')
     ) {
-      return NextResponse.next();
+      return NextResponse.next({
+        request: { headers: requestHeaders },
+      });
     }
   }
 

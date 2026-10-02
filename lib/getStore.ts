@@ -1,5 +1,4 @@
 import { db } from "@/lib/firebaseAdmin";
-import storesData from "@/data/stores.json";
 import { getAllProducts } from "@/lib/getProduct";
 import type { Store } from "@/types/store";
 import type { Product } from "@/types/product";
@@ -79,20 +78,6 @@ export async function getStoreBySlug(rawSlug: string): Promise<{
     }
   } catch (err) {
     console.warn(`Firestore store lookup error for ${cleanSlug}:`, err);
-  }
-
-  // 3. Fallback to sample stores.json if not found in Firestore
-  if (!foundStore) {
-    const localStore = (storesData as Store[]).find((s) => {
-      const sSlug = (s.slug || "").toLowerCase();
-      const sName = (s.name || "").toLowerCase();
-      const sGenerated = slugifyStoreName(s.name || "");
-      return sSlug === cleanSlug || sName === cleanSlug || sGenerated === cleanSlug || s.id.toLowerCase() === cleanSlug;
-    });
-
-    if (localStore) {
-      foundStore = { ...localStore };
-    }
   }
 
   if (!foundStore) {

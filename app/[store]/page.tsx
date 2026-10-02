@@ -7,6 +7,7 @@ import StoreFrontClient from "@/components/storefront/StoreFrontClient";
 
 interface StorePageProps {
   params: Promise<{ store: string }>;
+  searchParams?: Promise<{ tab?: string; category?: string; search?: string }>;
 }
 
 export async function generateMetadata({ params }: StorePageProps): Promise<Metadata> {
@@ -26,11 +27,25 @@ export async function generateMetadata({ params }: StorePageProps): Promise<Meta
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://devico.online";
   const storeImage = store.banner || store.logo || `${siteUrl}/logo.png`;
 
+  const headerList = await headers();
+  const host = headerList.get("host") || "";
+  const hostname = host.split(":")[0].toLowerCase();
+  const mainDomain = (process.env.NEXT_PUBLIC_MAIN_DOMAIN || "devico.online").toLowerCase();
+
+  const isSubdomainRequest =
+    (hostname.endsWith(`.${mainDomain}`) && hostname !== `www.${mainDomain}`) ||
+    (hostname.endsWith(".localhost") && !hostname.startsWith("localhost"));
+
+  const pageTitle = isSubdomainRequest
+    ? `${store.name} — Official Online Store`
+    : `${store.name} — Verified Merchant Storefront | Sellora Nigeria`;
+
   return {
-    title: `${store.name} — Verified Merchant Storefront | Sellora Nigeria`,
+    title: pageTitle,
+    icons: store.logo ? { icon: store.logo, apple: store.logo } : undefined,
     description:
       store.description ||
-      `Shop high-quality products directly from ${store.name} on Sellora with fast nationwide delivery and verified merchant protection. Developed by Divine David (https://divinie.web.app).`,
+      `Shop high-quality products directly from ${store.name} with fast nationwide delivery and verified merchant protection. Developed by Divine David (https://divinie.web.app).`,
     authors: [
       { name: store.name },
       { name: "Divine David", url: "https://divinie.web.app" },
@@ -68,8 +83,14 @@ export async function generateMetadata({ params }: StorePageProps): Promise<Meta
   };
 }
 
-export default async function StorePage({ params }: StorePageProps) {
+export default async function StorePage({ params, searchParams }: StorePageProps) {
   const { store: rawSlug } = await params;
+  const searchParamsResolved = searchParams ? await searchParams : {};
+  const rawTab = searchParamsResolved.tab;
+  const initialTab =
+    rawTab === "about" || rawTab === "policies" || rawTab === "products"
+      ? rawTab
+      : "products";
 
   if (!rawSlug || isReservedRoute(rawSlug)) {
     notFound();
@@ -151,6 +172,8 @@ export default async function StorePage({ params }: StorePageProps) {
         initialStore={store}
         initialProducts={products}
         storeSlug={rawSlug}
+        isSubdomain={isSubdomainRequest}
+        initialTab={initialTab}
       />
     </>
   );

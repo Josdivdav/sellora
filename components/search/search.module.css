@@ -1,0 +1,659 @@
+/* ==========================================================================
+   SEARCH SUGGESTIONS DROPDOWN STYLES
+   ========================================================================== */
+.suggestionsDropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.14), 0 4px 12px rgba(15, 23, 42, 0.05);
+  z-index: 1000;
+  overflow: hidden;
+  max-height: 480px;
+  overflow-y: auto;
+  text-align: left;
+  animation: dropdownFadeIn 0.15s ease-out;
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.suggestionsSection {
+  padding: 12px 14px 8px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.suggestionsSection:last-child {
+  border-bottom: none;
+}
+
+.suggestionsSectionTitle {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  color: #94a3b8;
+  font-weight: 700;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.suggestionItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: none;
+  border: none;
+  color: #1e293b;
+  font-size: 13.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.12s ease;
+  text-align: left;
+}
+
+.suggestionItem:hover,
+.suggestionItemActive {
+  background: #f1f5f9;
+  color: #2563eb;
+}
+
+.suggestionItemLeft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.suggestionHighlight {
+  font-weight: 700;
+  color: #2563eb;
+}
+
+.suggestionArrow {
+  font-size: 16px;
+  color: #cbd5e1;
+  transition: transform 0.12s ease, color 0.12s ease;
+}
+
+.suggestionItem:hover .suggestionArrow {
+  color: #2563eb;
+  transform: translateX(2px);
+}
+
+/* Category suggestion pill */
+.categoryPillList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.categoryPillBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 9999px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  color: #334155;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.categoryPillBtn:hover {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+  color: #2563eb;
+}
+
+/* Store suggestion row */
+.storeSuggestionItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: none;
+  border: none;
+  width: 100%;
+  cursor: pointer;
+  transition: background 0.12s ease;
+  text-align: left;
+}
+
+.storeSuggestionItem:hover {
+  background: #f8fafc;
+}
+
+.storeSuggestionLeft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.storeSuggestionLogo {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 1px solid #e2e8f0;
+}
+
+.storeSuggestionMonogram {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #2563eb, #4f46e5);
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 15px;
+  display: grid;
+  place-items: center;
+}
+
+.storeSuggestionName {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.storeSuggestionBadge {
+  font-size: 10.5px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.storeVisitPill {
+  font-size: 11px;
+  font-weight: 600;
+  color: #2563eb;
+  background: #eff6ff;
+  padding: 3px 8px;
+  border-radius: 9999px;
+  border: 1px solid #dbeafe;
+}
+
+/* Product preview suggestion row */
+.productSuggestionItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  text-decoration: none;
+  color: inherit;
+  transition: background 0.12s ease;
+  width: 100%;
+}
+
+.productSuggestionItem:hover {
+  background: #f8fafc;
+}
+
+.productSuggestionImg {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 1px solid #f1f5f9;
+}
+
+.productSuggestionDetails {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.productSuggestionName {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1e293b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.productSuggestionPriceRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.productSuggestionPrice {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #10b981;
+}
+
+.productSuggestionCategory {
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+/* View all results button */
+.viewAllResultsBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 12px 16px;
+  background: #f8fafc;
+  border: none;
+  border-top: 1px solid #e2e8f0;
+  color: #2563eb;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.viewAllResultsBtn:hover {
+  background: #eff6ff;
+}
+
+/* ==========================================================================
+   DEDICATED SEARCH PAGE STYLES
+   ========================================================================== */
+.searchPage {
+  min-height: 100vh;
+  background: #f8fafc;
+  color: #0f172a;
+  display: flex;
+  flex-direction: column;
+}
+
+.searchContentArea {
+  width: 100%;
+  max-width: 1360px;
+  margin: 0 auto;
+  padding: 24px 20px 60px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Search Header Hero */
+.searchHero {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 32px 28px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.searchHeroTop {
+  max-width: 720px;
+  margin: 0 auto;
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.searchHeroTitle {
+  font-size: 26px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 8px 0;
+}
+
+.searchHeroDesc {
+  font-size: 14px;
+  color: #64748b;
+  margin: 0;
+}
+
+.searchHeroDescStrong {
+  color: #2563eb;
+  font-weight: 700;
+}
+
+.searchBoxWrap {
+  max-width: 680px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.searchBoxForm {
+  display: flex;
+  align-items: center;
+  background: #f8fafc;
+  border: 2px solid #e2e8f0;
+  border-radius: 9999px;
+  padding: 6px 8px 6px 18px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s ease;
+}
+
+.searchBoxForm:focus-within {
+  background: #ffffff;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+}
+
+.searchBoxInput {
+  flex: 1;
+  height: 44px;
+  border: none;
+  background: transparent;
+  font-size: 15px;
+  color: #0f172a;
+  outline: none;
+}
+
+.searchBoxClearBtn {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+}
+
+.searchBoxSubmitBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #2563eb;
+  color: #ffffff;
+  padding: 10px 22px;
+  border-radius: 9999px;
+  border: none;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.searchBoxSubmitBtn:hover {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+/* Matching Store Card */
+.matchingStoreBanner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(135deg, #eff6ff, #f8fafc);
+  border: 1.5px solid #bfdbfe;
+  border-radius: 16px;
+  padding: 16px 20px;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.matchingStoreLeft {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.matchingStoreLogo {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  object-fit: cover;
+  border: 1px solid #bfdbfe;
+}
+
+.matchingStoreMonogram {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #2563eb, #4f46e5);
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 22px;
+  display: grid;
+  place-items: center;
+}
+
+.matchingStoreNameRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.matchingStoreName {
+  font-size: 16px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.matchingStoreBio {
+  font-size: 13px;
+  color: #64748b;
+  margin: 2px 0 0 0;
+}
+
+.matchingStoreBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #2563eb;
+  color: #ffffff;
+  padding: 8px 18px;
+  border-radius: 9999px;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* Toolbar & Filters */
+.searchToolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  background: #ffffff;
+  padding: 14px 20px;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+}
+
+.searchToolbarLeft {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.searchFilterPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 9999px;
+  font-size: 13px;
+  font-weight: 600;
+  background: #f8fafc;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.searchFilterPill:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.searchFilterPillActive {
+  background: #2563eb;
+  color: #ffffff;
+  border-color: #2563eb;
+}
+
+.searchToolbarRight {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sortSelect {
+  height: 38px;
+  padding: 0 14px;
+  border-radius: 10px;
+  border: 1.5px solid #e2e8f0;
+  background: #f8fafc;
+  color: #1e293b;
+  font-size: 13px;
+  font-weight: 600;
+  outline: none;
+  cursor: pointer;
+}
+
+.sortSelect:focus {
+  border-color: #2563eb;
+}
+
+.inStockToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+}
+
+/* Results Grid */
+.resultsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 20px;
+}
+
+/* Empty State */
+.emptyStateCard {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 60px 24px;
+  text-align: center;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  max-width: 600px;
+  margin: 20px auto;
+}
+
+.emptyStateIcon {
+  font-size: 56px;
+  color: #94a3b8;
+}
+
+.emptyStateTitle {
+  font-size: 20px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
+}
+
+.emptyStateDesc {
+  font-size: 14px;
+  color: #64748b;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.emptyTrendingSection {
+  margin-top: 12px;
+  width: 100%;
+}
+
+.emptyTrendingTitle {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #94a3b8;
+  margin-bottom: 10px;
+}
+
+.emptyResetBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 22px;
+  border-radius: 9999px;
+  background: #2563eb;
+  color: #ffffff;
+  font-size: 13.5px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  margin-top: 8px;
+}
+
+@media (max-width: 768px) {
+  .searchContentArea {
+    padding: 16px 12px 40px;
+  }
+
+  .searchHero {
+    padding: 24px 16px;
+  }
+
+  .searchHeroTitle {
+    font-size: 20px;
+  }
+
+  .searchBoxForm {
+    padding: 4px 6px 4px 14px;
+  }
+
+  .searchBoxSubmitBtn span:last-child {
+    display: none;
+  }
+
+  .matchingStoreBanner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .searchToolbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .searchToolbarRight {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .resultsGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+}

@@ -364,6 +364,18 @@ export default function ManageStoreDashboard({
     }
   };
 
+  // Copy Product Unique Affiliate Link
+  const handleCopyProductAffiliateLink = (p: Product) => {
+    const baseUrl = typeof window !== "undefined" ? window.location.origin : "https://devico.online";
+    const url =
+      p.affiliateMarketingUrl ||
+      `${baseUrl}/products/${p.id}?aff=${encodeURIComponent(p.affiliateCode || "partner")}`;
+    if (typeof navigator !== "undefined" && navigator.clipboard) {
+      navigator.clipboard.writeText(url);
+      onShowToast(`Copied unique affiliate link for "${p.name}"!`);
+    }
+  };
+
   // Filtered Products
   const filteredProducts = useMemo(() => {
     return products.filter((p) => {
@@ -377,6 +389,7 @@ export default function ManageStoreDashboard({
       if (statusFilter === "IN_STOCK") matchesStatus = stockNum >= 10;
       if (statusFilter === "LOW_STOCK") matchesStatus = stockNum > 0 && stockNum < 10;
       if (statusFilter === "OUT_OF_STOCK") matchesStatus = stockNum <= 0;
+      if (statusFilter === "AFFILIATE") matchesStatus = Boolean(p.isAffiliateEnabled);
 
       const matchesCat =
         categoryFilter === "ALL" || p.category === categoryFilter;
@@ -1032,6 +1045,7 @@ export default function ManageStoreDashboard({
                   <option value="IN_STOCK">In Stock (10+)</option>
                   <option value="LOW_STOCK">Low Stock (1-9)</option>
                   <option value="OUT_OF_STOCK">Out of Stock (0)</option>
+                  <option value="AFFILIATE">Affiliate Enabled</option>
                 </select>
 
                 {categoriesList.length > 1 && (
@@ -1141,7 +1155,15 @@ export default function ManageStoreDashboard({
                           </div>
                         </div>
                         <div className={styles.productCardContent}>
-                          <span className={styles.productCardCategory}>{p.category}</span>
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "6px" }}>
+                            <span className={styles.productCardCategory}>{p.category}</span>
+                            {p.isAffiliateEnabled && (
+                              <span className={styles.affiliateBadgePill} title="Affiliate Marketing Active">
+                                <span className="material-icons-round" style={{ fontSize: "11px" }}>campaign</span>
+                                {p.affiliateCommissionPercentage || 10}%
+                              </span>
+                            )}
+                          </div>
                           <h3 className={styles.productCardTitle} title={p.name}>{p.name}</h3>
                           {p.sku && <span className={styles.productCardSku}>SKU: {p.sku}</span>}
                           <div className={styles.productCardMeta}>
@@ -1152,6 +1174,17 @@ export default function ManageStoreDashboard({
                               )}
                             </div>
                             <div className={styles.productCardQuickActions}>
+                              {p.isAffiliateEnabled && (
+                                <button
+                                  type="button"
+                                  className={styles.editBtn}
+                                  style={{ color: "#2563eb", background: "#eff6ff", borderColor: "#bfdbfe" }}
+                                  onClick={(e) => { e.stopPropagation(); handleCopyProductAffiliateLink(p); }}
+                                  title="Copy Unique Affiliate Link"
+                                >
+                                  <span className="material-icons-round" style={{ fontSize: "16px" }}>link</span>
+                                </button>
+                              )}
                               <button
                                 type="button"
                                 className={styles.editBtn}
@@ -1206,7 +1239,15 @@ export default function ManageStoreDashboard({
                                 />
                                 <div className={styles.productTitleBlock}>
                                   <span className={styles.productTitle}>{p.name}</span>
-                                  {p.sku && <span className={styles.productSku}>SKU: {p.sku}</span>}
+                                  <div style={{ display: "flex", gap: "6px", alignItems: "center", flexWrap: "wrap", marginTop: "2px" }}>
+                                    {p.sku && <span className={styles.productSku}>SKU: {p.sku}</span>}
+                                    {p.isAffiliateEnabled && (
+                                      <span className={styles.affiliateBadgePill} title="Affiliate Marketing Active">
+                                        <span className="material-icons-round" style={{ fontSize: "11px" }}>campaign</span>
+                                        {p.affiliateCommissionPercentage || 10}% Affiliate
+                                      </span>
+                                    )}
+                                  </div>
                                 </div>
                               </div>
                             </td>
@@ -1241,6 +1282,17 @@ export default function ManageStoreDashboard({
                             </td>
                             <td>
                               <div className={styles.actionBtns}>
+                                {p.isAffiliateEnabled && (
+                                  <button
+                                    type="button"
+                                    className={styles.editBtn}
+                                    style={{ color: "#2563eb", background: "#eff6ff", borderColor: "#bfdbfe" }}
+                                    onClick={(e) => { e.stopPropagation(); handleCopyProductAffiliateLink(p); }}
+                                    title="Copy Unique Affiliate Link"
+                                  >
+                                    <span className="material-icons-round" style={{ fontSize: "16px" }}>link</span>
+                                  </button>
+                                )}
                                 <button
                                   type="button"
                                   className={styles.editBtn}

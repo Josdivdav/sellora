@@ -217,20 +217,26 @@ export default function HomeClient({
     return result.sort((a, b) => b.count - a.count);
   }, [products, stores]);
 
-  // Filter products according to category and search query
+  // Filter products according to category and search query (case-insensitive multi-word match)
   const filteredProducts = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    const words = q.split(/\s+/).filter(Boolean);
+
     return products.filter((product) => {
       const matchesCategory =
         category === "All" ||
         product.category.toLowerCase() === category.toLowerCase();
-      const q = search.trim().toLowerCase();
+
       const matchesSearch =
-        !q ||
-        product.name.toLowerCase().includes(q) ||
-        (product.author && product.author.toLowerCase().includes(q)) ||
-        (product.category && product.category.toLowerCase().includes(q)) ||
-        (product.description && product.description.toLowerCase().includes(q)) ||
-        (product.tags && product.tags.some((t) => t.toLowerCase().includes(q)));
+        words.length === 0 ||
+        words.every(
+          (w) =>
+            product.name.toLowerCase().includes(w) ||
+            (product.author && product.author.toLowerCase().includes(w)) ||
+            (product.category && product.category.toLowerCase().includes(w)) ||
+            (product.description && product.description.toLowerCase().includes(w)) ||
+            (product.tags && product.tags.some((t) => t.toLowerCase().includes(w)))
+        );
 
       return matchesCategory && matchesSearch;
     });
@@ -262,16 +268,20 @@ export default function HomeClient({
   const productsByStore = useMemo(() => {
     const groups: Record<string, Product[]> = {};
     const q = search.trim().toLowerCase();
+    const words = q.split(/\s+/).filter(Boolean);
 
     products.forEach((product) => {
       const author = product.author?.trim() || "Sellora";
       const matchesSearch =
-        !q ||
-        product.name.toLowerCase().includes(q) ||
-        author.toLowerCase().includes(q) ||
-        (product.category && product.category.toLowerCase().includes(q)) ||
-        (product.description && product.description.toLowerCase().includes(q)) ||
-        (product.tags && product.tags.some((t) => t.toLowerCase().includes(q)));
+        words.length === 0 ||
+        words.every(
+          (w) =>
+            product.name.toLowerCase().includes(w) ||
+            author.toLowerCase().includes(w) ||
+            (product.category && product.category.toLowerCase().includes(w)) ||
+            (product.description && product.description.toLowerCase().includes(w)) ||
+            (product.tags && product.tags.some((t) => t.toLowerCase().includes(w)))
+        );
 
       if (matchesSearch) {
         if (!groups[author]) groups[author] = [];
@@ -286,17 +296,21 @@ export default function HomeClient({
   const storeProducts = useMemo(() => {
     if (selectedStore === "All") return [];
     const q = search.trim().toLowerCase();
+    const words = q.split(/\s+/).filter(Boolean);
 
     const filtered = products.filter((product) => {
       const author = product.author?.trim() || "Sellora";
       const matchesStore = author.toLowerCase() === selectedStore.toLowerCase();
       const matchesSearch =
-        !q ||
-        product.name.toLowerCase().includes(q) ||
-        author.toLowerCase().includes(q) ||
-        (product.category && product.category.toLowerCase().includes(q)) ||
-        (product.description && product.description.toLowerCase().includes(q)) ||
-        (product.tags && product.tags.some((t) => t.toLowerCase().includes(q)));
+        words.length === 0 ||
+        words.every(
+          (w) =>
+            product.name.toLowerCase().includes(w) ||
+            author.toLowerCase().includes(w) ||
+            (product.category && product.category.toLowerCase().includes(w)) ||
+            (product.description && product.description.toLowerCase().includes(w)) ||
+            (product.tags && product.tags.some((t) => t.toLowerCase().includes(w)))
+        );
 
       return matchesStore && matchesSearch;
     });
