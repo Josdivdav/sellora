@@ -212,6 +212,17 @@ export default function Sidebar({
               Back to Shopping
             </button>
 
+            {user?.email?.toLowerCase() === "joshuadivine985@gmail.com" && (
+              <button
+                className={sideStyles.switchModeBtn}
+                style={{ background: "#111827", color: "#a5b4fc", borderColor: "#3730a3" }}
+                onClick={() => navigate("/developer")}
+              >
+                <span className="material-icons-round" style={{ fontSize: "18px", color: "#818cf8" }}>terminal</span>
+                Developer Console
+              </button>
+            )}
+
             {/* Sign out */}
             <div className={`${styles.sideNav} ${sideStyles.merchantBottom}`}>
               {user ? (
@@ -397,6 +408,14 @@ export default function Sidebar({
                   />
                 );
               })}
+              {user?.email?.toLowerCase() === "joshuadivine985@gmail.com" && (
+                <SideButton
+                  label="Developer Console"
+                  icon="terminal"
+                  onClick={() => navigate("/developer")}
+                  active={pathname === "/developer"}
+                />
+              )}
               {user ? (
                 <SideButton label="Log out" icon="logout" onClick={() => { onClose(); onSignOut(); }} />
               ) : (
