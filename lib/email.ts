@@ -1,5 +1,5 @@
 import nodemailer, { type Transporter } from "nodemailer";
-import type { Order } from "@/types/order";
+import type { Order, OrderItem } from "@/types/order";
 
 // Cached nodemailer transporter
 let transporter: Transporter | null = null;
@@ -281,7 +281,10 @@ export async function sendOrderConfirmationEmail(
 export async function sendMerchantNewOrderAlert(
   order: Order,
   merchantEmail: string,
-  storeName: string
+  storeName: string,
+  options?: {
+    merchantItems?: OrderItem[];
+  }
 ): Promise<{ success: boolean; error?: string }> {
   if (!merchantEmail) {
     return { success: false, error: "Merchant email is missing" };
@@ -290,7 +293,16 @@ export async function sendMerchantNewOrderAlert(
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://sellora.ng";
   const manageUrl = `${siteUrl}/account/manage-store`;
 
-  const itemsHtml = order.items
+  const itemsToRender =
+    options?.merchantItems && options.merchantItems.length > 0
+      ? options.merchantItems
+      : order.items;
+  const merchantTotal = itemsToRender.reduce(
+    (sum, it) => sum + it.price * it.quantity,
+    0
+  );
+
+  const itemsHtml = itemsToRender
     .map(
       (item) => `
       <tr>
@@ -345,8 +357,8 @@ export async function sendMerchantNewOrderAlert(
             </table>
 
             <div style="background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 10px; padding: 14px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-              <span style="font-size: 14px; font-weight: 700; color: #065f46;">Total Order Value:</span>
-              <span style="font-size: 18px; font-weight: 800; color: #059669;">${currency.format(order.pricing.total)}</span>
+              <span style="font-size: 14px; font-weight: 700; color: #065f46;">Store Items Total:</span>
+              <span style="font-size: 18px; font-weight: 800; color: #059669;">${currency.format(merchantTotal)}</span>
             </div>
 
             <div style="text-align: center; margin: 30px 0 10px 0;">
@@ -456,6 +468,275 @@ export async function sendOrderStatusUpdateEmail(
   return sendEmail({
     to: recipient,
     subject: `Update on Order #${order.orderNumber}: ${statusLabel}`,
+    html,
+  });
+}
+
+/**
+ * Email Template: Admin Platform Alert when any order is placed on Sellora
+ */
+export async function sendAdminNewOrderAlert(
+  order: Order
+): Promise<{ success: boolean; error?: string }> {
+  const adminEmail = process.env.ADMIN_EMAIL || process.env.GMAIL_USER;
+  if (!adminEmail) {
+    return { success: false, error: "Admin email not configured" };
+  }
+
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://sellora.ng";
+  const html = `
+    <!DOCTYPE html>
+    <html>
+      <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #f8fafc; padding: 20px; color: #0f172a;">
+        <div style="max-width: 560px; margin: 0 auto; background: #ffffff; border-radius: 14px; border: 1px solid #e2e8f0; padding: 24px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+          <h2 style="color: #2563eb; margin: 0 0 12px 0;">📦 Platform Order Alert: #${order.orderNumber}</h2>
+          <p style="font-size: 14px; color: #334155; line-height: 1.5;">
+            A new order of <strong>${currency.format(order.pricing.total)}</strong> was placed on Sellora.
+          </p>
+          <div style="background: #f1f5f9; border-radius: 8px; padding: 12px; font-size: 13px; line-height: 1.6; margin: 16px 0;">
+            <div><strong>Store:</strong> ${order.store?.name || "Sellora Store"}</div>
+            <div><strong>Buyer:</strong> ${order.shippingAddress.fullName} (${order.shippingAddress.phone})</div>
+            <div><strong>Email:</strong> ${order.shippingAddress.email || order.customerEmail || "N/A"}</div>
+            <div><strong>Payment Method:</strong> ${order.payment?.method || "Direct Bank Transfer"} (${order.payment?.status || "PENDING"})</div>
+            <div><strong>Items Ordered:</strong> ${order.items.length} product(s)</div>
+          </div>
+          <div style="text-align: center; margin-top: 24px;">
+            <a href="${siteUrl}/account/orders?id=${order.id}" style="display: inline-block; background: #2563eb; color: #ffffff; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: 700;">
+              View Order in Admin
+            </a>
+          </div>
+        </div>
+      </body>
+    </html>
+  `;
+
+  return sendEmail({
+    to: adminEmail,
+    subject: `🛒 [Sellora Platform] New Order #${order.orderNumber} - ${currency.format(order.pricing.total)}`,
+    html,
+  });
+}
+
+/**
+ * Email Template: Alert to Merchant when an order is cancelled
+ */
+export async function sendMerchantOrderCancelledAlert(
+  order: Order,
+  merchantEmail: string,
+  storeName: string,
+  reason?: string
+): Promise<{ success: boolean; error?: string }> {
+  if (!merchantEmail) {
+    return { success: false, error: "Merchant email is missing" };
+  }
+
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://sellora.ng";
+  const html = `
+    <!DOCTYPE html>
+    <html>
+      <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #f8fafc; padding: 20px; color: #0f172a;">
+        <div style="max-width: 560px; margin: 0 auto; background: #ffffff; border-radius: 14px; border: 1px solid #fee2e2; padding: 24px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+          <h2 style="color: #dc2626; margin: 0 0 12px 0;">⚠️ Order #${order.orderNumber} Cancelled</h2>
+          <p style="font-size: 14px; color: #334155; line-height: 1.5;">
+            An order for <strong>${storeName}</strong> has been cancelled.
+          </p>
+          ${
+            reason
+              ? `<div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 12px; font-size: 13px; color: #991b1b; margin: 16px 0;">
+                  <strong>Cancellation Reason:</strong> ${reason}
+                </div>`
+              : ""
+          }
+          <div style="font-size: 13px; color: #64748b; margin-bottom: 20px; line-height: 1.6;">
+            <div><strong>Customer:</strong> ${order.shippingAddress.fullName}</div>
+            <div><strong>Order Value:</strong> ${currency.format(order.pricing.total)}</div>
+          </div>
+          <div style="text-align: center; margin-top: 24px;">
+            <a href="${siteUrl}/account/manage-store" style="display: inline-block; background: #dc2626; color: #ffffff; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: 700;">
+              Review in Store Dashboard
+            </a>
+          </div>
+        </div>
+      </body>
+    </html>
+  `;
+
+  return sendEmail({
+    to: merchantEmail,
+    subject: `⚠️ Order #${order.orderNumber} Cancelled - ${storeName}`,
+    html,
+  });
+}
+
+/**
+ * Email Template: Sent to newly registered users
+ */
+export async function sendWelcomeUserEmail({
+  to,
+  displayName,
+}: {
+  to: string;
+  displayName?: string;
+}): Promise<{ success: boolean; error?: string }> {
+  if (!to) {
+    return { success: false, error: "Recipient email is missing" };
+  }
+
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://sellora.ng";
+  const name = displayName || "there";
+
+  const html = `
+    <!DOCTYPE html>
+    <html>
+      <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #f8fafc; margin: 0; padding: 24px; color: #0f172a;">
+        <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+          <div style="background: linear-gradient(135deg, #1e40af 0%, #2563eb 100%); padding: 32px 24px; text-align: center; color: #ffffff;">
+            <h1 style="margin: 0; font-size: 24px; font-weight: 800;">Welcome to Sellora! 🛍️</h1>
+            <p style="margin: 8px 0 0 0; font-size: 14px; opacity: 0.9;">Your marketplace for verified independent African brands</p>
+          </div>
+          <div style="padding: 28px 24px;">
+            <h2 style="font-size: 18px; font-weight: 700; margin: 0 0 12px 0;">Hello ${name},</h2>
+            <p style="font-size: 14px; color: #334155; line-height: 1.6; margin: 0 0 20px 0;">
+              We are thrilled to have you join Sellora. Discover thousands of authentic products directly from certified storefronts across Nigeria with secure nationwide delivery.
+            </p>
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px; margin-bottom: 24px;">
+              <h4 style="margin: 0 0 10px 0; color: #2563eb; font-size: 15px;">What you can do on Sellora:</h4>
+              <ul style="margin: 0; padding-left: 20px; font-size: 13.5px; color: #475569; line-height: 1.7;">
+                <li><strong>Shop Verified Stores:</strong> Direct-from-source authentic goods with tracked shipping.</li>
+                <li><strong>Sell & Grow:</strong> Open your own custom merchant storefront in minutes.</li>
+                <li><strong>Safe Transactions:</strong> Direct bank transfers and transparent order checkpoints.</li>
+              </ul>
+            </div>
+            <div style="text-align: center; margin: 30px 0 10px 0;">
+              <a href="${siteUrl}" style="display: inline-block; background: #2563eb; color: #ffffff; font-weight: 700; font-size: 14px; padding: 14px 28px; border-radius: 999px; text-decoration: none; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);">
+                Explore Products Now
+              </a>
+            </div>
+          </div>
+          <div style="background: #f8fafc; padding: 16px 24px; border-top: 1px solid #e2e8f0; text-align: center; font-size: 12px; color: #64748b;">
+            Sellora Marketplace • Connecting buyers with authentic creators
+          </div>
+        </div>
+      </body>
+    </html>
+  `;
+
+  return sendEmail({
+    to,
+    subject: `Welcome to Sellora, ${name}! 🛍️`,
+    html,
+  });
+}
+
+/**
+ * Email Template: Sent to a merchant when they launch a storefront
+ */
+export async function sendStoreCreatedEmail({
+  to,
+  storeName,
+  storeSlug,
+  storeUrl,
+}: {
+  to: string;
+  storeName: string;
+  storeSlug: string;
+  storeUrl: string;
+}): Promise<{ success: boolean; error?: string }> {
+  if (!to) {
+    return { success: false, error: "Recipient email is missing" };
+  }
+
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://sellora.ng";
+  const dashboardUrl = `${siteUrl}/account/manage-store`;
+
+  const html = `
+    <!DOCTYPE html>
+    <html>
+      <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #f8fafc; margin: 0; padding: 24px; color: #0f172a;">
+        <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+          <div style="background: linear-gradient(135deg, #059669 0%, #10b981 100%); padding: 32px 24px; text-align: center; color: #ffffff;">
+            <h1 style="margin: 0; font-size: 24px; font-weight: 800;">Congratulations! 🎉</h1>
+            <p style="margin: 8px 0 0 0; font-size: 14px; opacity: 0.95;">Your store <strong>${storeName}</strong> is now live!</p>
+          </div>
+          <div style="padding: 28px 24px;">
+            <p style="font-size: 14px; color: #334155; line-height: 1.6; margin: 0 0 20px 0;">
+              Your merchant storefront is officially published on Sellora. Customers nationwide can now discover your products, follow your store, and place orders.
+            </p>
+            <div style="background: #f0fdf4; border: 1px solid #a7f3d0; border-radius: 12px; padding: 16px; margin-bottom: 24px;">
+              <h4 style="margin: 0 0 8px 0; color: #065f46; font-size: 14px;">Your Public Store Link:</h4>
+              <a href="${storeUrl}" style="color: #059669; font-weight: 700; font-size: 15px; word-break: break-all;">${storeUrl}</a>
+            </div>
+            <div style="text-align: center; margin: 30px 0 10px 0;">
+              <a href="${dashboardUrl}" style="display: inline-block; background: #059669; color: #ffffff; font-weight: 700; font-size: 14px; padding: 14px 28px; border-radius: 999px; text-decoration: none; box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25);">
+                Go to Store Dashboard
+              </a>
+            </div>
+          </div>
+          <div style="background: #f8fafc; padding: 16px 24px; border-top: 1px solid #e2e8f0; text-align: center; font-size: 12px; color: #64748b;">
+            Sellora Merchant Network • Grow your business with confidence
+          </div>
+        </div>
+      </body>
+    </html>
+  `;
+
+  return sendEmail({
+    to,
+    subject: `🎉 Your store "${storeName}" is live on Sellora!`,
+    html,
+  });
+}
+
+/**
+ * Email Template: Sent when a store upgrades to Premium
+ */
+export async function sendStoreUpgradeEmail({
+  to,
+  storeName,
+  subdomainUrl,
+  transactionRef,
+}: {
+  to: string;
+  storeName: string;
+  subdomainUrl: string;
+  transactionRef: string;
+}): Promise<{ success: boolean; error?: string }> {
+  if (!to) {
+    return { success: false, error: "Recipient email is missing" };
+  }
+
+  const html = `
+    <!DOCTYPE html>
+    <html>
+      <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #f8fafc; margin: 0; padding: 24px; color: #0f172a;">
+        <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+          <div style="background: linear-gradient(135deg, #7c3aed 0%, #6366f1 100%); padding: 32px 24px; text-align: center; color: #ffffff;">
+            <h1 style="margin: 0; font-size: 24px; font-weight: 800;">⭐ Premium Storefront Activated!</h1>
+            <p style="margin: 8px 0 0 0; font-size: 14px; opacity: 0.95;">Store: <strong>${storeName}</strong></p>
+          </div>
+          <div style="padding: 28px 24px;">
+            <p style="font-size: 14px; color: #334155; line-height: 1.6; margin: 0 0 20px 0;">
+              Congratulations! Your Premium subscription is active. Your store now features a verified badge, priority listing, and a standalone custom subdomain:
+            </p>
+            <div style="background: #f5f3ff; border: 1.5px solid #ddd6fe; border-radius: 12px; padding: 18px; margin-bottom: 24px; text-align: center;">
+              <span style="font-size: 12px; text-transform: uppercase; font-weight: 800; color: #7c3aed; letter-spacing: 0.05em; display: block; margin-bottom: 4px;">Standalone Subdomain</span>
+              <a href="${subdomainUrl}" style="color: #6366f1; font-weight: 800; font-size: 17px; text-decoration: none;">${subdomainUrl}</a>
+            </div>
+            <div style="font-size: 12px; color: #64748b; background: #f8fafc; padding: 10px 14px; border-radius: 8px;">
+              <strong>Payment Reference:</strong> ${transactionRef}
+            </div>
+          </div>
+          <div style="background: #f8fafc; padding: 16px 24px; border-top: 1px solid #e2e8f0; text-align: center; font-size: 12px; color: #64748b;">
+            Sellora Premium Merchant Services
+          </div>
+        </div>
+      </body>
+    </html>
+  `;
+
+  return sendEmail({
+    to,
+    subject: `⭐ Premium Activated for ${storeName} - Sellora`,
     html,
   });
 }

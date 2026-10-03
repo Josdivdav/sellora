@@ -2,6 +2,8 @@ import { getAuth } from 'firebase-admin/auth';
 import { NextResponse, NextRequest } from 'next/server';
 import { db } from '@/lib/firebaseAdmin';
 import { invalidateStoreCache } from '@/lib/getStore';
+import { sendStoreCreatedEmail } from '@/lib/email';
+import { getStoreFullUrl } from '@/lib/storeUrl';
 
 export async function POST(request: NextRequest) {
   const authorization = request.headers.get('authorization');
@@ -23,6 +25,9 @@ export async function POST(request: NextRequest) {
     const userRef = db.collection('users').doc(uid);
     const storeRef = db.collection('stores').doc(uid);
 
+    const storeSnapshot = await storeRef.get();
+    const isNewStore = !storeSnapshot.exists;
+
     const updated = await request.json();
 
     if (!updated) {
@@ -39,6 +44,27 @@ export async function POST(request: NextRequest) {
       storeRef.set(storeData, { merge: true }),
       userRef.set({ has_store: true, updatedAt: new Date().toISOString() }, { merge: true }),
     ]);
+
+    // Send store created email if newly created (non-blocking)
+    if (isNewStore) {
+      (async () => {
+        try {
+          const userSnap = await userRef.get();
+          const merchantEmail = userSnap.data()?.email || updated.email;
+          if (merchantEmail && updated.name) {
+            const storeUrl = getStoreFullUrl(storeData as any);
+            await sendStoreCreatedEmail({
+              to: merchantEmail,
+              storeName: updated.name,
+              storeSlug: updated.slug || uid,
+              storeUrl,
+            });
+          }
+        } catch (e) {
+          console.warn('[Sellora Email] Store creation email error:', e);
+        }
+      })();
+    }
 
     // Record referral if store was created via a referral link
     if (updated.referredBy && typeof updated.referredBy === 'string') {

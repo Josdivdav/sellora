@@ -2,7 +2,7 @@ import { getAuth } from "firebase-admin/auth";
 import { NextResponse, NextRequest } from "next/server";
 import { db } from "@/lib/firebaseAdmin";
 import type { Order, TrackingEvent } from "@/types/order";
-import { sendOrderStatusUpdateEmail } from "@/lib/email";
+import { sendOrderStatusUpdateEmail, sendMerchantOrderCancelledAlert } from "@/lib/email";
 
 export const dynamic = "force-dynamic";
 
@@ -170,6 +170,33 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
       sendOrderStatusUpdateEmail(finalOrder, "CANCELLED", reason ? `Cancellation reason: ${reason}` : undefined).catch((e) =>
         console.warn("[Sellora Email] Cancellation notification error:", e)
       );
+
+      // Dispatch cancellation alert to merchants (non-blocking)
+      (async () => {
+        for (const sId of targetStoreIds) {
+          if (sId && sId !== "sellora-official") {
+            try {
+              const storeSnap = await db.collection("stores").doc(sId).get();
+              const storeData = storeSnap.data();
+              let mEmail = storeData?.email;
+              if (!mEmail) {
+                const uSnap = await db.collection("users").doc(sId).get();
+                mEmail = uSnap.data()?.email;
+              }
+              if (mEmail) {
+                await sendMerchantOrderCancelledAlert(
+                  finalOrder,
+                  mEmail,
+                  storeData?.name || existingOrder.store?.name || "Your Store",
+                  reason
+                );
+              }
+            } catch (err) {
+              console.warn("[Sellora Email] Merchant cancellation alert error:", err);
+            }
+          }
+        }
+      })();
 
       return NextResponse.json({ success: true, order: finalOrder }, { status: 200 });
     }

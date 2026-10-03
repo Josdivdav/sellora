@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getAuth } from 'firebase-admin/auth';
 
 import { db } from '@/lib/firebaseAdmin';
+import { sendWelcomeUserEmail } from '@/lib/email';
 
 // export async function GET() {
 //   const snapshot = await db.collection('users').get();
@@ -53,6 +54,13 @@ export async function POST(request: Request) {
       photoURL,
       ...(existingUser.exists ? {} : { createdAt: new Date(), has_store: false }),
     }, { merge: true });
+
+    // Send welcome email for newly created accounts (non-blocking)
+    if (!existingUser.exists && email) {
+      sendWelcomeUserEmail({ to: email, displayName }).catch((e) =>
+        console.warn('[Sellora Email] Welcome email error:', e)
+      );
+    }
 
     return NextResponse.json({ message: 'User registered successfully' }, { status: 201 });
   } catch (error) {

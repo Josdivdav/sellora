@@ -4,6 +4,7 @@ import { db } from "@/lib/firebaseAdmin";
 import { invalidateStoreCache } from "@/lib/getStore";
 import { getStoreFullUrl } from "@/lib/storeUrl";
 import type { Store } from "@/types/store";
+import { sendStoreUpgradeEmail } from "@/lib/email";
 
 export const dynamic = "force-dynamic";
 
@@ -90,6 +91,27 @@ export async function POST(request: NextRequest) {
     const finalStore = { id: storeSnapshot.id, ...refreshedSnapshot.data() } as Store;
 
     const fullUrl = getStoreFullUrl(finalStore);
+
+    // Dispatch upgrade confirmation email (non-blocking)
+    (async () => {
+      try {
+        let merchantEmail = finalStore.email;
+        if (!merchantEmail) {
+          const uSnap = await db.collection("users").doc(uid).get();
+          merchantEmail = uSnap.data()?.email;
+        }
+        if (merchantEmail) {
+          await sendStoreUpgradeEmail({
+            to: merchantEmail,
+            storeName: finalStore.name,
+            subdomainUrl: fullUrl,
+            transactionRef,
+          });
+        }
+      } catch (e) {
+        console.warn("[Sellora Email] Store upgrade email error:", e);
+      }
+    })();
 
     return NextResponse.json(
       {

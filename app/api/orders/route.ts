@@ -2,7 +2,11 @@ import { getAuth } from "firebase-admin/auth";
 import { NextResponse, NextRequest } from "next/server";
 import { db } from "@/lib/firebaseAdmin";
 import type { Order, OrderItem, ShippingAddress, PaymentDetails } from "@/types/order";
-import { sendOrderConfirmationEmail, sendMerchantNewOrderAlert } from "@/lib/email";
+import {
+  sendOrderConfirmationEmail,
+  sendMerchantNewOrderAlert,
+  sendAdminNewOrderAlert,
+} from "@/lib/email";
 
 export const dynamic = "force-dynamic";
 
@@ -288,16 +292,23 @@ export async function POST(request: NextRequest) {
             }
 
             if (merchantEmail) {
+              const merchantItems = orderDocData.items.filter(
+                (it) => it.storeId === sId || (!it.storeId && sId === storeInfo.id)
+              );
               await sendMerchantNewOrderAlert(
                 orderDocData,
                 merchantEmail,
-                storeData?.name || storeInfo.name || "Your Store"
+                storeData?.name || storeInfo.name || "Your Store",
+                { merchantItems }
               );
             }
           } catch (mErr) {
             console.warn(`[Sellora Email] Could not notify merchant for store ${sId}:`, mErr);
           }
         }
+
+        // Send Platform Admin Notification
+        await sendAdminNewOrderAlert(orderDocData);
       } catch (emailErr) {
         console.warn("[Sellora Email] Order notification error:", emailErr);
       }
