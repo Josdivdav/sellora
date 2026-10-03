@@ -2,6 +2,7 @@ import { getAuth } from "firebase-admin/auth";
 import { NextResponse, NextRequest } from "next/server";
 import { db } from "@/lib/firebaseAdmin";
 import type { Order, OrderItem, ShippingAddress, PaymentDetails } from "@/types/order";
+import { sendOrderConfirmationEmail, sendMerchantNewOrderAlert } from "@/lib/email";
 
 export const dynamic = "force-dynamic";
 
@@ -262,6 +263,45 @@ export async function POST(request: NextRequest) {
         console.warn("Could not write order to store subcollection:", storeOrderErr);
       }
     }
+
+    // 3. Dispatch automated email notifications via Gmail SMTP (non-blocking)
+    (async () => {
+      try {
+        // Send Buyer Confirmation Email
+        await sendOrderConfirmationEmail(orderDocData, {
+          bankDetails: body.bankDetails || undefined,
+          whatsappPhone: body.whatsappPhone || undefined,
+        });
+
+        // Send Merchant Alert Emails to participating stores
+        const targetStoreIds = storeIds.length > 0 ? storeIds : (storeInfo.id ? [storeInfo.id] : []);
+        for (const sId of targetStoreIds) {
+          try {
+            const storeSnap = await db.collection("stores").doc(sId).get();
+            const storeData = storeSnap.data();
+            let merchantEmail = storeData?.email;
+
+            // If store doc doesn't have an email, look up owner user doc
+            if (!merchantEmail) {
+              const userSnap = await db.collection("users").doc(sId).get();
+              merchantEmail = userSnap.data()?.email;
+            }
+
+            if (merchantEmail) {
+              await sendMerchantNewOrderAlert(
+                orderDocData,
+                merchantEmail,
+                storeData?.name || storeInfo.name || "Your Store"
+              );
+            }
+          } catch (mErr) {
+            console.warn(`[Sellora Email] Could not notify merchant for store ${sId}:`, mErr);
+          }
+        }
+      } catch (emailErr) {
+        console.warn("[Sellora Email] Order notification error:", emailErr);
+      }
+    })();
 
     return NextResponse.json({ success: true, order: orderDocData }, { status: 201 });
   } catch (error: any) {

@@ -26,6 +26,7 @@ export interface OrderItem {
 
 export interface ShippingAddress {
   fullName: string;
+  email?: string;
   phone: string;
   street: string;
   city: string;
@@ -53,6 +54,7 @@ export interface OrderPricing {
 export interface Order {
   id: string;
   orderNumber: string;
+  customerEmail?: string;
   status: OrderStatus;
   createdAt: string;
   estimatedDelivery: string;

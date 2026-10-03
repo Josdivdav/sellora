@@ -2,6 +2,7 @@ import { getAuth } from "firebase-admin/auth";
 import { NextResponse, NextRequest } from "next/server";
 import { db } from "@/lib/firebaseAdmin";
 import type { Order, TrackingEvent } from "@/types/order";
+import { sendOrderStatusUpdateEmail } from "@/lib/email";
 
 export const dynamic = "force-dynamic";
 
@@ -164,6 +165,12 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
       }
 
       const finalOrder: Order = { ...existingOrder, ...updates };
+
+      // Dispatch status update email notification (non-blocking)
+      sendOrderStatusUpdateEmail(finalOrder, "CANCELLED", reason ? `Cancellation reason: ${reason}` : undefined).catch((e) =>
+        console.warn("[Sellora Email] Cancellation notification error:", e)
+      );
+
       return NextResponse.json({ success: true, order: finalOrder }, { status: 200 });
     }
 
@@ -215,6 +222,18 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
       }
 
       const finalOrder: Order = { ...existingOrder, ...updates };
+
+      // Dispatch status update email notification (non-blocking)
+      sendOrderStatusUpdateEmail(
+        finalOrder,
+        newStatus,
+        newStatus === "IN_TRANSIT"
+          ? `Dispatched with ${finalOrder.carrier || "carrier"} (Tracking: ${finalOrder.trackingNumber || "Assigned"})`
+          : newStatus === "DELIVERED"
+          ? "Package has been delivered to your delivery address"
+          : undefined
+      ).catch((e) => console.warn("[Sellora Email] Status update notification error:", e));
+
       return NextResponse.json({ success: true, order: finalOrder }, { status: 200 });
     }
 
