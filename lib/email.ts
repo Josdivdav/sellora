@@ -108,7 +108,8 @@ export async function sendOrderConfirmationEmail(
   }
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://sellora.ng";
-  const trackingUrl = `${siteUrl}/account/orders?id=${order.id}`;
+  const trackingCode = order.trackingNumber || order.orderNumber || order.id;
+  const trackingUrl = `${siteUrl}/track?code=${encodeURIComponent(trackingCode)}`;
   const isTransfer = order.payment?.method?.toLowerCase().includes("transfer");
 
   const bankName =
@@ -244,6 +245,7 @@ export async function sendOrderConfirmationEmail(
               <div><strong>Phone:</strong> ${order.shippingAddress.phone}</div>
               <div><strong>Delivery Address:</strong> ${order.shippingAddress.street}, ${order.shippingAddress.city}, ${order.shippingAddress.state}</div>
               <div><strong>Carrier:</strong> ${order.carrier} (Estimated: ${new Date(order.estimatedDelivery).toLocaleDateString("en-NG", { weekday: "short", month: "short", day: "numeric" })})</div>
+              ${order.trackingNumber ? `<div><strong>Tracking ID:</strong> <span style="font-family: monospace; font-weight: 700; color: #1d4ed8; background: #eff6ff; padding: 2px 6px; border-radius: 4px;">${order.trackingNumber}</span></div>` : ""}
             </div>
 
             <!-- Action Button -->
@@ -397,7 +399,8 @@ export async function sendOrderStatusUpdateEmail(
   }
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://sellora.ng";
-  const trackingUrl = `${siteUrl}/account/orders?id=${order.id}`;
+  const trackingCode = order.trackingNumber || order.orderNumber || order.id;
+  const trackingUrl = `${siteUrl}/track?code=${encodeURIComponent(trackingCode)}`;
 
   const statusLabel =
     status === "DELIVERED"

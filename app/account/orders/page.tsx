@@ -102,6 +102,25 @@ export default function OrdersPage() {
     }
   }, []);
 
+  // Auto-open tracking modal if ?id= or ?track= is provided in URL
+  useEffect(() => {
+    if (typeof window === "undefined" || orders.length === 0) return;
+    const params = new URLSearchParams(window.location.search);
+    const targetCode = params.get("id") || params.get("track") || params.get("code");
+    if (targetCode) {
+      const clean = targetCode.trim().toLowerCase();
+      const matched = orders.find(
+        (o) =>
+          o.id.toLowerCase() === clean ||
+          o.orderNumber?.toLowerCase() === clean ||
+          o.trackingNumber?.toLowerCase() === clean
+      );
+      if (matched) {
+        setTrackingOrder(matched);
+      }
+    }
+  }, [orders]);
+
   // Compute status counts
   const statusCounts = useMemo<Record<TabFilter, number>>(() => {
     return {
@@ -137,14 +156,16 @@ export default function OrdersPage() {
         }
       }
 
-      // Search query (Order #, item name, store name)
+      // Search query (Order #, Tracking #, item name, store name)
       if (query) {
         const matchNumber = order.orderNumber?.toLowerCase().includes(query);
+        const matchTracking = order.trackingNumber?.toLowerCase().includes(query);
+        const matchId = order.id?.toLowerCase().includes(query);
         const matchStore = order.store?.name?.toLowerCase().includes(query);
         const matchItems = order.items?.some((item) =>
           item.name?.toLowerCase().includes(query)
         );
-        if (!matchNumber && !matchStore && !matchItems) {
+        if (!matchNumber && !matchTracking && !matchId && !matchStore && !matchItems) {
           return false;
         }
       }
