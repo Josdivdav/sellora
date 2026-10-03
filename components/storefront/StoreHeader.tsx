@@ -4,6 +4,7 @@ import Link from "next/link";
 import styles from "./storefront.module.css";
 import type { Store } from "@/types/store";
 import { getStoreSlug } from "@/lib/storeUrl";
+import { useChat } from "@/context/ChatContext";
 
 interface StoreHeaderProps {
   store: Store;
@@ -42,8 +43,17 @@ export default function StoreHeader({
   onShare,
   isOwner,
 }: StoreHeaderProps) {
+  const { openChat } = useChat();
   const storeSlug = getStoreSlug(store);
   const homeHref = isSubdomain ? "/" : `/${storeSlug}`;
+
+  const handleInAppChat = () => {
+    openChat({
+      storeId: store.id || store.ownerId || store.slug || "official",
+      storeName: store.name,
+      storeSlug: storeSlug,
+    });
+  };
 
   // WhatsApp link for instant contact
   const cleanPhone = (store.whatsapp || store.phone || store.whatsappPhone || "08038737198").replace(/\D/g, "");
@@ -182,6 +192,26 @@ export default function StoreHeader({
 
           {/* RIGHT ACTION BUTTONS */}
           <div className={styles.headerActions}>
+            {!isOwner && (
+              <button
+                type="button"
+                className={styles.headerWhatsappBtn}
+                onClick={handleInAppChat}
+                title="Chat with store merchant on Sellora"
+                style={{
+                  background: "#eff6ff",
+                  borderColor: "#bfdbfe",
+                  color: "#2b6dff",
+                  cursor: "pointer",
+                }}
+              >
+                <span className="material-icons-round" style={{ fontSize: "18px" }}>
+                  chat
+                </span>
+                <span className={styles.headerWhatsappText}>Chat</span>
+              </button>
+            )}
+
             {/* WhatsApp Contact CTA */}
             <a
               href={whatsappUrl}
@@ -191,7 +221,7 @@ export default function StoreHeader({
               title="Chat with store merchant on WhatsApp"
             >
               <span className="material-icons-round" style={{ fontSize: "18px" }}>
-                chat
+                forum
               </span>
               <span className={styles.headerWhatsappText}>WhatsApp Us</span>
             </a>

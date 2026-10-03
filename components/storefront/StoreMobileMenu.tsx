@@ -3,6 +3,8 @@
 import Link from "next/link";
 import styles from "./storefront.module.css";
 import type { Store } from "@/types/store";
+import { getStoreSlug } from "@/lib/storeUrl";
+import { useChat } from "@/context/ChatContext";
 
 interface StoreMobileMenuProps {
   isOpen: boolean;
@@ -27,6 +29,8 @@ export default function StoreMobileMenu({
   onSelectCategory,
   onShare,
 }: StoreMobileMenuProps) {
+  const { openChat } = useChat();
+
   if (!isOpen) return null;
 
   const cleanPhone = (store.whatsapp || store.phone || store.whatsappPhone || "08038737198").replace(/\D/g, "");
@@ -80,8 +84,34 @@ export default function StoreMobileMenu({
           </button>
         </div>
 
-        {/* WhatsApp Quick Action */}
-        <div className={styles.mobileDrawerCtaSection}>
+        {/* Chat & WhatsApp Quick Actions */}
+        <div className={styles.mobileDrawerCtaSection} style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+          <button
+            type="button"
+            className={styles.mobileDrawerWhatsappBtn}
+            onClick={() => {
+              onClose();
+              openChat({
+                storeId: store.id || store.ownerId || store.slug || "official",
+                storeName: store.name,
+                storeSlug: getStoreSlug(store),
+              });
+            }}
+            style={{
+              background: "#2b6dff",
+              color: "#ffffff",
+              border: "none",
+              cursor: "pointer",
+              font: "inherit",
+              width: "100%",
+            }}
+          >
+            <span className="material-icons-round" style={{ fontSize: "18px" }}>
+              chat
+            </span>
+            <span>Chat on Sellora</span>
+          </button>
+
           <a
             href={whatsappUrl}
             target="_blank"
@@ -89,9 +119,9 @@ export default function StoreMobileMenu({
             className={styles.mobileDrawerWhatsappBtn}
           >
             <span className="material-icons-round" style={{ fontSize: "18px" }}>
-              chat
+              forum
             </span>
-            <span>Chat Directly on WhatsApp</span>
+            <span>Chat on WhatsApp</span>
           </a>
         </div>
 

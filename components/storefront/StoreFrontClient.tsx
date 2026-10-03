@@ -14,6 +14,7 @@ import ProductCard from "@/components/home/ProductCard";
 import { getStoreFullUrl, getStoreSlug } from "@/lib/storeUrl";
 import { toggleStoreFollow } from "@/lib/followStore";
 import { useCart } from "@/context/CartContext";
+import { useChat } from "@/context/ChatContext";
 
 interface StoreFrontClientProps {
   initialStore: Store;
@@ -35,6 +36,7 @@ export default function StoreFrontClient({
 }: StoreFrontClientProps) {
   const router = useRouter();
   const { user } = useAuth();
+  const { openChat } = useChat();
 
   // Navigation & Drawer states
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -180,6 +182,15 @@ export default function StoreFrontClient({
     } else {
       showToast(`Store URL: ${fullUrl}`);
     }
+  };
+
+  // In-app chat with merchant
+  const handleInAppChat = () => {
+    openChat({
+      storeId: initialStore.id || initialStore.ownerId || initialStore.slug || "official",
+      storeName: initialStore.name,
+      storeSlug: storeSlugFormatted,
+    });
   };
 
   // Contact Merchant directly via WhatsApp
@@ -442,16 +453,36 @@ export default function StoreFrontClient({
                     <span>Share</span>
                   </button>
 
+                  {!isOwner && (
+                    <button
+                      type="button"
+                      className={styles.contactBtn}
+                      onClick={handleInAppChat}
+                      title="Chat with merchant on Sellora"
+                      style={{
+                        background: "#eff6ff",
+                        borderColor: "#bfdbfe",
+                        color: "#2b6dff",
+                        fontWeight: 600,
+                      }}
+                    >
+                      <span className="material-icons-round" style={{ fontSize: "16px" }}>
+                        chat
+                      </span>
+                      <span>Chat</span>
+                    </button>
+                  )}
+
                   <button
                     type="button"
                     className={styles.contactBtn}
                     onClick={handleContactMerchant}
-                    title="Contact store representative"
+                    title="Contact store representative on WhatsApp"
                   >
-                    <span className="material-icons-round" style={{ fontSize: "16px" }}>
-                      chat_bubble_outline
+                    <span className="material-icons-round" style={{ fontSize: "16px", color: "#10b981" }}>
+                      forum
                     </span>
-                    <span>Contact</span>
+                    <span>WhatsApp</span>
                   </button>
                 </div>
               </div>

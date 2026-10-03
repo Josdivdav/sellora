@@ -3,12 +3,19 @@ export type NavItem = {
   href: string;
   icon: string;
   requiresAuth?: boolean;
-  badgeKey?: "activeOrders" | "favoriteStores";
+  badgeKey?: "activeOrders" | "favoriteStores" | "unreadMessages";
 };
 
 const buyerNav: NavItem[] = [
   { label: "Browse", href: "/", icon: "storefront" },
   { label: "Cart", href: "/cart", icon: "shopping_cart" },
+  {
+    label: "Messages",
+    href: "/account/messages",
+    icon: "forum",
+    badgeKey: "unreadMessages",
+    requiresAuth: true,
+  },
   {
     label: "My orders",
     href: "/account/orders",

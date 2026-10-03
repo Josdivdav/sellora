@@ -13,8 +13,10 @@ import type { Product } from "@/types/product";
 import type { Order } from "@/types/order";
 import type { User } from "firebase/auth";
 import { getStoreRelativePath, getStoreFullUrl } from "@/lib/storeUrl";
+import { useChat } from "@/context/ChatContext";
 
 const MerchantOrdersTab = lazy(() => import("./tabs/MerchantOrdersTab"));
+const MerchantMessagesTab = lazy(() => import("./tabs/MerchantMessagesTab"));
 const MerchantAnalyticsTab = lazy(() => import("./tabs/MerchantAnalyticsTab"));
 const MerchantPromotionsTab = lazy(() => import("./tabs/MerchantPromotionsTab"));
 const MerchantReferralsTab = lazy(() => import("./tabs/MerchantReferralsTab"));
@@ -83,6 +85,7 @@ export default function ManageStoreDashboard({
   activeTab = "dashboard",
   onShowToast,
 }: ManageStoreDashboardProps) {
+  const { unreadCount } = useChat();
   const [store, setStore] = useState<Store | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
@@ -670,6 +673,28 @@ export default function ManageStoreDashboard({
           Orders ({orders.length})
         </Link>
         <Link
+          href="/account/manage-store?tab=messages"
+          className={`${styles.merchantTabLink} ${activeTab === "messages" ? styles.merchantTabLinkActive : ""}`}
+        >
+          <span className="material-icons-round" style={{ fontSize: "18px" }}>forum</span>
+          Messages
+          {unreadCount > 0 && (
+            <span
+              style={{
+                marginLeft: "6px",
+                background: "#ef4444",
+                color: "#ffffff",
+                fontSize: "11px",
+                fontWeight: 700,
+                padding: "1px 6px",
+                borderRadius: "999px",
+              }}
+            >
+              {unreadCount}
+            </span>
+          )}
+        </Link>
+        <Link
           href="/account/manage-store?tab=analytics"
           className={`${styles.merchantTabLink} ${activeTab === "analytics" ? styles.merchantTabLinkActive : ""}`}
         >
@@ -725,6 +750,13 @@ export default function ManageStoreDashboard({
             orders={orders}
             onOrdersChange={setOrders}
             currency={currency}
+            user={user}
+            onShowToast={onShowToast}
+          />
+        )}
+        {activeTab === "messages" && (
+          <MerchantMessagesTab
+            store={store}
             user={user}
             onShowToast={onShowToast}
           />

@@ -9,6 +9,7 @@ import type { User } from "firebase/auth";
 import { useRouter, usePathname } from "next/navigation";
 import storesData from "@/data/stores.json";
 import { getStoreRelativePath } from "@/lib/storeUrl";
+import { useChat } from "@/context/ChatContext";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -38,6 +39,7 @@ const MERCHANT_PATHS = [
 const merchantNav = [
   { label: "Dashboard", tab: null, icon: "dashboard" },
   { label: "Customer Orders", tab: "orders", icon: "receipt_long" },
+  { label: "Customer Messages", tab: "messages", icon: "forum" },
   { label: "Analytics", tab: "analytics", icon: "bar_chart" },
   { label: "Products", tab: "products", icon: "inventory_2" },
   { label: "Promotions", tab: "promotions", icon: "local_offer" },
@@ -59,6 +61,7 @@ export default function Sidebar({
 }: SidebarProps) {
   const router = useRouter();
   const pathname = usePathname();
+  const { unreadCount } = useChat();
 
   // Read ?tab= after mount to avoid useSearchParams Suspense requirement
   const [activeTab, setActiveTab] = useState<string | null>(null);
@@ -108,8 +111,9 @@ export default function Sidebar({
 
   const visibleBuyerNav = buyerNav.filter((item) => user || !item.requiresAuth);
 
-  const getBadge = (key?: "activeOrders" | "favoriteStores") => {
+  const getBadge = (key?: "activeOrders" | "favoriteStores" | "unreadMessages") => {
     if (key === "favoriteStores") return favCount > 0 ? String(favCount) : undefined;
+    if (key === "unreadMessages") return unreadCount > 0 ? String(unreadCount) : undefined;
     return undefined;
   };
 
@@ -191,6 +195,7 @@ export default function Sidebar({
                     key={item.label}
                     label={item.label}
                     icon={item.icon}
+                    n={item.tab === "messages" && unreadCount > 0 ? String(unreadCount) : undefined}
                     onClick={() => navigate(href)}
                     active={isActive}
                   />

@@ -3,6 +3,8 @@ import { Poppins } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 import { CartProvider } from "@/context/CartContext";
+import { ChatProvider } from "@/context/ChatContext";
+import ChatWidget from "@/components/chat/ChatWidget";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -142,7 +144,12 @@ export default function RootLayout({ children }: React.PropsWithChildren) {
       </head>
       <body>
         <AuthProvider>
-          <CartProvider>{children}</CartProvider>
+          <ChatProvider>
+            <CartProvider>
+              {children}
+              <ChatWidget />
+            </CartProvider>
+          </ChatProvider>
         </AuthProvider>
       </body>
     </html>

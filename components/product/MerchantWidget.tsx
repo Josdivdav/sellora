@@ -3,7 +3,9 @@
 import Link from "next/link";
 import styles from "./product.module.css";
 import type { Store } from "@/types/store";
-import { getStoreRelativePath } from "@/lib/storeUrl";
+import type { Product } from "@/types/product";
+import { getStoreRelativePath, slugifyStoreName, getStoreSlug } from "@/lib/storeUrl";
+import { useChat } from "@/context/ChatContext";
 
 interface MerchantWidgetProps {
   authorName?: string;
@@ -13,6 +15,7 @@ interface MerchantWidgetProps {
   followersCount?: number;
   id?: string;
   store?: Store | null;
+  product?: Product | null;
 }
 
 export default function MerchantWidget({
@@ -23,10 +26,29 @@ export default function MerchantWidget({
   followersCount,
   id,
   store,
+  product,
 }: MerchantWidgetProps) {
+  const { openChat } = useChat();
+
   const formatFollowers = (num: number) => {
     if (num >= 1000) return (num / 1000).toFixed(1) + "k";
     return String(num);
+  };
+
+  const handleInAppChat = () => {
+    openChat({
+      storeId: store?.id || (store as any)?.ownerId || authorName || "official",
+      storeName: store?.name || authorName || "Sellora Merchant",
+      storeSlug: store ? getStoreSlug(store) : authorName ? slugifyStoreName(authorName) : undefined,
+      product: product
+        ? {
+            id: product.id,
+            name: product.name,
+            image: product.image,
+            price: product.price,
+          }
+        : undefined,
+    });
   };
 
   const handleChatWithSeller = () => {
@@ -163,14 +185,33 @@ export default function MerchantWidget({
               <button
                 type="button"
                 className={styles.merchantChatBtn}
-                onClick={handleChatWithSeller}
-                aria-label="Chat with seller via WhatsApp"
-                title="Chat with seller via WhatsApp"
+                onClick={handleInAppChat}
+                aria-label="Chat with merchant on Sellora"
+                title="Chat with merchant on Sellora"
+                style={{
+                  background: "#eff6ff",
+                  borderColor: "#bfdbfe",
+                  color: "#2b6dff",
+                  fontWeight: 600,
+                }}
               >
                 <span className="material-icons-round" style={{ fontSize: "16px" }}>
                   chat
                 </span>
                 Chat
+              </button>
+
+              <button
+                type="button"
+                className={styles.merchantChatBtn}
+                onClick={handleChatWithSeller}
+                aria-label="Chat with seller via WhatsApp"
+                title="Chat with seller via WhatsApp"
+              >
+                <span className="material-icons-round" style={{ fontSize: "16px", color: "#10b981" }}>
+                  forum
+                </span>
+                WhatsApp
               </button>
 
               {onFollowToggle && (

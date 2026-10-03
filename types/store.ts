@@ -50,4 +50,5 @@ export interface Store {
   referredBy?: string;
   referralsCount?: number;
   referralEarnings?: number;
+  ownerId?: string;
 }

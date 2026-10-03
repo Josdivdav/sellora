@@ -665,6 +665,7 @@ export default function ProductDetailClient({
                 isAuthor={isAuthor}
                 followersCount={merchantFollowersCount}
                 store={activeStore}
+                product={product}
               />
             </section>
 
@@ -774,6 +775,7 @@ export default function ProductDetailClient({
               isFollowing={isFollowingStore}
               isAuthor={isAuthor}
               followersCount={merchantFollowersCount}
+              product={product}
             />
           </section>
 

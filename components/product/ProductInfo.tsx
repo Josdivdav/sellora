@@ -4,7 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import styles from "./product.module.css";
 import type { Product } from "@/types/product";
-import { getStoreRelativePath } from "@/lib/storeUrl";
+import { getStoreRelativePath, slugifyStoreName } from "@/lib/storeUrl";
+import { useChat } from "@/context/ChatContext";
 
 const currency = new Intl.NumberFormat("en-NG", {
   style: "currency",
@@ -31,6 +32,7 @@ export default function ProductInfo({
   isWishlisted,
   isAuthor = false,
 }: ProductInfoProps) {
+  const { openChat } = useChat();
   const [quantity, setQuantity] = useState(1);
   const roundedRating = Math.round(product.rating);
   const maxStock = product.stock || 50;
@@ -41,6 +43,20 @@ export default function ProductInfo({
 
   const handleIncrease = () => {
     setQuantity((prev) => Math.min(maxStock, prev + 1));
+  };
+
+  const handleChatClick = () => {
+    openChat({
+      storeId: product.storeId || product.author || "official",
+      storeName: product.author || "Sellora Official Store",
+      storeSlug: product.author ? slugifyStoreName(product.author) : undefined,
+      product: {
+        id: product.id,
+        name: product.name,
+        image: product.image,
+        price: product.price,
+      },
+    });
   };
 
   const discountAmount = product.oldPrice ? product.oldPrice - product.price : 0;
@@ -82,6 +98,7 @@ export default function ProductInfo({
           <button
             type="button"
             className={styles.chatSellerBtn}
+            onClick={handleChatClick}
             aria-label="Chat with seller"
             title="Chat with seller"
           >
@@ -235,6 +252,7 @@ export default function ProductInfo({
           <button
             type="button"
             className={styles.iconActionBtn}
+            onClick={handleChatClick}
             aria-label="Chat with seller"
             title="Chat with seller"
           >
