@@ -80,7 +80,7 @@ export default function NewArrivalsFeed({
     const q = searchQuery.trim().toLowerCase();
     const searchWords = q.split(/\s+/).filter(Boolean);
 
-    let list = products.filter((product) => {
+    const list = products.filter((product) => {
       // Store filter
       if (selectedStore !== "ALL") {
         const store = getStoreForProduct(product);

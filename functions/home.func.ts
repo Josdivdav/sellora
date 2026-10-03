@@ -1,6 +1,6 @@
 import { app } from "@/lib/firebase";
 
-import { getAuth, signOut, User } from "firebase/auth";
+import { getAuth, signOut } from "firebase/auth";
 
 export const notifySessionExpired = () => {
     if (typeof window !== "undefined") {

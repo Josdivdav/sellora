@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import Link from "next/link";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import styles from "./track.module.css";
 import HomeHeader from "@/components/home/HomeHeader";
@@ -94,9 +93,11 @@ export default function TrackOrderClient() {
   }, []);
 
   // Read URL query code on mount
+  const lastFetchedRef = useRef<string>("");
   useEffect(() => {
     const initialCode = searchParams?.get("code") || searchParams?.get("id") || "";
-    if (initialCode) {
+    if (initialCode && initialCode !== lastFetchedRef.current) {
+      lastFetchedRef.current = initialCode;
       setQueryCode(initialCode);
       void fetchTracking(initialCode);
     }
@@ -104,9 +105,11 @@ export default function TrackOrderClient() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!queryCode.trim()) return;
-    router.replace(`/track?code=${encodeURIComponent(queryCode.trim())}`);
-    void fetchTracking(queryCode);
+    const clean = queryCode.trim();
+    if (!clean) return;
+    lastFetchedRef.current = clean;
+    router.replace(`/track?code=${encodeURIComponent(clean)}`);
+    void fetchTracking(clean);
   };
 
   const handleCopy = () => {

@@ -431,7 +431,7 @@ export default function CheckoutClient() {
                   <strong>{activeStoreName} — Bank Transfer Details</strong>
                 </div>
                 <p className={styles.bankTransferSub}>
-                  Please transfer <strong>{currency.format(placedOrder.pricing?.total || grandTotal)}</strong> to the seller's account below:
+                  Please transfer <strong>{currency.format(placedOrder.pricing?.total || grandTotal)}</strong> to the seller&apos;s account below:
                 </p>
                 <div className={styles.bankDetailsGrid}>
                   <div className={styles.bankDetailItem}>

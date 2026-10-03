@@ -668,6 +668,7 @@ export async function sendStoreCreatedEmail({
             <div style="background: #f0fdf4; border: 1px solid #a7f3d0; border-radius: 12px; padding: 16px; margin-bottom: 24px;">
               <h4 style="margin: 0 0 8px 0; color: #065f46; font-size: 14px;">Your Public Store Link:</h4>
               <a href="${storeUrl}" style="color: #059669; font-weight: 700; font-size: 15px; word-break: break-all;">${storeUrl}</a>
+              <p style="margin: 6px 0 0 0; font-size: 12px; color: #047857;">Store Identifier: <strong>${storeSlug}</strong></p>
             </div>
             <div style="text-align: center; margin: 30px 0 10px 0;">
               <a href="${dashboardUrl}" style="display: inline-block; background: #059669; color: #ffffff; font-weight: 700; font-size: 14px; padding: 14px 28px; border-radius: 999px; text-decoration: none; box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25);">

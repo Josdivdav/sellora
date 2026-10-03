@@ -132,10 +132,12 @@ export default function OrdersPage() {
     };
   }, [orders]);
 
+  const [currentTime] = useState(() => Date.now());
+
   // Filter orders by tab, search, and time
   const filteredOrders = useMemo(() => {
     const query = (orderSearchQuery || headerSearch).trim().toLowerCase();
-    const now = Date.now();
+    const now = currentTime;
 
     return orders.filter((order) => {
       // Tab filter

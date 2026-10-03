@@ -51,7 +51,8 @@ export default function ProductFormModal({
     productToEdit?.stock !== undefined ? productToEdit.stock : 25
   );
   const [sku, setSku] = useState(
-    productToEdit?.sku ||
+    () =>
+      productToEdit?.sku ||
       `SEL-${storeName.slice(0, 3).toUpperCase()}-${Math.floor(100 + Math.random() * 900)}`
   );
 
