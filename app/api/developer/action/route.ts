@@ -10,10 +10,15 @@ export async function POST(request: NextRequest) {
   const devKey = request.headers.get("x-developer-key");
   const configuredPasscode = process.env.DEVELOPER_PASSCODE || process.env.DEV_PASSCODE || "sellora-dev-2026";
   const adminEmail = (process.env.ADMIN_EMAIL || process.env.GMAIL_USER || "joshuadivine985@gmail.com").toLowerCase().trim();
+  const devCookie = request.cookies.get("sellora_dev_auth")?.value;
 
   let isAuthorized = false;
 
   if (devKey && devKey.trim() === configuredPasscode) {
+    isAuthorized = true;
+  }
+
+  if (!isAuthorized && devCookie === "1") {
     isAuthorized = true;
   }
 
@@ -30,7 +35,7 @@ export async function POST(request: NextRequest) {
   }
 
   if (!isAuthorized) {
-    return NextResponse.json({ error: "Unauthorized developer action." }, { status: 401 });
+    return NextResponse.json({ error: "Not Found" }, { status: 404 });
   }
 
   try {

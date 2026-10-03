@@ -8,7 +8,7 @@ import buyerNav from "@/config/BuyerNav";
 import type { User } from "firebase/auth";
 import { useRouter, usePathname } from "next/navigation";
 import storesData from "@/data/stores.json";
-import { getStoreRelativePath } from "@/lib/storeUrl";
+import { getStoreRelativePath, getAdminConsoleUrl } from "@/lib/storeUrl";
 import { useChat } from "@/context/ChatContext";
 
 interface SidebarProps {
@@ -140,6 +140,14 @@ export default function Sidebar({
     }
   };
 
+  const handleOpenAdminConsole = () => {
+    onClose();
+    if (typeof window !== "undefined") {
+      const targetUrl = getAdminConsoleUrl(window.location.host);
+      window.location.href = targetUrl;
+    }
+  };
+
   const scrollToSection = (id: string) => {
     onClose();
     if (typeof document !== "undefined") {
@@ -216,7 +224,7 @@ export default function Sidebar({
               <button
                 className={sideStyles.switchModeBtn}
                 style={{ background: "#111827", color: "#a5b4fc", borderColor: "#3730a3" }}
-                onClick={() => navigate("/developer")}
+                onClick={handleOpenAdminConsole}
               >
                 <span className="material-icons-round" style={{ fontSize: "18px", color: "#818cf8" }}>terminal</span>
                 Developer Console
@@ -412,7 +420,7 @@ export default function Sidebar({
                 <SideButton
                   label="Developer Console"
                   icon="terminal"
-                  onClick={() => navigate("/developer")}
+                  onClick={handleOpenAdminConsole}
                   active={pathname === "/developer"}
                 />
               )}

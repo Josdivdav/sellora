@@ -23,9 +23,10 @@ export async function GET(request: NextRequest) {
   const devKey = request.headers.get("x-developer-key") || request.nextUrl.searchParams.get("key");
   const configuredPasscode = process.env.DEVELOPER_PASSCODE || process.env.DEV_PASSCODE || "sellora-dev-2026";
   const adminEmail = (process.env.ADMIN_EMAIL || process.env.GMAIL_USER || "joshuadivine985@gmail.com").toLowerCase().trim();
+  const devCookie = request.cookies.get("sellora_dev_auth")?.value;
 
   let isAuthorized = false;
-  let authorizedAs: "token" | "key" | null = null;
+  let authorizedAs: "token" | "key" | "cookie" | null = null;
   let authenticatedEmail: string | null = null;
 
   // 1. Check Passcode / Dev Key
@@ -35,7 +36,14 @@ export async function GET(request: NextRequest) {
     authenticatedEmail = "Developer Key Authenticated";
   }
 
-  // 2. Check Firebase ID Token (Admin Email)
+  // 2. Check Cookie
+  if (!isAuthorized && devCookie === "1") {
+    isAuthorized = true;
+    authorizedAs = "cookie";
+    authenticatedEmail = "Developer Secret Session";
+  }
+
+  // 3. Check Firebase ID Token (Admin Email)
   if (!isAuthorized && authHeader?.startsWith("Bearer ")) {
     const token = authHeader.slice(7);
     try {
@@ -51,13 +59,7 @@ export async function GET(request: NextRequest) {
   }
 
   if (!isAuthorized) {
-    return NextResponse.json(
-      {
-        error: "Unauthorized: Developer or Platform Administrator credentials required.",
-        hint: "Provide valid Developer Passcode or log in as platform administrator.",
-      },
-      { status: 401 }
-    );
+    return NextResponse.json({ error: "Not Found" }, { status: 404 });
   }
 
   try {

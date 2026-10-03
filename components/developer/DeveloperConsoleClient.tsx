@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import Link from "next/link";
 import styles from "./developer.module.css";
 import { useAuth } from "@/context/AuthContext";
+import { getAdminConsoleUrl } from "@/lib/storeUrl";
 
 type TabKey = "feed" | "users" | "stores" | "orders" | "conversations" | "system";
 
@@ -42,6 +43,8 @@ export default function DeveloperConsoleClient() {
   const [showKey, setShowKey] = useState(false);
   const [isUnlocked, setIsUnlocked] = useState(false);
   const [gateError, setGateError] = useState("");
+  const [isAdminHost, setIsAdminHost] = useState(false);
+  const [adminUrl, setAdminUrl] = useState("");
 
   // Data State
   const [data, setData] = useState<any>(null);
@@ -65,8 +68,13 @@ export default function DeveloperConsoleClient() {
     setTimeout(() => setToast(null), 3500);
   };
 
-  // Check stored key on mount
+  // Check stored key and admin host on mount
   useEffect(() => {
+    if (typeof window !== "undefined") {
+      const host = window.location.host.toLowerCase();
+      setIsAdminHost(host.startsWith("admin."));
+      setAdminUrl(getAdminConsoleUrl(window.location.host));
+    }
     const stored = sessionStorage.getItem("sellora_developer_key");
     if (stored) {
       setDevKey(stored);
@@ -79,6 +87,9 @@ export default function DeveloperConsoleClient() {
     if (user && !isUnlocked) {
       const email = user.email?.toLowerCase();
       if (email === "joshuadivine985@gmail.com") {
+        if (typeof document !== "undefined") {
+          document.cookie = "sellora_dev_auth=1; path=/; max-age=604800; SameSite=Lax";
+        }
         setIsUnlocked(true);
       }
     }
@@ -103,7 +114,7 @@ export default function DeveloperConsoleClient() {
       const json = await res.json();
 
       if (!res.ok) {
-        if (res.status === 401) {
+        if (res.status === 401 || res.status === 404) {
           setIsUnlocked(false);
           setGateError(json.error || "Authentication failed. Please verify passcode.");
         }
@@ -112,6 +123,9 @@ export default function DeveloperConsoleClient() {
 
       setData(json);
       setIsUnlocked(true);
+      if (typeof document !== "undefined") {
+        document.cookie = "sellora_dev_auth=1; path=/; max-age=604800; SameSite=Lax";
+      }
       if (devKey) {
         sessionStorage.setItem("sellora_developer_key", devKey);
       }
@@ -151,6 +165,9 @@ export default function DeveloperConsoleClient() {
   };
 
   const handleLock = () => {
+    if (typeof document !== "undefined") {
+      document.cookie = "sellora_dev_auth=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+    }
     sessionStorage.removeItem("sellora_developer_key");
     setDevKey("");
     setIsUnlocked(false);
@@ -434,6 +451,23 @@ export default function DeveloperConsoleClient() {
           </div>
 
           <div className={styles.topNavActions}>
+            {isAdminHost ? (
+              <div className={styles.liveIndicator} style={{ background: "rgba(99, 102, 241, 0.15)", color: "#a5b4fc", borderColor: "rgba(99, 102, 241, 0.3)" }}>
+                <span className="material-icons-round" style={{ fontSize: "14px" }}>shield</span>
+                <span>ADMIN SUBDOMAIN</span>
+              </div>
+            ) : (
+              <a
+                href={adminUrl || "https://admin.devico.online"}
+                className={styles.navActionBtn}
+                style={{ borderColor: "rgba(99, 102, 241, 0.4)", color: "#a5b4fc" }}
+                title="Switch to secret standalone admin subdomain"
+              >
+                <span className="material-icons-round" style={{ fontSize: "16px" }}>domain</span>
+                <span>admin.[domain]</span>
+              </a>
+            )}
+
             <div className={styles.liveIndicator}>
               <span className={styles.liveDot} />
               <span>LIVE CLUSTER</span>

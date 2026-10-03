@@ -43,6 +43,45 @@ export function proxy(request: NextRequest) {
     }
   }
 
+  // ── SPECIAL SUBDOMAIN: ADMIN / DEVELOPER CONSOLE ──
+  // Matches admin.devico.online, admin.localhost, or any admin.* host
+  const isAdminDomain =
+    subdomain === 'admin' ||
+    hostname === 'admin.localhost' ||
+    hostname.startsWith('admin.');
+
+  if (isAdminDomain) {
+    const requestHeaders = new Headers(request.headers);
+    requestHeaders.set('x-is-admin-domain', 'true');
+
+    // On admin subdomain, root / or /admin rewrites directly to /developer
+    if (pathname === '/' || pathname === '' || pathname === '/admin') {
+      const rewriteUrl = new URL(`/developer${search}`, request.url);
+      return NextResponse.rewrite(rewriteUrl, {
+        request: { headers: requestHeaders },
+      });
+    }
+
+    // Allow all other routes on admin domain (e.g. /developer, static files, auth)
+    return NextResponse.next({
+      request: { headers: requestHeaders },
+    });
+  }
+
+  // ── SECRECY GUARD: HIDE /developer ON MAIN / PUBLIC DOMAIN ──
+  // If anyone tries to access /developer directly on the main public site without authorization:
+  if (pathname === '/developer' || pathname.startsWith('/developer/')) {
+    const devCookie = request.cookies.get('sellora_dev_auth')?.value;
+    const devSecretPass = process.env.DEVELOPER_PASSCODE || process.env.DEV_PASSCODE || 'sellora-dev-2026';
+    const isDevSecretParam = request.nextUrl.searchParams.get('key') === devSecretPass;
+
+    // If not on admin domain and without secret auth/cookie, return 404 (Not Found)
+    if (!isAdminDomain && !devCookie && !isDevSecretParam) {
+      const notFoundUrl = new URL('/_not-found', request.url);
+      return NextResponse.rewrite(notFoundUrl);
+    }
+  }
+
   // If a store subdomain is present (e.g. storename.devico.online)
   if (subdomain && !isReservedRoute(subdomain)) {
     const requestHeaders = new Headers(request.headers);

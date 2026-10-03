@@ -16,6 +16,8 @@ export const RESERVED_PATHS = new Set([
   "account",
   "products",
   "api",
+  "admin",
+  "developer",
   "_next",
   "favicon.ico",
   "favicon.png",
@@ -124,3 +126,26 @@ export function isReservedRoute(slug: string): boolean {
   const clean = slug.toLowerCase().trim().replace(/^@+/, "");
   return RESERVED_PATHS.has(clean);
 }
+
+/**
+ * Returns the secret standalone admin domain URL:
+ * - Production: `https://admin.devico.online`
+ * - Dev: `http://admin.localhost:3000`
+ */
+export function getAdminConsoleUrl(customHost?: string): string {
+  const mainDomain = (process.env.NEXT_PUBLIC_MAIN_DOMAIN || "devico.online").toLowerCase();
+  let host = customHost;
+  if (!host && typeof window !== "undefined") {
+    host = window.location.host;
+  }
+  if (host) {
+    const hostname = host.split(":")[0].toLowerCase();
+    const port = host.split(":")[1] ? `:${host.split(":")[1]}` : "";
+    if (hostname === "localhost" || hostname.endsWith(".localhost") || hostname === "127.0.0.1") {
+      return `http://admin.localhost${port}`;
+    }
+    return `https://admin.${mainDomain}`;
+  }
+  return `https://admin.${mainDomain}`;
+}
+
