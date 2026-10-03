@@ -323,17 +323,7 @@ export default function TrackOrderClient() {
                   </div>
                 </div>
 
-                <div
-                  style={{
-                    marginTop: "18px",
-                    fontSize: "13px",
-                    color: "#475569",
-                    display: "flex",
-                    justifyContent: "space-between",
-                    flexWrap: "wrap",
-                    gap: "8px",
-                  }}
-                >
+                <div className={styles.progressMeta}>
                   <div>
                     <strong>Estimated Arrival:</strong>{" "}
                     {new Date(trackingData.estimatedDelivery).toLocaleDateString("en-NG", {
