@@ -5,8 +5,9 @@ import Link from "next/link";
 import styles from "./developer.module.css";
 import { useAuth } from "@/context/AuthContext";
 import { getAdminConsoleUrl } from "@/lib/storeUrl";
+import DeveloperCharts from "./DeveloperCharts";
 
-type TabKey = "feed" | "users" | "stores" | "orders" | "conversations" | "system";
+type TabKey = "analytics" | "feed" | "users" | "stores" | "orders" | "conversations" | "system";
 
 const currency = new Intl.NumberFormat("en-NG", {
   style: "currency",
@@ -49,7 +50,7 @@ export default function DeveloperConsoleClient() {
   // Data State
   const [data, setData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<TabKey>("feed");
+  const [activeTab, setActiveTab] = useState<TabKey>("analytics");
   const [toast, setToast] = useState<string | null>(null);
 
   // Filters
@@ -533,8 +534,30 @@ export default function DeveloperConsoleClient() {
       <main className={styles.container}>
         {/* ── Top Metric Cards Ribbon ── */}
         <section className={styles.metricsGrid}>
+          {/* Platform GMV & Orders */}
+          <div
+            className={styles.metricCard}
+            onClick={() => setActiveTab("analytics")}
+            title="View Revenue & GMV Analytics Charts"
+          >
+            <div className={styles.metricIconWrap} style={{ background: "rgba(245, 158, 11, 0.15)", color: "#fbbf24" }}>
+              <span className="material-icons-round">account_balance_wallet</span>
+            </div>
+            <div className={styles.metricDetails}>
+              <span className={styles.metricLabel}>Platform GMV</span>
+              <span className={styles.metricValue}>{currency.format(summary.totalGMV)}</span>
+              <span className={styles.metricSub}>
+                {summary.totalOrders} Orders Placed • View Charts →
+              </span>
+            </div>
+          </div>
+
           {/* Total Users */}
-          <div className={styles.metricCard}>
+          <div
+            className={styles.metricCard}
+            onClick={() => setActiveTab("users")}
+            title="Inspect Registered Users Directory"
+          >
             <div className={styles.metricIconWrap} style={{ background: "rgba(59, 130, 246, 0.15)", color: "#60a5fa" }}>
               <span className="material-icons-round">people</span>
             </div>
@@ -548,7 +571,11 @@ export default function DeveloperConsoleClient() {
           </div>
 
           {/* Total Stores */}
-          <div className={styles.metricCard}>
+          <div
+            className={styles.metricCard}
+            onClick={() => setActiveTab("stores")}
+            title="Inspect Stores & Merchants"
+          >
             <div className={styles.metricIconWrap} style={{ background: "rgba(16, 185, 129, 0.15)", color: "#34d399" }}>
               <span className="material-icons-round">storefront</span>
             </div>
@@ -562,7 +589,11 @@ export default function DeveloperConsoleClient() {
           </div>
 
           {/* Total Products */}
-          <div className={styles.metricCard}>
+          <div
+            className={styles.metricCard}
+            onClick={() => setActiveTab("analytics")}
+            title="View Product & Category Distribution"
+          >
             <div className={styles.metricIconWrap} style={{ background: "rgba(168, 85, 247, 0.15)", color: "#c084fc" }}>
               <span className="material-icons-round">inventory_2</span>
             </div>
@@ -575,22 +606,12 @@ export default function DeveloperConsoleClient() {
             </div>
           </div>
 
-          {/* Platform GMV & Orders */}
-          <div className={styles.metricCard}>
-            <div className={styles.metricIconWrap} style={{ background: "rgba(245, 158, 11, 0.15)", color: "#fbbf24" }}>
-              <span className="material-icons-round">account_balance_wallet</span>
-            </div>
-            <div className={styles.metricDetails}>
-              <span className={styles.metricLabel}>Platform GMV</span>
-              <span className={styles.metricValue}>{currency.format(summary.totalGMV)}</span>
-              <span className={styles.metricSub}>
-                {summary.totalOrders} Orders Placed
-              </span>
-            </div>
-          </div>
-
           {/* In-App Chat Inquiries */}
-          <div className={styles.metricCard}>
+          <div
+            className={styles.metricCard}
+            onClick={() => setActiveTab("conversations")}
+            title="View Customer Messages & Conversations"
+          >
             <div className={styles.metricIconWrap} style={{ background: "rgba(236, 72, 153, 0.15)", color: "#f472b6" }}>
               <span className="material-icons-round">forum</span>
             </div>
@@ -602,7 +623,11 @@ export default function DeveloperConsoleClient() {
           </div>
 
           {/* Referrals */}
-          <div className={styles.metricCard}>
+          <div
+            className={styles.metricCard}
+            onClick={() => setActiveTab("stores")}
+            title="View Merchant Growth & Referrals"
+          >
             <div className={styles.metricIconWrap} style={{ background: "rgba(99, 102, 241, 0.15)", color: "#a5b4fc" }}>
               <span className="material-icons-round">card_giftcard</span>
             </div>
@@ -616,6 +641,16 @@ export default function DeveloperConsoleClient() {
 
         {/* ── Navigation Tabs ── */}
         <nav className={styles.tabsBar} aria-label="Developer tabs">
+          <button
+            type="button"
+            className={`${styles.tabItem} ${activeTab === "analytics" ? styles.tabItemActive : ""}`}
+            onClick={() => { setActiveTab("analytics"); setSearchQuery(""); }}
+          >
+            <span className="material-icons-round" style={{ fontSize: "17px" }}>insights</span>
+            <span>Analytics &amp; Charts</span>
+            <span className={styles.tabBadge} style={{ background: "rgba(16, 185, 129, 0.2)", color: "#34d399" }}>LIVE</span>
+          </button>
+
           <button
             type="button"
             className={`${styles.tabItem} ${activeTab === "feed" ? styles.tabItemActive : ""}`}
@@ -675,6 +710,18 @@ export default function DeveloperConsoleClient() {
             <span>System Health</span>
           </button>
         </nav>
+
+        {/* ── TAB 0: ANALYTICS & VISUAL CHARTS ── */}
+        {activeTab === "analytics" && (
+          <DeveloperCharts
+            users={data?.users || []}
+            stores={data?.stores || []}
+            orders={data?.orders || []}
+            categories={data?.categories || []}
+            currency={currency}
+            summary={summary}
+          />
+        )}
 
         {/* ── TAB 1: LIVE ACTIVITY FEED ── */}
         {activeTab === "feed" && (

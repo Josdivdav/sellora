@@ -1,0 +1,649 @@
+/* Developer Console Analytics & Visual Charts Stylesheet */
+
+.chartsRoot {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+}
+
+/* Overview Highlights Grid */
+.highlightsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.highlightCard {
+  background: rgba(17, 24, 39, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.highlightCard::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.6), transparent);
+  opacity: 0.5;
+  transition: opacity 0.25s ease;
+}
+
+.highlightCard:hover {
+  transform: translateY(-2px);
+  border-color: rgba(99, 102, 241, 0.3);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(99, 102, 241, 0.15);
+}
+
+.highlightCard:hover::before {
+  opacity: 1;
+}
+
+.highlightHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.highlightTitle {
+  font-size: 12px;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+.highlightIcon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  font-size: 18px;
+}
+
+.highlightValue {
+  font-size: 26px;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.5px;
+  line-height: 1.15;
+}
+
+.highlightMeta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #64748b;
+  flex-wrap: wrap;
+}
+
+.highlightBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* Main Chart Card (e.g. GMV Trajectory) */
+.chartCard {
+  background: rgba(17, 24, 39, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.2s ease;
+}
+
+.chartCard:hover {
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+.chartCardHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.chartTitleGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.chartTitle {
+  font-size: 17px;
+  font-weight: 800;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  letter-spacing: -0.3px;
+  margin: 0;
+}
+
+.chartSubtitle {
+  font-size: 12.5px;
+  color: #94a3b8;
+  margin: 0;
+}
+
+.chartControls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* Segmented Toggle Pills */
+.segmentedGroup {
+  display: inline-flex;
+  align-items: center;
+  background: #0f172a;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 3px;
+  gap: 2px;
+}
+
+.segmentedBtn {
+  border: none;
+  background: transparent;
+  color: #94a3b8;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 9px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.segmentedBtn:hover {
+  color: #ffffff;
+}
+
+.segmentedBtnActive {
+  background: #1e293b;
+  color: #ffffff;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+/* Chart Summary Metric Pills Row */
+.metricSummaryRow {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 14px;
+  padding: 14px 18px;
+  margin-bottom: 20px;
+}
+
+.summaryItem {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.summaryLabel {
+  font-size: 11px;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.summaryValue {
+  font-size: 17px;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.3px;
+}
+
+/* SVG Chart Container */
+.svgChartWrap {
+  width: 100%;
+  position: relative;
+  overflow: visible;
+  touch-action: pan-y;
+}
+
+.svgChart {
+  width: 100%;
+  height: auto;
+  display: block;
+  overflow: visible;
+}
+
+/* SVG Chart Elements */
+.gridLine {
+  stroke: rgba(255, 255, 255, 0.05);
+  stroke-dasharray: 4 4;
+}
+
+.axisText {
+  fill: #64748b;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.areaGradient {
+  opacity: 0.25;
+  transition: opacity 0.2s ease;
+}
+
+.chartCard:hover .areaGradient {
+  opacity: 0.32;
+}
+
+.chartLine {
+  fill: none;
+  stroke-width: 3px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 4px 12px rgba(99, 102, 241, 0.45));
+}
+
+.chartDataPoint {
+  fill: #0b0f19;
+  stroke-width: 2.5px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.chartDataPoint:hover,
+.chartDataPointActive {
+  r: 6px;
+  stroke-width: 3.5px;
+  fill: #ffffff;
+  filter: drop-shadow(0 0 8px currentColor);
+}
+
+.crosshairLine {
+  stroke: rgba(255, 255, 255, 0.25);
+  stroke-dasharray: 3 3;
+  stroke-width: 1.5px;
+}
+
+/* Floating Chart Tooltip */
+.chartTooltip {
+  position: absolute;
+  pointer-events: none;
+  background: #111827;
+  border: 1px solid rgba(99, 102, 241, 0.4);
+  border-radius: 12px;
+  padding: 10px 14px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.06);
+  z-index: 50;
+  transform: translate(-50%, -115%);
+  transition: left 0.08s ease, top 0.08s ease;
+  min-width: 140px;
+}
+
+.tooltipDate {
+  font-size: 11px;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.tooltipValue {
+  font-size: 15px;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.3px;
+}
+
+.tooltipSub {
+  font-size: 11px;
+  color: #a5b4fc;
+  margin-top: 2px;
+}
+
+/* Dual Column Secondary Charts Grid */
+.twoColGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+/* Donut Chart Styles */
+.donutFlex {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  gap: 24px;
+  padding: 10px 0;
+}
+
+.donutSvgWrap {
+  position: relative;
+  width: 210px;
+  height: 210px;
+  flex-shrink: 0;
+}
+
+.donutSvg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.donutSegment {
+  fill: none;
+  stroke-width: 20;
+  stroke-linecap: round;
+  transition: stroke-width 0.2s ease, opacity 0.2s ease;
+  cursor: pointer;
+}
+
+.donutSegment:hover,
+.donutSegmentActive {
+  stroke-width: 24;
+  filter: drop-shadow(0 0 8px currentColor);
+}
+
+.donutCenter {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: none;
+}
+
+.donutCenterValue {
+  font-size: 26px;
+  font-weight: 900;
+  color: #ffffff;
+  line-height: 1.1;
+  letter-spacing: -0.5px;
+}
+
+.donutCenterLabel {
+  font-size: 11px;
+  font-weight: 600;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 2px;
+}
+
+.donutLegend {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+  min-width: 200px;
+}
+
+.legendRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: rgba(15, 23, 42, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.legendRow:hover,
+.legendRowActive {
+  background: rgba(30, 41, 59, 0.7);
+  border-color: rgba(255, 255, 255, 0.1);
+  transform: translateX(3px);
+}
+
+.legendLeft {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.legendDot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.legendName {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #cbd5e1;
+}
+
+.legendRight {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.legendCount {
+  font-size: 13px;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.legendPct {
+  font-size: 11px;
+  font-weight: 700;
+  color: #64748b;
+  min-width: 32px;
+  text-align: right;
+}
+
+/* Bar Track Charts (Ranked Categories & Growth) */
+.barList {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.barItem {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.barHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12.5px;
+}
+
+.barCategoryName {
+  font-weight: 600;
+  color: #cbd5e1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.barValueText {
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.barTrack {
+  height: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 50px;
+  overflow: hidden;
+  position: relative;
+}
+
+.barFill {
+  height: 100%;
+  border-radius: 50px;
+  transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 0 10px rgba(99, 102, 241, 0.3);
+}
+
+.barMeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  color: #64748b;
+}
+
+/* User & Store Growth Vertical Bar Columns */
+.growthBarsContainer {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  height: 200px;
+  padding: 20px 0 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  gap: 10px;
+}
+
+.growthBarCol {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  height: 100%;
+  justify-content: flex-end;
+  gap: 8px;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.growthBarCol:hover {
+  transform: translateY(-2px);
+}
+
+.growthPillGroup {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  height: 150px;
+  width: 100%;
+  justify-content: center;
+}
+
+.growthPillUser {
+  width: 12px;
+  background: linear-gradient(180deg, #6366f1, #4338ca);
+  border-radius: 4px 4px 0 0;
+  transition: height 0.5s ease;
+  min-height: 4px;
+}
+
+.growthPillStore {
+  width: 12px;
+  background: linear-gradient(180deg, #10b981, #047857);
+  border-radius: 4px 4px 0 0;
+  transition: height 0.5s ease;
+  min-height: 4px;
+}
+
+.growthColLabel {
+  font-size: 10.5px;
+  color: #64748b;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Split Ratio Metric Card */
+.splitProgressContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.splitProgressBar {
+  display: flex;
+  height: 12px;
+  border-radius: 6px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.splitLegend {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11.5px;
+  color: #94a3b8;
+}
+
+/* Empty State inside chart */
+.emptyChart {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+  color: #64748b;
+  gap: 8px;
+}
+
+/* Responsive Breakpoints */
+@media (max-width: 1024px) {
+  .twoColGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .chartCard {
+    padding: 18px 14px;
+    border-radius: 16px;
+  }
+
+  .chartCardHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .donutFlex {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .metricSummaryRow {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
