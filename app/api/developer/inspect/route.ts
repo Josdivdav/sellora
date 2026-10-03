@@ -3,8 +3,6 @@ import { getAuth } from "firebase-admin/auth";
 import { db } from "@/lib/firebaseAdmin";
 import { getAllProducts } from "@/lib/getProduct";
 import { isEmailConfigured } from "@/lib/email";
-import seedStores from "@/data/stores.json";
-import seedOrders from "@/data/orders.json";
 
 export const dynamic = "force-dynamic";
 
@@ -95,63 +93,32 @@ export async function GET(request: NextRequest) {
       return tB - tA;
     });
 
-    // 2. Fetch Stores
+    // 2. Fetch Stores (Directly from Firestore)
     const storesMap = new Map<string, any>();
-    // Pre-populate with seed stores for baseline
-    if (Array.isArray(seedStores)) {
-      seedStores.forEach((s: any) => {
-        storesMap.set(s.id || s.slug, {
-          id: s.id || s.slug,
-          name: s.name,
-          slug: s.slug || s.name.toLowerCase().replace(/[^a-z0-9]/g, "-"),
-          category: s.category || "General",
-          description: s.description || "",
-          ownerId: s.ownerId || "seed_system",
-          ownerEmail: s.email || null,
-          isVerified: Boolean(s.isVerified),
-          isPremium: Boolean(s.isPremium),
-          plan: s.plan || (s.isPremium ? "Premium" : "Starter"),
-          phone: s.phone || s.whatsapp || "",
-          whatsapp: s.whatsapp || s.phone || "",
-          location: s.location || "Nigeria",
-          logo: s.logo || null,
-          banner: s.banner || null,
-          rating: s.rating || 5,
-          reviewCount: s.reviewCount || 0,
-          joinedDate: s.joinedDate || s.createdAt || "2026-01-01T00:00:00.000Z",
-          productCount: Array.isArray(s.products) ? s.products.length : 0,
-          source: "Seed Store",
-        });
-      });
-    }
-
-    // Merge live Firestore stores
     try {
       const storesSnap = await db.collection("stores").get();
       storesSnap.forEach((doc) => {
         const d = doc.data();
-        const existing = storesMap.get(doc.id) || storesMap.get(d.slug) || {};
         storesMap.set(doc.id, {
-          ...existing,
           id: doc.id,
-          name: d.name || existing.name || "Untitled Store",
-          slug: d.slug || existing.slug || doc.id,
-          category: d.category || existing.category || "General",
-          description: d.description || existing.description || "",
+          name: d.name || "Untitled Store",
+          slug: d.slug || doc.id,
+          category: d.category || "General",
+          description: d.description || "",
           ownerId: d.ownerId || doc.id,
-          ownerEmail: d.email || usersMap.get(d.ownerId || doc.id)?.email || existing.ownerEmail || null,
-          isVerified: Boolean(d.isVerified !== undefined ? d.isVerified : existing.isVerified),
-          isPremium: Boolean(d.isPremium !== undefined ? d.isPremium : existing.isPremium),
+          ownerEmail: d.email || usersMap.get(d.ownerId || doc.id)?.email || null,
+          isVerified: Boolean(d.isVerified),
+          isPremium: Boolean(d.isPremium),
           plan: d.plan || (d.isPremium ? "Premium" : "Starter"),
-          phone: d.phone || d.whatsapp || existing.phone || "",
-          whatsapp: d.whatsapp || d.phone || existing.whatsapp || "",
-          location: d.location || existing.location || "Nigeria",
-          logo: d.logo || existing.logo || null,
-          banner: d.banner || existing.banner || null,
-          rating: d.rating || existing.rating || 5,
-          reviewCount: d.reviewCount || existing.reviewCount || 0,
-          joinedDate: d.joinedDate || d.createdAt || d.updatedAt || existing.joinedDate || new Date().toISOString(),
-          productCount: Array.isArray(d.products) ? d.products.length : existing.productCount || 0,
+          phone: d.phone || d.whatsapp || "",
+          whatsapp: d.whatsapp || d.phone || "",
+          location: d.location || "Nigeria",
+          logo: d.logo || null,
+          banner: d.banner || null,
+          rating: d.rating || 5,
+          reviewCount: d.reviewCount || 0,
+          joinedDate: d.joinedDate || d.createdAt || d.updatedAt || new Date().toISOString(),
+          productCount: Array.isArray(d.products) ? d.products.length : (d.productsCount || 0),
           source: "Firestore Registered",
         });
       });
@@ -165,31 +132,8 @@ export async function GET(request: NextRequest) {
       return tB - tA;
     });
 
-    // 3. Fetch Orders
+    // 3. Fetch Orders (Directly from Firestore)
     const ordersMap = new Map<string, any>();
-    if (Array.isArray(seedOrders)) {
-      seedOrders.forEach((o: any) => {
-        ordersMap.set(o.id, {
-          id: o.id,
-          orderNumber: o.orderNumber || o.id,
-          trackingNumber: o.trackingNumber || `SEL-${o.id}`,
-          userId: o.userId || "seed_customer",
-          customerName: o.shippingAddress?.fullName || o.customer?.name || "Customer",
-          customerEmail: o.shippingAddress?.email || o.customer?.email || "customer@example.com",
-          customerPhone: o.shippingAddress?.phone || o.customer?.phone || "",
-          storeName: o.items?.[0]?.storeName || o.storeName || "Marketplace Store",
-          storeId: o.storeId || o.storeIds?.[0] || "",
-          total: Number(o.pricing?.total ?? o.total ?? 0),
-          status: o.status || "PROCESSING",
-          paymentStatus: o.payment?.status || "PENDING",
-          paymentMethod: o.payment?.method || "WHATSAPP_CONFIRMATION",
-          itemCount: Array.isArray(o.items) ? o.items.reduce((acc: number, it: any) => acc + (it.quantity || 1), 0) : 1,
-          createdAt: o.createdAt || "2026-03-01T00:00:00.000Z",
-          source: "Seed Order",
-        });
-      });
-    }
-
     try {
       const ordersSnap = await db.collection("orders").get();
       ordersSnap.forEach((doc) => {

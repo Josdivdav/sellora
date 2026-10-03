@@ -7,7 +7,6 @@ import SideButton from "@/components/SideButton";
 import buyerNav from "@/config/BuyerNav";
 import type { User } from "firebase/auth";
 import { useRouter, usePathname } from "next/navigation";
-import storesData from "@/data/stores.json";
 import { getStoreRelativePath, getAdminConsoleUrl } from "@/lib/storeUrl";
 import { useChat } from "@/context/ChatContext";
 
