@@ -57,18 +57,6 @@ export async function GET(request: NextRequest) {
         tags: Array.isArray(data.tags) ? data.tags : [],
         createdAt: data.createdAt || new Date().toISOString(),
         updatedAt: data.updatedAt,
-        isAffiliateEnabled: Boolean(data.isAffiliateEnabled),
-        affiliateCommissionPercentage:
-          data.affiliateCommissionPercentage !== undefined
-            ? Number(data.affiliateCommissionPercentage)
-            : undefined,
-        affiliateCommissionAmount:
-          data.affiliateCommissionAmount !== undefined
-            ? Number(data.affiliateCommissionAmount)
-            : undefined,
-        affiliateCode: data.affiliateCode || '',
-        affiliateMarketingUrl: data.affiliateMarketingUrl || '',
-        affiliateTerms: data.affiliateTerms || '',
       });
     });
 
@@ -195,29 +183,6 @@ export async function POST(request: NextRequest) {
     const numOldPrice = body.oldPrice ? Number(body.oldPrice) : null;
     const slug = body.slug || name.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
 
-    // Affiliate marketing setup
-    const isAffiliateEnabled = Boolean(body.isAffiliateEnabled);
-    const affiliateCommissionPercentage = isAffiliateEnabled
-      ? Number(body.affiliateCommissionPercentage || 10)
-      : undefined;
-    const affiliateCommissionAmount = isAffiliateEnabled
-      ? Number(body.affiliateCommissionAmount || Math.round((numPrice * (affiliateCommissionPercentage || 10)) / 100))
-      : undefined;
-    const storePrefix = (storeData.slug || storeData.name || 'SEL')
-      .replace(/[^a-zA-Z0-9]/g, '')
-      .slice(0, 4)
-      .toUpperCase();
-    const affiliateCode = isAffiliateEnabled
-      ? (body.affiliateCode ? String(body.affiliateCode).trim().toUpperCase() : `AFF-${storePrefix}-${Math.random().toString(36).substring(2, 7).toUpperCase()}`)
-      : undefined;
-
-    const host = request.headers.get('host') || 'devico.online';
-    const protocol = host.includes('localhost') ? 'http' : 'https';
-    const affiliateMarketingUrl = isAffiliateEnabled && affiliateCode
-      ? `${protocol}://${host}/products/${productId}?aff=${affiliateCode}`
-      : undefined;
-    const affiliateTerms = body.affiliateTerms ? String(body.affiliateTerms).trim() : undefined;
-
     const newProduct: Product = {
       id: productId,
       name: name.trim(),
@@ -240,12 +205,6 @@ export async function POST(request: NextRequest) {
       tags: Array.isArray(body.tags) ? body.tags : [],
       createdAt: body.createdAt || new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-      isAffiliateEnabled,
-      affiliateCommissionPercentage,
-      affiliateCommissionAmount,
-      affiliateCode,
-      affiliateMarketingUrl,
-      affiliateTerms,
     };
 
     const subDocRef = storeRef.collection('products').doc(productId);

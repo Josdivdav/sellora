@@ -8,7 +8,6 @@ import DeleteProductModal from "./DeleteProductModal";
 import EditStoreModal from "./EditStoreModal";
 import UpgradeToPremiumModal from "./UpgradeToPremiumModal";
 import ProductDetailsModal from "./ProductDetailsModal";
-import AffiliateSuccessModal from "./AffiliateSuccessModal";
 import type { Store } from "@/types/store";
 import type { Product } from "@/types/product";
 import type { Order } from "@/types/order";
@@ -104,7 +103,6 @@ export default function ManageStoreDashboard({
   const [deletingProduct, setDeletingProduct] = useState<Product | null>(null);
   const [isEditStoreModalOpen, setIsEditStoreModalOpen] = useState(false);
   const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
-  const [affiliateSuccessProduct, setAffiliateSuccessProduct] = useState<Product | null>(null);
 
   // Load store, products, and customer orders from backend database
   const loadData = useCallback(async () => {
@@ -234,9 +232,6 @@ export default function ManageStoreDashboard({
       );
       setProducts(updated);
       onShowToast(`Updated "${savedProduct.name}"`);
-      if (updatedProd.isAffiliateEnabled && !editingProduct?.isAffiliateEnabled) {
-        setAffiliateSuccessProduct(updatedProd);
-      }
     } else {
       // Add new product to backend
       const res = await fetch("/api/user/store/products", {
@@ -265,10 +260,6 @@ export default function ManageStoreDashboard({
         setStore(updatedStore);
       }
       onShowToast(`Added "${savedProduct.name}" to store catalog`);
-
-      if (newProd.isAffiliateEnabled) {
-        setAffiliateSuccessProduct(newProd);
-      }
     }
 
     setIsProductModalOpen(false);
@@ -373,18 +364,6 @@ export default function ManageStoreDashboard({
     }
   };
 
-  // Copy Product Unique Affiliate Link
-  const handleCopyProductAffiliateLink = (p: Product) => {
-    const baseUrl = typeof window !== "undefined" ? window.location.origin : "https://devico.online";
-    const url =
-      p.affiliateMarketingUrl ||
-      `${baseUrl}/products/${p.id}?aff=${encodeURIComponent(p.affiliateCode || "partner")}`;
-    if (typeof navigator !== "undefined" && navigator.clipboard) {
-      navigator.clipboard.writeText(url);
-      onShowToast(`Copied unique affiliate link for "${p.name}"!`);
-    }
-  };
-
   // Filtered Products
   const filteredProducts = useMemo(() => {
     return products.filter((p) => {
@@ -398,7 +377,6 @@ export default function ManageStoreDashboard({
       if (statusFilter === "IN_STOCK") matchesStatus = stockNum >= 10;
       if (statusFilter === "LOW_STOCK") matchesStatus = stockNum > 0 && stockNum < 10;
       if (statusFilter === "OUT_OF_STOCK") matchesStatus = stockNum <= 0;
-      if (statusFilter === "AFFILIATE") matchesStatus = Boolean(p.isAffiliateEnabled);
 
       const matchesCat =
         categoryFilter === "ALL" || p.category === categoryFilter;
@@ -1054,7 +1032,6 @@ export default function ManageStoreDashboard({
                   <option value="IN_STOCK">In Stock (10+)</option>
                   <option value="LOW_STOCK">Low Stock (1-9)</option>
                   <option value="OUT_OF_STOCK">Out of Stock (0)</option>
-                  <option value="AFFILIATE">Affiliate Enabled</option>
                 </select>
 
                 {categoriesList.length > 1 && (
@@ -1166,12 +1143,6 @@ export default function ManageStoreDashboard({
                         <div className={styles.productCardContent}>
                           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "6px" }}>
                             <span className={styles.productCardCategory}>{p.category}</span>
-                            {p.isAffiliateEnabled && (
-                              <span className={styles.affiliateBadgePill} title="Affiliate Marketing Active">
-                                <span className="material-icons-round" style={{ fontSize: "11px" }}>campaign</span>
-                                {p.affiliateCommissionPercentage || 10}%
-                              </span>
-                            )}
                           </div>
                           <h3 className={styles.productCardTitle} title={p.name}>{p.name}</h3>
                           {p.sku && <span className={styles.productCardSku}>SKU: {p.sku}</span>}
@@ -1183,17 +1154,6 @@ export default function ManageStoreDashboard({
                               )}
                             </div>
                             <div className={styles.productCardQuickActions}>
-                              {p.isAffiliateEnabled && (
-                                <button
-                                  type="button"
-                                  className={styles.editBtn}
-                                  style={{ color: "#2563eb", background: "#eff6ff", borderColor: "#bfdbfe" }}
-                                  onClick={(e) => { e.stopPropagation(); setAffiliateSuccessProduct(p); }}
-                                  title="Affiliate Marketing Link & Share Hub"
-                                >
-                                  <span className="material-icons-round" style={{ fontSize: "16px" }}>campaign</span>
-                                </button>
-                              )}
                               <button
                                 type="button"
                                 className={styles.editBtn}
@@ -1250,12 +1210,7 @@ export default function ManageStoreDashboard({
                                   <span className={styles.productTitle}>{p.name}</span>
                                   <div style={{ display: "flex", gap: "6px", alignItems: "center", flexWrap: "wrap", marginTop: "2px" }}>
                                     {p.sku && <span className={styles.productSku}>SKU: {p.sku}</span>}
-                                    {p.isAffiliateEnabled && (
-                                      <span className={styles.affiliateBadgePill} title="Affiliate Marketing Active">
-                                        <span className="material-icons-round" style={{ fontSize: "11px" }}>campaign</span>
-                                        {p.affiliateCommissionPercentage || 10}% Affiliate
-                                      </span>
-                                    )}
+
                                   </div>
                                 </div>
                               </div>
@@ -1291,17 +1246,7 @@ export default function ManageStoreDashboard({
                             </td>
                             <td>
                               <div className={styles.actionBtns}>
-                                {p.isAffiliateEnabled && (
-                                  <button
-                                    type="button"
-                                    className={styles.editBtn}
-                                    style={{ color: "#2563eb", background: "#eff6ff", borderColor: "#bfdbfe" }}
-                                    onClick={(e) => { e.stopPropagation(); setAffiliateSuccessProduct(p); }}
-                                    title="Affiliate Marketing Link & Share Hub"
-                                  >
-                                    <span className="material-icons-round" style={{ fontSize: "16px" }}>campaign</span>
-                                  </button>
-                                )}
+
                                 <button
                                   type="button"
                                   className={styles.editBtn}
@@ -1361,7 +1306,6 @@ export default function ManageStoreDashboard({
           onClose={() => setSelectedProductForDetails(null)}
           onEdit={(prod) => { setSelectedProductForDetails(null); setEditingProduct(prod); setIsProductModalOpen(true); }}
           onDelete={(prod) => { setSelectedProductForDetails(null); setDeletingProduct(prod); setIsDeleteModalOpen(true); }}
-          onViewAffiliate={(prod) => { setSelectedProductForDetails(null); setAffiliateSuccessProduct(prod); }}
         />
       )}
       {isProductModalOpen && (
@@ -1397,13 +1341,6 @@ export default function ManageStoreDashboard({
             setStore(updated);
             onShowToast(`🎉 Upgraded! ${updated.slug}.devico.online is now live.`);
           }}
-        />
-      )}
-      {affiliateSuccessProduct && (
-        <AffiliateSuccessModal
-          product={affiliateSuccessProduct}
-          currencyFormatter={currency}
-          onClose={() => setAffiliateSuccessProduct(null)}
         />
       )}
     </div>

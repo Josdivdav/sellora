@@ -70,58 +70,10 @@ export default function ProductFormModal({
     productToEdit?.tags ? productToEdit.tags.join(", ") : ""
   );
 
-  // Stable Product ID (ensures affiliate URL preview matches actual created ID)
+  // Stable Product ID
   const [productId] = useState<string>(
     () => productToEdit?.id || `prod_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`
   );
-
-  // ── Affiliate Marketing Configuration ──
-  const storePrefix = (storeName || "SEL")
-    .replace(/[^a-zA-Z0-9]/g, "")
-    .slice(0, 4)
-    .toUpperCase();
-
-  const generateAffiliateCode = () => {
-    return `AFF-${storePrefix || "SEL"}-${Math.floor(1000 + Math.random() * 9000)}`;
-  };
-
-  const [isAffiliateEnabled, setIsAffiliateEnabled] = useState<boolean>(
-    Boolean(productToEdit?.isAffiliateEnabled)
-  );
-  const [affiliateRate, setAffiliateRate] = useState<number | string>(
-    productToEdit?.affiliateCommissionPercentage !== undefined
-      ? productToEdit.affiliateCommissionPercentage
-      : 10
-  );
-  const [affiliateCode, setAffiliateCode] = useState<string>(
-    productToEdit?.affiliateCode || generateAffiliateCode()
-  );
-  const [affiliateTerms, setAffiliateTerms] = useState<string>(
-    productToEdit?.affiliateTerms || ""
-  );
-  const [copiedAffiliateLink, setCopiedAffiliateLink] = useState(false);
-
-  const numAffiliateRate = Number(affiliateRate) || 0;
-  const numSellingPrice = Number(price) || 0;
-  const estimatedCommission = Math.round((numSellingPrice * numAffiliateRate) / 100);
-
-  // Live marketing URL preview using the real product ID and active code
-  const baseUrl = typeof window !== "undefined" ? window.location.origin : "https://devico.online";
-  const cleanAffiliateCode = (affiliateCode || "PARTNER").trim().toUpperCase();
-  const generatedAffiliateUrl = `${baseUrl}/products/${productId}?aff=${encodeURIComponent(cleanAffiliateCode)}`;
-
-  const handleCopyAffiliateLink = () => {
-    if (typeof navigator !== "undefined" && navigator.clipboard) {
-      navigator.clipboard.writeText(generatedAffiliateUrl);
-      setCopiedAffiliateLink(true);
-      setTimeout(() => setCopiedAffiliateLink(false), 2500);
-    }
-  };
-
-  const handleShareAffiliateWhatsApp = () => {
-    const text = `Earn ₦${estimatedCommission.toLocaleString()} (${numAffiliateRate}%) commission by promoting "${name || "this product"}" on Sellora!\n\nOfficial marketing link: ${generatedAffiliateUrl}`;
-    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank", "noopener,noreferrer");
-  };
 
   const [error, setError] = useState("");
   const [isSaving, setIsSaving] = useState(false);
@@ -248,12 +200,6 @@ export default function ProductFormModal({
       tags,
       createdAt: productToEdit?.createdAt || new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-      isAffiliateEnabled,
-      affiliateCommissionPercentage: isAffiliateEnabled ? numAffiliateRate : undefined,
-      affiliateCommissionAmount: isAffiliateEnabled ? estimatedCommission : undefined,
-      affiliateCode: isAffiliateEnabled ? cleanAffiliateCode : undefined,
-      affiliateMarketingUrl: isAffiliateEnabled ? generatedAffiliateUrl : undefined,
-      affiliateTerms: isAffiliateEnabled && affiliateTerms.trim() ? affiliateTerms.trim() : undefined,
     };
 
     setIsSaving(true);
@@ -423,164 +369,6 @@ export default function ProductFormModal({
                   </label>
                 )}
               </div>
-            </div>
-
-            {/* ── Affiliate Marketing Configuration ── */}
-            <div className={styles.affiliateSectionCard}>
-              <div className={styles.affiliateToggleHeader}>
-                <div className={styles.affiliateToggleTitleWrap}>
-                  <div className={styles.affiliateIconWrap}>
-                    <span className="material-icons-round" style={{ fontSize: "20px" }}>campaign</span>
-                  </div>
-                  <div>
-                    <h4 className={styles.affiliateToggleTitle}>Affiliate Marketing & Commissions</h4>
-                    <p className={styles.affiliateToggleSubtitle}>
-                      Allow marketers, influencers, and buyers to promote this product with a unique marketing URL and earn a commission per sale.
-                    </p>
-                  </div>
-                </div>
-
-                <label className={styles.switchLabel} title="Toggle affiliate marketing">
-                  <input
-                    type="checkbox"
-                    className={styles.switchInput}
-                    checked={isAffiliateEnabled}
-                    onChange={(e) => setIsAffiliateEnabled(e.target.checked)}
-                  />
-                  <span className={styles.switchSlider} />
-                </label>
-              </div>
-
-              {isAffiliateEnabled && (
-                <div className={styles.affiliateConfigBody}>
-                  {/* Commission Rate Row */}
-                  <div className={styles.twoColRow}>
-                    <div className={styles.formGroup}>
-                      <label className={styles.formLabel}>
-                        Affiliate Commission Rate (%) <span style={{ color: "#e11d48" }}>*</span>
-                      </label>
-                      <input
-                        type="number"
-                        className={styles.formInput}
-                        value={affiliateRate}
-                        onChange={(e) => setAffiliateRate(e.target.value)}
-                        placeholder="e.g. 10"
-                        min="1"
-                        max="80"
-                        step="1"
-                        required={isAffiliateEnabled}
-                      />
-                      <div className={styles.presetRateRow}>
-                        {[5, 10, 15, 20, 25, 30].map((preset) => (
-                          <button
-                            key={preset}
-                            type="button"
-                            className={`${styles.presetRateBtn} ${
-                              Number(affiliateRate) === preset ? styles.presetRateBtnActive : ""
-                            }`}
-                            onClick={() => setAffiliateRate(preset)}
-                          >
-                            {preset}%
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className={styles.formGroup}>
-                      <label className={styles.formLabel}>
-                        Unique Affiliate Promo Code <span style={{ color: "#e11d48" }}>*</span>
-                      </label>
-                      <div className={styles.affiliateCodeInputRow}>
-                        <input
-                          type="text"
-                          className={styles.formInput}
-                          value={affiliateCode}
-                          onChange={(e) => setAffiliateCode(e.target.value.toUpperCase().replace(/\s+/g, "-"))}
-                          placeholder="e.g. AFF-STORE-123"
-                          required={isAffiliateEnabled}
-                        />
-                        <button
-                          type="button"
-                          className={styles.affiliateRefreshCodeBtn}
-                          onClick={() => setAffiliateCode(generateAffiliateCode())}
-                          title="Generate new random code"
-                        >
-                          <span className="material-icons-round" style={{ fontSize: "18px" }}>refresh</span>
-                        </button>
-                      </div>
-                      <span style={{ fontSize: "11px", color: "#64748b", marginTop: "4px" }}>
-                        Unique marketing parameter attached to this product link.
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Live Commission Estimate */}
-                  <div className={styles.affiliateEstimatePill}>
-                    <span className="material-icons-round" style={{ fontSize: "18px", color: "#059669" }}>
-                      payments
-                    </span>
-                    <span>
-                      Promoters earn <strong>₦{estimatedCommission.toLocaleString()}</strong> per completed sale ({numAffiliateRate}% of ₦{numSellingPrice.toLocaleString()}).
-                    </span>
-                  </div>
-
-                  {/* Unique Marketing URL Preview */}
-                  <div className={styles.affiliateUrlPreviewBox}>
-                    <div className={styles.affiliateUrlPreviewHeader}>
-                      <span>Unique Affiliate Marketing URL</span>
-                      <span style={{ color: "#059669", textTransform: "none", fontWeight: 700, display: "inline-flex", alignItems: "center", gap: "4px" }}>
-                        <span className="material-icons-round" style={{ fontSize: "14px" }}>check_circle</span>
-                        {isEditing ? "Live product link" : "Ready to share upon listing"}
-                      </span>
-                    </div>
-                    <div className={styles.affiliateUrlRow}>
-                      <input
-                        type="text"
-                        readOnly
-                        value={generatedAffiliateUrl}
-                        className={styles.affiliateUrlText}
-                        title={generatedAffiliateUrl}
-                        onClick={(e) => (e.target as HTMLInputElement).select()}
-                      />
-                      <button
-                        type="button"
-                        className={`${styles.affiliateCopyBtn} ${
-                          copiedAffiliateLink ? styles.affiliateCopyBtnSuccess : ""
-                        }`}
-                        onClick={handleCopyAffiliateLink}
-                      >
-                        <span className="material-icons-round" style={{ fontSize: "14px" }}>
-                          {copiedAffiliateLink ? "check" : "content_copy"}
-                        </span>
-                        {copiedAffiliateLink ? "Copied!" : "Copy Link"}
-                      </button>
-                      <button
-                        type="button"
-                        className={styles.affiliateShareWhatsAppBtn}
-                        onClick={handleShareAffiliateWhatsApp}
-                        title="Share on WhatsApp"
-                      >
-                        <span className="material-icons-round" style={{ fontSize: "14px" }}>
-                          chat
-                        </span>
-                        WhatsApp
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Optional Terms */}
-                  <div className={styles.formGroup} style={{ marginBottom: 0 }}>
-                    <label className={styles.formLabel}>Affiliate Terms & Payout Notes (Optional)</label>
-                    <input
-                      type="text"
-                      className={styles.formInput}
-                      value={affiliateTerms}
-                      onChange={(e) => setAffiliateTerms(e.target.value)}
-                      placeholder="e.g. Commission paid out after 7-day delivery return window."
-                    />
-                  </div>
-                </div>
-              )}
             </div>
 
             {/* Description */}

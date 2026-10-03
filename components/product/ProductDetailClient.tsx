@@ -103,43 +103,6 @@ export default function ProductDetailClient({
     setIsSubdomain(subCheck);
   }, []);
 
-  // Active Affiliate Referral tracking state
-  const [activeAffiliateCode, setActiveAffiliateCode] = useState<string | null>(null);
-
-  // Capture affiliate marketing referral tracking parameter
-  useEffect(() => {
-    if (typeof window === "undefined" || !product?.id) return;
-    try {
-      const urlParams = new URLSearchParams(window.location.search);
-      const affCode = urlParams.get("aff");
-      if (affCode) {
-        const cleanCode = affCode.trim();
-        setActiveAffiliateCode(cleanCode);
-        const attribution = {
-          code: cleanCode,
-          productId: product.id,
-          storeId: product.storeId,
-          timestamp: Date.now(),
-        };
-        localStorage.setItem(`sellora_aff_${product.id}`, JSON.stringify(attribution));
-        localStorage.setItem("sellora_last_aff_attribution", JSON.stringify(attribution));
-        document.cookie = `sellora_aff=${encodeURIComponent(cleanCode)}; path=/; max-age=2592000; SameSite=Lax`;
-      } else {
-        const stored =
-          localStorage.getItem(`sellora_aff_${product.id}`) ||
-          localStorage.getItem("sellora_last_aff_attribution");
-        if (stored) {
-          const parsed = JSON.parse(stored);
-          if (parsed?.code) {
-            setActiveAffiliateCode(parsed.code);
-          }
-        }
-      }
-    } catch {
-      // ignore
-    }
-  }, [product?.id, product?.storeId]);
-
   // Resolve store details for this product's author / merchant
   useEffect(() => {
     if (!product?.author) return;
@@ -687,8 +650,6 @@ export default function ProductDetailClient({
                 onToggleWishlist={handleToggleWishlist}
                 isWishlisted={isWishlisted}
                 isAuthor={isAuthor}
-                activeAffiliateCode={activeAffiliateCode}
-                user={user}
               />
             </section>
 
@@ -799,8 +760,6 @@ export default function ProductDetailClient({
               onToggleWishlist={handleToggleWishlist}
               isWishlisted={isWishlisted}
               isAuthor={isAuthor}
-              activeAffiliateCode={activeAffiliateCode}
-              user={user}
             />
           </section>
 

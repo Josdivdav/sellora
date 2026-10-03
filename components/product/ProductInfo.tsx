@@ -1,10 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import styles from "./product.module.css";
 import type { Product } from "@/types/product";
-import type { User } from "firebase/auth";
 import { getStoreRelativePath } from "@/lib/storeUrl";
 
 const currency = new Intl.NumberFormat("en-NG", {
@@ -21,8 +20,6 @@ interface ProductInfoProps {
   onToggleWishlist: (product: Product) => void;
   isWishlisted: boolean;
   isAuthor?: boolean;
-  activeAffiliateCode?: string | null;
-  user?: User | null;
 }
 
 export default function ProductInfo({
@@ -33,44 +30,10 @@ export default function ProductInfo({
   onToggleWishlist,
   isWishlisted,
   isAuthor = false,
-  activeAffiliateCode = null,
-  user = null,
 }: ProductInfoProps) {
   const [quantity, setQuantity] = useState(1);
   const roundedRating = Math.round(product.rating);
   const maxStock = product.stock || 50;
-
-  // Track if registered user has opted into promoting this product ("wants to join")
-  const [hasJoinedAffiliate, setHasJoinedAffiliate] = useState<boolean>(false);
-
-  useEffect(() => {
-    if (!user?.uid || !product?.id) {
-      setHasJoinedAffiliate(false);
-      return;
-    }
-    try {
-      const stored = localStorage.getItem(`sellora_aff_joined_${user.uid}_${product.id}`);
-      setHasJoinedAffiliate(stored === "true");
-    } catch {
-      setHasJoinedAffiliate(false);
-    }
-  }, [user?.uid, product?.id]);
-
-  const handleJoinAffiliate = () => {
-    if (!user?.uid || !product?.id) return;
-    setHasJoinedAffiliate(true);
-    try {
-      localStorage.setItem(`sellora_aff_joined_${user.uid}_${product.id}`, "true");
-    } catch {}
-  };
-
-  const handleLeaveAffiliate = () => {
-    if (!user?.uid || !product?.id) return;
-    setHasJoinedAffiliate(false);
-    try {
-      localStorage.removeItem(`sellora_aff_joined_${user.uid}_${product.id}`);
-    } catch {}
-  };
 
   const handleDecrease = () => {
     setQuantity((prev) => Math.max(1, prev - 1));
@@ -81,29 +44,6 @@ export default function ProductInfo({
   };
 
   const discountAmount = product.oldPrice ? product.oldPrice - product.price : 0;
-
-  // Affiliate Marketing calculation & unique marketing link
-  const [copiedAffiliate, setCopiedAffiliate] = useState(false);
-  const baseUrl = typeof window !== "undefined" ? window.location.origin : "https://devico.online";
-  const affiliateMarketingUrl =
-    product.affiliateMarketingUrl ||
-    `${baseUrl}/products/${product.id}?aff=${encodeURIComponent(product.affiliateCode || "partner")}`;
-  const affiliateCommissionAmount =
-    product.affiliateCommissionAmount ||
-    Math.round((product.price * (product.affiliateCommissionPercentage || 10)) / 100);
-
-  const handleCopyAffiliate = () => {
-    if (typeof navigator !== "undefined" && navigator.clipboard) {
-      navigator.clipboard.writeText(affiliateMarketingUrl);
-      setCopiedAffiliate(true);
-      setTimeout(() => setCopiedAffiliate(false), 2200);
-    }
-  };
-
-  const handleShareAffiliateWhatsApp = () => {
-    const text = `Earn ₦${affiliateCommissionAmount.toLocaleString()} (${product.affiliateCommissionPercentage || 10}%) commission by promoting "${product.name}" on Sellora! Use this official affiliate link: ${affiliateMarketingUrl}`;
-    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank", "noopener,noreferrer");
-  };
 
   return (
     <div className={styles.infoWrap}>
@@ -327,174 +267,7 @@ export default function ProductInfo({
         </div>
       )}
 
-      {/* Affiliate Marketing Section: Only shown to registered users and wants to join (or store owner) */}
-      {product.isAffiliateEnabled && (
-        isAuthor ? (
-          /* Store owner viewing their listing */
-          <div className={styles.affiliatePromoCard}>
-            <div className={styles.affiliatePromoHeader}>
-              <div className={styles.affiliatePromoLeft}>
-                <div className={styles.affiliateBadgeIcon}>
-                  <span className="material-icons-round" style={{ fontSize: "20px" }}>
-                    campaign
-                  </span>
-                </div>
-                <div>
-                  <h4 className={styles.affiliatePromoTitle}>
-                    Your Affiliate Listing: ₦{affiliateCommissionAmount.toLocaleString()} / sale
-                    <span className={styles.affiliateCommissionTag}>
-                      {product.affiliateCommissionPercentage || 10}% Commission
-                    </span>
-                  </h4>
-                  <p className={styles.affiliatePromoDesc}>
-                    Your listing offers commission to promoters. Share your official unique affiliate marketing link below.
-                  </p>
-                </div>
-              </div>
-            </div>
 
-            <div className={styles.affiliateLinkDisplay} title={affiliateMarketingUrl}>
-              {affiliateMarketingUrl}
-            </div>
-
-            <div className={styles.affiliatePromoActions}>
-              <button
-                type="button"
-                className={`${styles.affiliateCopyLinkBtn} ${
-                  copiedAffiliate ? styles.affiliateCopyLinkBtnCopied : ""
-                }`}
-                onClick={handleCopyAffiliate}
-              >
-                <span className="material-icons-round" style={{ fontSize: "16px" }}>
-                  {copiedAffiliate ? "check" : "content_copy"}
-                </span>
-                {copiedAffiliate ? "Link Copied!" : "Copy Affiliate Link"}
-              </button>
-
-              <button
-                type="button"
-                className={styles.affiliateWhatsAppShareBtn}
-                onClick={handleShareAffiliateWhatsApp}
-              >
-                <span className="material-icons-round" style={{ fontSize: "16px", color: "#25d366" }}>
-                  chat
-                </span>
-                Share on WhatsApp
-              </button>
-            </div>
-          </div>
-        ) : user ? (
-          /* Registered user */
-          hasJoinedAffiliate ? (
-            /* Registered user who wants to join and has joined */
-            <div className={styles.affiliatePromoCard}>
-              <div className={styles.affiliatePromoHeader}>
-                <div className={styles.affiliatePromoLeft}>
-                  <div className={styles.affiliateBadgeIcon}>
-                    <span className="material-icons-round" style={{ fontSize: "20px" }}>
-                      campaign
-                    </span>
-                  </div>
-                  <div>
-                    <h4 className={styles.affiliatePromoTitle}>
-                      Affiliate Program: Earn ₦{affiliateCommissionAmount.toLocaleString()} / sale
-                      <span className={styles.affiliateCommissionTag}>
-                        {product.affiliateCommissionPercentage || 10}% Commission
-                      </span>
-                    </h4>
-                    <p className={styles.affiliatePromoDesc}>
-                      You are an active affiliate promoter for this product. Share your unique marketing link below to earn commissions on every referred purchase.
-                    </p>
-                  </div>
-                </div>
-
-                <span className={styles.affiliateActiveStatusPill}>
-                  <span className="material-icons-round" style={{ fontSize: "13px" }}>
-                    check_circle
-                  </span>
-                  Active Affiliate
-                </span>
-              </div>
-
-              <div className={styles.affiliateLinkDisplay} title={affiliateMarketingUrl}>
-                {affiliateMarketingUrl}
-              </div>
-
-              <div className={styles.affiliatePromoActions}>
-                <button
-                  type="button"
-                  className={`${styles.affiliateCopyLinkBtn} ${
-                    copiedAffiliate ? styles.affiliateCopyLinkBtnCopied : ""
-                  }`}
-                  onClick={handleCopyAffiliate}
-                >
-                  <span className="material-icons-round" style={{ fontSize: "16px" }}>
-                    {copiedAffiliate ? "check" : "content_copy"}
-                  </span>
-                  {copiedAffiliate ? "Link Copied!" : "Copy Affiliate Link"}
-                </button>
-
-                <button
-                  type="button"
-                  className={styles.affiliateWhatsAppShareBtn}
-                  onClick={handleShareAffiliateWhatsApp}
-                >
-                  <span className="material-icons-round" style={{ fontSize: "16px", color: "#25d366" }}>
-                    chat
-                  </span>
-                  Share on WhatsApp
-                </button>
-
-                <button
-                  type="button"
-                  className={styles.affiliateLeaveBtn}
-                  onClick={handleLeaveAffiliate}
-                  title="Opt out of promoting this product"
-                >
-                  Opt out
-                </button>
-              </div>
-            </div>
-          ) : (
-            /* Registered user who hasn't joined yet — asks if they want to join */
-            <div className={styles.affiliateJoinCard}>
-              <div className={styles.affiliatePromoHeader}>
-                <div className={styles.affiliatePromoLeft}>
-                  <div className={styles.affiliateBadgeIcon}>
-                    <span className="material-icons-round" style={{ fontSize: "20px" }}>
-                      campaign
-                    </span>
-                  </div>
-                  <div>
-                    <h4 className={styles.affiliatePromoTitle}>
-                      Sellora Affiliate Program
-                      <span className={styles.affiliateCommissionTag}>
-                        {product.affiliateCommissionPercentage || 10}% Commission
-                      </span>
-                    </h4>
-                    <p className={styles.affiliatePromoDesc}>
-                      Earn ₦{affiliateCommissionAmount.toLocaleString()} commission on every customer who buys this product through your link.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className={styles.affiliateJoinActionRow}>
-                <button
-                  type="button"
-                  className={styles.affiliateJoinBtn}
-                  onClick={handleJoinAffiliate}
-                >
-                  <span className="material-icons-round" style={{ fontSize: "16px" }}>
-                    handshake
-                  </span>
-                  Want to Join as an Affiliate
-                </button>
-              </div>
-            </div>
-          )
-        ) : null /* Unregistered guests do not see affiliation */
-      )}
 
       {/* Trust & Guarantees */}
       <div className={styles.assurancesList}>

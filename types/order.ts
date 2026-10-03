@@ -83,5 +83,4 @@ export interface Order {
   payment: PaymentDetails;
   trackingEvents: TrackingEvent[];
   notes?: string;
-  affiliateCode?: string;
 }

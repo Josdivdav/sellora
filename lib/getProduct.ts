@@ -145,18 +145,6 @@ export async function getProductById(idOrSlug: string): Promise<Product | null> 
       specifications: productData.specifications || {},
       createdAt: productData.createdAt || new Date().toISOString(),
       updatedAt: productData.updatedAt,
-      isAffiliateEnabled: Boolean(productData.isAffiliateEnabled),
-      affiliateCommissionPercentage:
-        productData.affiliateCommissionPercentage !== undefined
-          ? Number(productData.affiliateCommissionPercentage)
-          : undefined,
-      affiliateCommissionAmount:
-        productData.affiliateCommissionAmount !== undefined
-          ? Number(productData.affiliateCommissionAmount)
-          : undefined,
-      affiliateCode: productData.affiliateCode || "",
-      affiliateMarketingUrl: productData.affiliateMarketingUrl || "",
-      affiliateTerms: productData.affiliateTerms || "",
     };
 
     setInCache(resolvedProduct);
@@ -253,18 +241,6 @@ export async function getAllProducts(): Promise<{
         specifications: data.specifications || {},
         createdAt: data.createdAt || new Date().toISOString(),
         updatedAt: data.updatedAt,
-        isAffiliateEnabled: Boolean(data.isAffiliateEnabled),
-        affiliateCommissionPercentage:
-          data.affiliateCommissionPercentage !== undefined
-            ? Number(data.affiliateCommissionPercentage)
-            : undefined,
-        affiliateCommissionAmount:
-          data.affiliateCommissionAmount !== undefined
-            ? Number(data.affiliateCommissionAmount)
-            : undefined,
-        affiliateCode: data.affiliateCode || "",
-        affiliateMarketingUrl: data.affiliateMarketingUrl || "",
-        affiliateTerms: data.affiliateTerms || "",
       });
     });
 

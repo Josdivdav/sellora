@@ -21,12 +21,5 @@ export interface Product {
   specifications?: Record<string, string | undefined>;
   createdAt?: string;
   updatedAt?: string;
-
-  // Affiliate Marketing
-  isAffiliateEnabled?: boolean;
-  affiliateCommissionPercentage?: number; // e.g. 10 (meaning 10%)
-  affiliateCommissionAmount?: number;     // e.g. 3500 (₦3,500)
-  affiliateCode?: string;                 // unique marketing code e.g. "AFF-JOS-489"
-  affiliateMarketingUrl?: string;         // canonical unique marketing URL
-  affiliateTerms?: string;                // optional terms / instructions
 }
+

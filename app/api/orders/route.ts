@@ -227,7 +227,6 @@ export async function POST(request: NextRequest) {
       payment,
       trackingEvents,
       notes: String(body.notes || body.deliveryNotes || ""),
-      affiliateCode: body.affiliateCode ? String(body.affiliateCode).trim() : undefined,
       storeIds,
     };
 

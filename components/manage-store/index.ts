@@ -3,7 +3,6 @@ export { default as ManageStoreDashboard } from "./ManageStoreDashboard";
 export { default as ProductFormModal } from "./ProductFormModal";
 export { default as DeleteProductModal } from "./DeleteProductModal";
 export { default as EditStoreModal } from "./EditStoreModal";
-export { default as AffiliateSuccessModal } from "./AffiliateSuccessModal";
 export { default as UpgradeToPremiumModal } from "./UpgradeToPremiumModal";
 export { default as HomeHeader } from "@/components/home/HomeHeader";
 export { default as Sidebar } from "@/components/SidebarN";
