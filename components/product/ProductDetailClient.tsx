@@ -688,6 +688,7 @@ export default function ProductDetailClient({
                 isWishlisted={isWishlisted}
                 isAuthor={isAuthor}
                 activeAffiliateCode={activeAffiliateCode}
+                user={user}
               />
             </section>
 
@@ -799,6 +800,7 @@ export default function ProductDetailClient({
               isWishlisted={isWishlisted}
               isAuthor={isAuthor}
               activeAffiliateCode={activeAffiliateCode}
+              user={user}
             />
           </section>
 
