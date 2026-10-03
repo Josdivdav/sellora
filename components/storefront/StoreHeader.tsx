@@ -275,6 +275,39 @@ export default function StoreHeader({
         </div>
       </div>
 
+      {/* 2.5 MOBILE SEARCH ROW */}
+      <div className={styles.mobileSearchRow}>
+        <div className={styles.mobileSearchWrap}>
+          <span className={`material-icons-round ${styles.headerSearchIcon}`}>
+            search
+          </span>
+          <input
+            type="text"
+            className={styles.headerSearchInput}
+            placeholder={`Search products in ${store.name}...`}
+            value={searchQuery}
+            onChange={(e) => {
+              onSearchChange(e.target.value);
+              if (activeTab !== "products") {
+                onTabChange("products");
+              }
+            }}
+          />
+          {searchQuery && (
+            <button
+              type="button"
+              className={styles.headerSearchClearBtn}
+              onClick={() => onSearchChange("")}
+              aria-label="Clear search"
+            >
+              <span className="material-icons-round" style={{ fontSize: "16px" }}>
+                close
+              </span>
+            </button>
+          )}
+        </div>
+      </div>
+
       {/* 3. STORE NAVIGATION MENU BAR */}
       <nav className={styles.storeNavBar} aria-label="Store navigation">
         <div className={styles.storeNavContainer}>

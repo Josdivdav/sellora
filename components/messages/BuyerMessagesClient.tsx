@@ -254,7 +254,7 @@ export default function BuyerMessagesClient() {
           ) : (
             <div className={styles.chatContainer}>
               {/* Left Column: Conversations List */}
-              <aside className={styles.sidebarPanel}>
+              <aside className={`${styles.sidebarPanel} ${selectedConvId ? styles.mobileHidden : ""}`}>
                 <div className={styles.searchWrap}>
                   <span className={`material-icons-round ${styles.searchIcon}`}>search</span>
                   <input
@@ -358,12 +358,23 @@ export default function BuyerMessagesClient() {
               </aside>
 
               {/* Right Column: Chat Thread */}
-              <section className={styles.chatArea}>
+              <section className={`${styles.chatArea} ${!selectedConvId ? styles.mobileHidden : ""}`}>
                 {activeConv ? (
                   <>
                     {/* Header */}
                     <div className={styles.chatHead}>
                       <div className={styles.chatHeadLeft}>
+                        <button
+                          type="button"
+                          className={styles.mobileBackBtn}
+                          onClick={() => setSelectedConvId(null)}
+                          aria-label="Back to conversations list"
+                        >
+                          <span className="material-icons-round" style={{ fontSize: "18px" }}>
+                            arrow_back
+                          </span>
+                          <span>Chats</span>
+                        </button>
                         <div className={styles.storeAvatar}>
                           {(activeConv.storeName || "S")[0].toUpperCase()}
                         </div>

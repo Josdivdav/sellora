@@ -166,10 +166,63 @@
   box-shadow: 0 4px 20px rgba(11, 18, 48, 0.05);
 }
 
+.mobileBackBtn {
+  display: none;
+  align-items: center;
+  gap: 4px;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #334155;
+  cursor: pointer;
+  margin-right: 4px;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+}
+
+.mobileBackBtn:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
 @media (max-width: 860px) {
   .chatContainer {
-    grid-template-columns: 1fr;
-    height: 720px;
+    display: flex;
+    flex-direction: column;
+    height: calc(100dvh - 200px);
+    min-height: 520px;
+  }
+
+  .mobileHidden {
+    display: none !important;
+  }
+
+  .mobileBackBtn {
+    display: inline-flex;
+  }
+
+  .chatHead {
+    padding: 10px 14px;
+  }
+
+  .productCardBanner {
+    max-width: 170px;
+    padding: 4px 8px;
+  }
+
+  .productName {
+    font-size: 11px;
+    max-width: 90px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .productPrice {
+    font-size: 11px;
   }
 }
 

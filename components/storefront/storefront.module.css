@@ -1670,6 +1670,10 @@
   }
 }
 
+.mobileSearchRow {
+  display: none;
+}
+
 @media (max-width: 768px) {
   .mobileMenuBtn {
     display: block;
@@ -1677,6 +1681,48 @@
 
   .headerSearchWrap {
     display: none;
+  }
+
+  .mobileSearchRow {
+    display: block;
+    padding: 0 16px 12px;
+    background: #ffffff;
+    border-bottom: 1px solid #edf2f7;
+  }
+
+  .mobileSearchWrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+  }
+
+  .mobileSearchWrap .headerSearchInput {
+    width: 100%;
+    padding: 9px 36px 9px 36px;
+    font-size: 13px;
+    border-radius: 50px;
+    border: 1px solid #e2e8f0;
+    background: #f8fafc;
+  }
+
+  .mobileSearchWrap .headerSearchIcon {
+    position: absolute;
+    left: 12px;
+    font-size: 18px;
+    color: #94a3b8;
+    pointer-events: none;
+  }
+
+  .mobileSearchWrap .headerSearchClearBtn {
+    position: absolute;
+    right: 10px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #94a3b8;
+    display: grid;
+    place-items: center;
   }
 
   .headerWhatsappText {
@@ -1696,6 +1742,47 @@
   }
 
   .contentArea {
-    padding: 16px 12px 40px;
+    padding: 14px 10px 40px;
+  }
+}
+
+@media (max-width: 640px) {
+  .productsGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .storeBrandTitle {
+    font-size: 14.5px;
+    max-width: 130px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .storeBrandSub {
+    font-size: 11px;
+  }
+
+  .headerMainRow {
+    padding: 8px 0;
+  }
+
+  .headerActions {
+    gap: 6px;
+  }
+
+  .headerWhatsappBtn {
+    padding: 6px 10px;
+  }
+
+  .headerCartBtn {
+    padding: 6px 10px;
+  }
+}
+
+@media (max-width: 360px) {
+  .productsGrid {
+    grid-template-columns: 1fr;
   }
 }

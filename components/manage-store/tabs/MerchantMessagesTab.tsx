@@ -240,7 +240,7 @@ export default function MerchantMessagesTab({ store, user, onShowToast }: Props)
       {/* Main Two-Column Chat Container */}
       <div className={styles.chatLayout}>
         {/* Left Column: Conversations List */}
-        <aside className={styles.convListPanel}>
+        <aside className={`${styles.convListPanel} ${selectedConvId ? styles.mobileHidden : ""}`}>
           <div className={styles.convSearchWrap}>
             <span className={`material-icons-round ${styles.searchIcon}`}>search</span>
             <input
@@ -319,12 +319,23 @@ export default function MerchantMessagesTab({ store, user, onShowToast }: Props)
         </aside>
 
         {/* Right Column: Chat Thread */}
-        <section className={styles.chatPanel}>
+        <section className={`${styles.chatPanel} ${!selectedConvId ? styles.mobileHidden : ""}`}>
           {activeConv ? (
             <>
               {/* Active Conversation Header */}
               <div className={styles.chatHeader}>
                 <div className={styles.chatHeaderLeft}>
+                  <button
+                    type="button"
+                    className={styles.mobileBackBtn}
+                    onClick={() => setSelectedConvId(null)}
+                    aria-label="Back to customer inquiries"
+                  >
+                    <span className="material-icons-round" style={{ fontSize: "18px" }}>
+                      arrow_back
+                    </span>
+                    <span>Inquiries</span>
+                  </button>
                   <div className={styles.avatar}>
                     {(activeConv.buyerName || "B")[0].toUpperCase()}
                   </div>

@@ -993,3 +993,179 @@
   transform: translateY(-1px);
 }
 
+/* ==========================================================================
+   RESPONSIVE MOBILE BREAKPOINTS FOR MERCHANT HUB TABS
+   ========================================================================== */
+@media (max-width: 768px) {
+  .card {
+    padding: 18px 16px;
+    border-radius: 16px;
+    margin-bottom: 16px;
+  }
+
+  .statRow {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+
+  .statPill {
+    min-width: 0;
+    padding: 12px 14px;
+    gap: 10px;
+    border-radius: 14px;
+  }
+
+  .statPillIcon {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    font-size: 18px;
+  }
+
+  .statPillValue {
+    font-size: 18px;
+  }
+
+  .statPillLabel {
+    font-size: 11px;
+  }
+
+  .filterRow {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .searchInput {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .filterSelect {
+    width: 100%;
+  }
+
+  .formGrid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .orderCard {
+    padding: 16px 14px;
+    border-radius: 16px;
+  }
+
+  .orderHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .orderCustomerGrid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    padding: 12px 0;
+  }
+
+  .orderFooter {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+    padding-top: 14px;
+  }
+
+  .orderTotalSummary {
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .orderActionsRow {
+    flex-direction: column;
+    width: 100%;
+    gap: 8px;
+  }
+
+  .actionBtnPrimary,
+  .actionBtnSecondary,
+  .actionBtnDanger {
+    width: 100%;
+    justify-content: center;
+    padding: 10px 14px;
+  }
+
+  .promosGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .milestoneCard {
+    padding: 18px 16px;
+    border-radius: 16px;
+  }
+
+  .referralHeroCard {
+    padding: 20px 18px;
+    border-radius: 16px;
+  }
+
+  .referralLinkBox {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 12px;
+    gap: 10px;
+  }
+
+  .referralLinkText {
+    min-width: 0;
+    font-size: 12px;
+  }
+
+  .referralCopyBtn,
+  .referralWhatsAppBtn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .statRow {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .tabTitle {
+    font-size: 18px;
+  }
+
+  .orderItemRow {
+    gap: 10px;
+  }
+
+  .orderItemThumb {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+  }
+
+  .orderItemName {
+    font-size: 13px;
+  }
+
+  .orderItemPrice {
+    font-size: 13px;
+  }
+
+  .milestoneHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .milestoneClaimBtn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+

@@ -751,6 +751,39 @@
     padding: 16px;
     border-radius: 18px;
   }
+
+  .productTitle {
+    font-size: 20px;
+  }
+
+  .currentPrice {
+    font-size: 24px;
+  }
+
+  .purchaseRow {
+    gap: 10px;
+  }
+
+  .addToCartBtn,
+  .buyNowBtn {
+    flex: 1 1 100%;
+    min-width: 0;
+    justify-content: center;
+  }
+
+  .storeBanner {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .storeBannerLink {
+    width: 100%;
+  }
+
+  .chatSellerBtn {
+    width: 100%;
+    justify-content: center;
+  }
 }
 
 

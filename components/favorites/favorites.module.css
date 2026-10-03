@@ -1158,3 +1158,29 @@
     justify-content: center;
   }
 }
+
+@media (max-width: 640px) {
+  .arrivalsGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .tabsHeader {
+    gap: 6px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px;
+  }
+
+  .tabBtn {
+    padding: 8px 14px;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 360px) {
+  .arrivalsGrid {
+    grid-template-columns: 1fr;
+  }
+}
