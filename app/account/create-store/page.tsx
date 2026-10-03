@@ -22,7 +22,7 @@ function CreateStoreInner() {
 
   useEffect(() => {
     if (!authLoading && !user) {
-      router.replace("/");
+      router.replace("/login?redirect=/account/create-store");
     }
   }, [authLoading, user, router]);
 

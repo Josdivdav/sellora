@@ -31,7 +31,7 @@ function ManageStoreInner() {
 
   useEffect(() => {
     if (!isAuthLoading && !user) {
-      router.replace("/");
+      router.replace("/login?redirect=/account/manage-store");
     }
   }, [isAuthLoading, user, router]);
 

@@ -107,7 +107,7 @@ export async function sendOrderConfirmationEmail(
     return { success: false, error: "Recipient email is missing from order" };
   }
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://sellora.ng";
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://devico.online";
   const trackingCode = order.trackingNumber || order.orderNumber || order.id;
   const trackingUrl = `${siteUrl}/track?code=${encodeURIComponent(trackingCode)}`;
   const isTransfer = order.payment?.method?.toLowerCase().includes("transfer");
@@ -292,7 +292,7 @@ export async function sendMerchantNewOrderAlert(
     return { success: false, error: "Merchant email is missing" };
   }
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://sellora.ng";
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://devico.online";
   const manageUrl = `${siteUrl}/account/manage-store`;
 
   const itemsToRender =
@@ -398,7 +398,7 @@ export async function sendOrderStatusUpdateEmail(
     return { success: false, error: "Recipient email is missing from order" };
   }
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://sellora.ng";
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://devico.online";
   const trackingCode = order.trackingNumber || order.orderNumber || order.id;
   const trackingUrl = `${siteUrl}/track?code=${encodeURIComponent(trackingCode)}`;
 
@@ -486,7 +486,7 @@ export async function sendAdminNewOrderAlert(
     return { success: false, error: "Admin email not configured" };
   }
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://sellora.ng";
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://devico.online";
   const html = `
     <!DOCTYPE html>
     <html>
@@ -533,7 +533,7 @@ export async function sendMerchantOrderCancelledAlert(
     return { success: false, error: "Merchant email is missing" };
   }
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://sellora.ng";
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://devico.online";
   const html = `
     <!DOCTYPE html>
     <html>
@@ -585,7 +585,7 @@ export async function sendWelcomeUserEmail({
     return { success: false, error: "Recipient email is missing" };
   }
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://sellora.ng";
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://devico.online";
   const name = displayName || "there";
 
   const html = `
@@ -649,7 +649,7 @@ export async function sendStoreCreatedEmail({
     return { success: false, error: "Recipient email is missing" };
   }
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://sellora.ng";
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://devico.online";
   const dashboardUrl = `${siteUrl}/account/manage-store`;
 
   const html = `

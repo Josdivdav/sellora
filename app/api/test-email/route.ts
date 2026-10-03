@@ -36,6 +36,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // In production, restrict recipient to the configured admin email to prevent open relay abuse
+    if (process.env.NODE_ENV === "production" && recipient !== process.env.GMAIL_USER) {
+      return NextResponse.json(
+        {
+          error: "In production, test emails can only be dispatched to the configured admin email.",
+        },
+        { status: 403 }
+      );
+    }
+
     if (!isEmailConfigured()) {
       return NextResponse.json(
         {

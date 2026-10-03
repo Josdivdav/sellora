@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import styles from "./login.module.css";
 import {
   continueWithGoogle,
@@ -10,13 +10,20 @@ import {
   loginWithEmailAndPassword,
 } from "@/functions/login.func";
 
-export default function LoginPage() {
+function LoginContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const rawRedirect = searchParams?.get("redirect");
+  const redirectTarget =
+    rawRedirect && rawRedirect.startsWith("/") && !rawRedirect.startsWith("//")
+      ? rawRedirect
+      : "/";
+
   const [showPassword, setShowPassword] = useState(false);
   const [emailError, setEmailError] = useState(false);
   const [warning, setWarning] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [remember, setRemember] = useState(false);
-  const router = useRouter();
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -30,7 +37,7 @@ export default function LoginPage() {
     setIsSubmitting(true);
     try {
       await loginWithEmailAndPassword(email, password, rememberMe);
-      router.replace("/");
+      router.replace(redirectTarget);
     } catch (error) {
       setWarning(getLoginErrorMessage(error));
       setEmailError(true);
@@ -46,7 +53,7 @@ export default function LoginPage() {
     setIsSubmitting(true);
     try {
       await continueWithGoogle(remember);
-      router.replace("/");
+      router.replace(redirectTarget);
     } catch (error) {
       console.error("Error during Google sign-in:", error);
       setWarning(getLoginErrorMessage(error));
@@ -201,11 +208,22 @@ export default function LoginPage() {
             </form>
 
             <p className={styles.signupLine}>
-              Don&apos;t have an account? <Link href="/register">Sign up free</Link>
+              Don&apos;t have an account?{" "}
+              <Link href={rawRedirect ? `/register?redirect=${encodeURIComponent(rawRedirect)}` : "/register"}>
+                Sign up free
+              </Link>
             </p>
           </div>
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className={styles.page} style={{ display: "grid", placeItems: "center" }}>Loading...</div>}>
+      <LoginContent />
+    </Suspense>
   );
 }

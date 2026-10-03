@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import Link from "next/link";
 import styles from "./register.module.css";
 import {
@@ -8,10 +8,17 @@ import {
   continueWithGoogle,
   getRegistrationErrorMessage,
 } from "@/functions/register.func";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
-export default function RegisterPage() {
+function RegisterContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const rawRedirect = searchParams?.get("redirect");
+  const redirectTarget =
+    rawRedirect && rawRedirect.startsWith("/") && !rawRedirect.startsWith("//")
+      ? rawRedirect
+      : "/";
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [emailError, setEmailError] = useState(false);
@@ -41,7 +48,7 @@ export default function RegisterPage() {
     setIsSubmitting(true);
     try {
       const result = await registerWithEmailAndPassword(email, password, username);
-      router.replace("/");
+      router.replace(redirectTarget);
       setSuccess(
         result.linkedPassword
           ? "Password added. You can now sign in with Google or your email and password."
@@ -73,7 +80,7 @@ export default function RegisterPage() {
     setIsSubmitting(true);
     try {
       await continueWithGoogle();
-      router.replace("/");
+      router.replace(redirectTarget);
     } catch (error) {
       console.error("Error during Google sign-in:", error);
       setWarning(getRegistrationErrorMessage(error));
@@ -271,11 +278,22 @@ export default function RegisterPage() {
             </form>
 
             <p className={styles.signupLine}>
-              Already have an account? <Link href="/login">Sign in</Link>
+              Already have an account?{" "}
+              <Link href={rawRedirect ? `/login?redirect=${encodeURIComponent(rawRedirect)}` : "/login"}>
+                Sign in
+              </Link>
             </p>
           </div>
         </div>
       </div>
     </div>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={<div className={styles.page} style={{ display: "grid", placeItems: "center" }}>Loading...</div>}>
+      <RegisterContent />
+    </Suspense>
   );
 }

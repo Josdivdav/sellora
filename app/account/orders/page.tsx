@@ -239,7 +239,7 @@ export default function OrdersPage() {
   const handleOrderHelp = (order: Order) => {
     setToast(
       `Support for ${order.orderNumber}: Call +234 1 800 735 567 or email support@${
-        typeof window !== "undefined" ? window.location.hostname : "sellora.ng"
+        typeof window !== "undefined" ? window.location.hostname : "devico.online"
       }`
     );
   };

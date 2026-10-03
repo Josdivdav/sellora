@@ -2,6 +2,7 @@ import { getAuth } from "firebase-admin/auth";
 import { NextResponse, NextRequest } from "next/server";
 import { db } from "@/lib/firebaseAdmin";
 import type { Order, TrackingEvent } from "@/types/order";
+import { sendOrderStatusUpdateEmail } from "@/lib/email";
 
 export const dynamic = "force-dynamic";
 
@@ -194,6 +195,18 @@ export async function PATCH(request: NextRequest) {
     await storeSubRef.set(updates, { merge: true });
 
     const updatedOrder: Order = { ...existingOrder, ...updates };
+
+    // Dispatch status update email notification to customer (non-blocking)
+    if (status) {
+      sendOrderStatusUpdateEmail(
+        updatedOrder,
+        status,
+        carrier ? `Carrier: ${carrier}` : undefined
+      ).catch((e) =>
+        console.warn("[Sellora Email] Status update notification error:", e)
+      );
+    }
+
     return NextResponse.json({ success: true, order: updatedOrder }, { status: 200 });
   } catch (error) {
     console.error("Error in PATCH /api/user/store/orders:", error);

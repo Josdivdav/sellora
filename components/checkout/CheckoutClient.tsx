@@ -489,6 +489,14 @@ export default function CheckoutClient() {
                 <span>Order Reference:</span>
                 <span className={styles.receiptRowVal}>#{placedOrder.orderNumber}</span>
               </div>
+              {placedOrder.trackingNumber && (
+                <div className={styles.receiptRow}>
+                  <span>Tracking ID:</span>
+                  <span className={styles.receiptRowVal} style={{ fontFamily: "monospace", fontWeight: 700, color: "#1d4ed8" }}>
+                    {placedOrder.trackingNumber}
+                  </span>
+                </div>
+              )}
               <div className={styles.receiptRow}>
                 <span>Seller Store:</span>
                 <span className={styles.receiptRowVal}>{activeStoreName}</span>
@@ -533,6 +541,7 @@ export default function CheckoutClient() {
                   `*Sellora Order Confirmation*\n` +
                   `Store: ${activeStoreName}\n` +
                   `Order Ref: #${placedOrder.orderNumber}\n` +
+                  `Tracking ID: ${placedOrder.trackingNumber || "Assigned"}\n` +
                   `Customer: ${placedOrder.shippingAddress?.fullName}\n` +
                   `Phone: ${placedOrder.shippingAddress?.phone}\n` +
                   `Address: ${placedOrder.shippingAddress?.street}, ${placedOrder.shippingAddress?.city}, ${placedOrder.shippingAddress?.state}\n` +
@@ -553,9 +562,16 @@ export default function CheckoutClient() {
             </div>
 
             <div className={styles.successActions}>
-              <Link href="/account/orders" className={styles.primarySuccessBtn}>
+              <Link
+                href={`/track?code=${encodeURIComponent(placedOrder.trackingNumber || placedOrder.orderNumber)}`}
+                className={styles.primarySuccessBtn}
+              >
+                <span className="material-icons-round">local_shipping</span>
+                Track Order Live
+              </Link>
+              <Link href="/account/orders" className={styles.secondarySuccessBtn}>
                 <span className="material-icons-round">receipt_long</span>
-                View &amp; Track Orders
+                My Orders
               </Link>
               <Link href="/" className={styles.secondarySuccessBtn}>
                 <span className="material-icons-round">storefront</span>
