@@ -73,21 +73,22 @@ export default function AboutClient() {
         onCartClick={() => router.push("/cart")}
       />
 
-      <Sidebar
-        isOpen={sidebarOpen}
-        onClose={() => setSidebarOpen(false)}
-        user={user}
-        onSignIn={() => router.push("/login")}
-        onSignOut={async () => {
-          await SignOut();
-          setToast("Signed out successfully");
-        }}
-        hasStore={hasStore}
-        onCreateStore={() => router.push("/account/create-store")}
-        manageStore={() => router.push("/account/manage-store")}
-      />
+      <div className={styles.contentArea}>
+        <Sidebar
+          isOpen={sidebarOpen}
+          onClose={() => setSidebarOpen(false)}
+          user={user}
+          onSignIn={() => router.push("/login")}
+          onSignOut={async () => {
+            await SignOut();
+            setToast("Signed out successfully");
+          }}
+          hasStore={hasStore}
+          onCreateStore={() => router.push("/account/create-store")}
+          manageStore={() => router.push("/account/manage-store")}
+        />
 
-      <main className={styles.main}>
+        <main className={styles.main}>
         {/* Breadcrumb */}
         <nav className={styles.breadcrumb} aria-label="Breadcrumb">
           <Link href="/" className={styles.breadcrumbLink}>
@@ -518,6 +519,7 @@ export default function AboutClient() {
           </div>
         </section>
       </main>
+      </div>
 
       {/* Footer */}
       <footer className={styles.footer}>

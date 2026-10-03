@@ -5,11 +5,21 @@
   flex-direction: column;
 }
 
+.contentArea {
+  display: flex;
+  width: 95.5%;
+  margin: 10px auto 0;
+  gap: 18px;
+  align-items: flex-start;
+}
+
 .main {
   flex: 1;
-  max-width: 800px;
-  width: 92%;
-  margin: 32px auto 60px;
+  min-width: 0;
+  max-width: 960px;
+  width: 100%;
+  margin: 0;
+  padding: 0 0 60px;
 }
 
 .searchHero {
@@ -358,6 +368,19 @@
   padding: 60px 20px;
   color: #64748b;
   font-size: 14px;
+}
+
+@media (max-width: 900px) {
+  .contentArea {
+    width: 100%;
+    margin-top: 10px;
+    padding: 0 12px;
+  }
+
+  .main {
+    max-width: 100%;
+    margin: 0 auto 60px;
+  }
 }
 
 @media (max-width: 640px) {

@@ -16,6 +16,11 @@ const buyerNav: NavItem[] = [
     badgeKey: "activeOrders",
     requiresAuth: true,
   },
+  {
+    label: "Track order",
+    href: "/track",
+    icon: "local_shipping",
+  },
   { 
     label: "Favorite stores", 
     href: "/account/favorites", 

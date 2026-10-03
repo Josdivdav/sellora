@@ -154,21 +154,22 @@ export default function TrackOrderClient() {
         onLogoClick={() => router.push("/")}
       />
 
-      <Sidebar
-        isOpen={sidebarOpen}
-        onClose={() => setSidebarOpen(false)}
-        user={user}
-        hasStore={hasStore}
-        onCreateStore={() => router.push("/account/create-store")}
-        manageStore={() => router.push("/account/manage-store")}
-        onSignOut={async () => {
-          await SignOut();
-          router.replace("/");
-        }}
-        onSignIn={() => router.push("/login?redirect=/track")}
-      />
+      <div className={styles.contentArea}>
+        <Sidebar
+          isOpen={sidebarOpen}
+          onClose={() => setSidebarOpen(false)}
+          user={user}
+          hasStore={hasStore}
+          onCreateStore={() => router.push("/account/create-store")}
+          manageStore={() => router.push("/account/manage-store")}
+          onSignOut={async () => {
+            await SignOut();
+            router.replace("/");
+          }}
+          onSignIn={() => router.push("/login?redirect=/track")}
+        />
 
-      <main className={styles.main}>
+        <main className={styles.main}>
         {/* Search Hero */}
         <section className={styles.searchHero}>
           <h1 className={styles.heroTitle}>Track Your Order Live</h1>
@@ -393,6 +394,7 @@ export default function TrackOrderClient() {
           </div>
         )}
       </main>
+      </div>
     </div>
   );
 }
