@@ -120,6 +120,39 @@ export default function MerchantOrdersTab({
     }
   };
 
+  // Handle payment verification update (e.g. merchant verifies WhatsApp bank receipt)
+  const handleUpdatePaymentStatus = async (orderId: string, newPaymentStatus: "PAID" | "PENDING") => {
+    if (!user) return;
+    setUpdatingOrderId(orderId);
+    try {
+      const token = await user.getIdToken();
+      const res = await fetch("/api/user/store/orders", {
+        method: "PATCH",
+        headers: {
+          authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ orderId, paymentStatus: newPaymentStatus }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to update payment status");
+      }
+
+      const updatedOrder: Order = data.order;
+      const updatedList = orders.map((o) => (o.id === orderId ? updatedOrder : o));
+      setOrders(updatedList);
+      onOrdersChange?.(updatedList);
+
+      onShowToast(`Order #${updatedOrder.orderNumber} payment marked as ${newPaymentStatus}!`);
+    } catch (err: any) {
+      onShowToast(err.message || "Failed to update payment status");
+    } finally {
+      setUpdatingOrderId(null);
+    }
+  };
+
   // Filtered orders
   const filteredOrders = useMemo(() => {
     return orders.filter((order) => {
@@ -301,6 +334,113 @@ export default function MerchantOrdersTab({
                       {order.payment?.method || "Debit Card"} ({order.payment?.status || "PAID"})
                     </span>
                   </div>
+                </div>
+
+                {/* Bank Transfer / WhatsApp Payment Verification Card for Merchant */}
+                <div
+                  style={{
+                    margin: "0 18px 16px",
+                    padding: "12px 16px",
+                    borderRadius: "12px",
+                    background: order.payment?.status === "PAID" ? "#f0fdf4" : "#fffbeb",
+                    border: `1.5px solid ${order.payment?.status === "PAID" ? "#bbf7d0" : "#fde68a"}`,
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "8px",
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "8px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                      <span
+                        className="material-icons-round"
+                        style={{
+                          fontSize: "18px",
+                          color: order.payment?.status === "PAID" ? "#16a34a" : "#d97706",
+                        }}
+                      >
+                        {order.payment?.status === "PAID" ? "verified" : "pending_actions"}
+                      </span>
+                      <strong
+                        style={{
+                          fontSize: "13px",
+                          color: order.payment?.status === "PAID" ? "#166534" : "#92400e",
+                        }}
+                      >
+                        {order.payment?.method?.toLowerCase().includes("transfer")
+                          ? order.payment?.status === "PAID"
+                            ? `Payment Confirmed & Verified (${currency.format(order.pricing?.total ?? 0)})`
+                            : `Direct Bank Transfer — Awaiting WhatsApp Receipt (${currency.format(order.pricing?.total ?? 0)})`
+                          : `Payment: ${order.payment?.method || "Standard"} (${order.payment?.status || "PENDING"})`}
+                      </strong>
+                    </div>
+
+                    {order.payment?.status !== "PAID" && (
+                      <button
+                        type="button"
+                        disabled={isUpdating}
+                        onClick={() => handleUpdatePaymentStatus(order.id, "PAID")}
+                        style={{
+                          background: "#059669",
+                          color: "#ffffff",
+                          border: "none",
+                          borderRadius: "8px",
+                          padding: "6px 12px",
+                          fontSize: "12px",
+                          fontWeight: 700,
+                          cursor: "pointer",
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "4px",
+                          boxShadow: "0 2px 6px rgba(5, 150, 105, 0.2)",
+                        }}
+                      >
+                        <span className="material-icons-round" style={{ fontSize: "14px" }}>
+                          check
+                        </span>
+                        Mark as Paid
+                      </button>
+                    )}
+                  </div>
+
+                  <p style={{ margin: 0, fontSize: "12px", color: order.payment?.status === "PAID" ? "#15803d" : "#78350f", lineHeight: "1.4" }}>
+                    {order.payment?.status === "PAID"
+                      ? "Payment has been confirmed. You can proceed with packaging and dispatch."
+                      : "Buyer was instructed to transfer to your bank account and send the screenshot to your WhatsApp. Check your account and WhatsApp to verify."}
+                  </p>
+
+                  {order.shippingAddress?.phone && (
+                    <div style={{ marginTop: "4px" }}>
+                      <a
+                        href={`https://wa.me/${order.shippingAddress.phone.replace(/\D/g, "")}?text=${encodeURIComponent(
+                          order.payment?.status === "PAID"
+                            ? `Hello ${order.shippingAddress.fullName || "Customer"}! This is ${store.name}. We have verified your payment of ${currency.format(order.pricing?.total ?? 0)} for Sellora Order #${order.orderNumber}. Your order is currently being prepared for dispatch! 📦`
+                            : `Hello ${order.shippingAddress.fullName || "Customer"}! This is ${store.name} regarding your Sellora Order #${order.orderNumber} for ${currency.format(order.pricing?.total ?? 0)}.\n\nCould you kindly send your bank transfer payment screenshot here so we can confirm payment and dispatch your package immediately? Thank you!`
+                        )}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "6px",
+                          background: "#25d366",
+                          color: "#ffffff",
+                          padding: "7px 14px",
+                          borderRadius: "8px",
+                          fontSize: "12.5px",
+                          fontWeight: 700,
+                          textDecoration: "none",
+                          boxShadow: "0 2px 6px rgba(37, 211, 102, 0.3)",
+                        }}
+                      >
+                        <span className="material-icons-round" style={{ fontSize: "15px" }}>
+                          chat
+                        </span>
+                        {order.payment?.status === "PAID"
+                          ? "Send Dispatch Update to Buyer on WhatsApp"
+                          : "Chat with Buyer on WhatsApp (Request Receipt)"}
+                      </a>
+                    </div>
+                  )}
                 </div>
 
                 {/* Order Items */}

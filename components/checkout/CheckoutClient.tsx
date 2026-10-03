@@ -417,71 +417,201 @@ export default function CheckoutClient() {
             <p className={styles.successSubtitle}>
               Your order has been recorded for <strong>{activeStoreName}</strong>.{" "}
               {placedOrder.payment?.method?.includes("Transfer")
-                ? "Please transfer to the seller's account below to finalize processing."
+                ? "Please transfer to the seller's account below and share your receipt on WhatsApp to finalize processing."
                 : "You will pay upon package arrival at your doorstep."}
             </p>
 
             {/* Seller's Bank Transfer Details Box if payment is via Transfer */}
-            {placedOrder.payment?.method?.includes("Transfer") && (
-              <div className={styles.bankTransferCard}>
-                <div className={styles.bankTransferHeader}>
-                  <span className="material-icons-round" style={{ color: "#2b6dff", fontSize: "20px" }}>
-                    account_balance
-                  </span>
-                  <strong>{activeStoreName} — Bank Transfer Details</strong>
-                </div>
-                <p className={styles.bankTransferSub}>
-                  Please transfer <strong>{currency.format(placedOrder.pricing?.total || grandTotal)}</strong> to the seller&apos;s account below:
-                </p>
-                <div className={styles.bankDetailsGrid}>
-                  <div className={styles.bankDetailItem}>
-                    <span className={styles.bankDetailLabel}>Bank Name</span>
-                    <span className={styles.bankDetailVal}>{activeBank.bankName}</span>
-                  </div>
-                  <div className={styles.bankDetailItem}>
-                    <span className={styles.bankDetailLabel}>Account Number</span>
-                    <div className={styles.bankAccRow}>
-                      <span className={styles.bankDetailValAcc}>{activeBank.accountNumber}</span>
-                      <button
-                        type="button"
-                        onClick={() => handleCopyAccount(activeBank.accountNumber)}
-                        className={styles.bankCopyBtn}
-                        title="Copy account number"
-                      >
-                        <span className="material-icons-round" style={{ fontSize: "15px" }}>
-                          {copiedAccount ? "check" : "content_copy"}
-                        </span>
-                        {copiedAccount ? "Copied" : "Copy"}
-                      </button>
+            {placedOrder.payment?.method?.includes("Transfer") ? (
+              <>
+                <div className={styles.paymentGuideCard}>
+                  <div className={styles.paymentGuideHeader}>
+                    <span className="material-icons-round" style={{ color: "#16a34a", fontSize: "24px" }}>
+                      task_alt
+                    </span>
+                    <div>
+                      <strong>2 Quick Steps to Complete Your Order</strong>
+                      <p>Follow these steps so {activeStoreName} can verify payment and dispatch your package immediately.</p>
                     </div>
                   </div>
-                  <div className={styles.bankDetailItem}>
-                    <span className={styles.bankDetailLabel}>Account Name</span>
-                    <span className={styles.bankDetailVal}>{activeBank.accountName}</span>
+
+                  <div className={styles.guideStepsList}>
+                    {/* Step 1 */}
+                    <div className={styles.guideStepItem}>
+                      <div className={styles.guideStepNum}>1</div>
+                      <div className={styles.guideStepBody}>
+                        <div className={styles.guideStepTitle}>
+                          Transfer <strong>{currency.format(placedOrder.pricing?.total || grandTotal)}</strong> to Seller&apos;s Account
+                        </div>
+                        <p className={styles.guideStepDesc}>
+                          Send the exact amount from your bank app to the verified merchant account below. Use <strong>#{placedOrder.orderNumber}</strong> as the payment description / remark.
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Bank Card */}
+                    <div className={styles.bankTransferCard}>
+                      <div className={styles.bankTransferHeader}>
+                        <span className="material-icons-round" style={{ color: "#2563eb", fontSize: "20px" }}>
+                          account_balance
+                        </span>
+                        <strong>{activeStoreName} — Verified Account Details</strong>
+                      </div>
+                      <div className={styles.bankDetailsGrid}>
+                        <div className={styles.bankDetailItem}>
+                          <span className={styles.bankDetailLabel}>Bank Name</span>
+                          <span className={styles.bankDetailVal}>{activeBank.bankName}</span>
+                        </div>
+                        <div className={styles.bankDetailItem}>
+                          <span className={styles.bankDetailLabel}>Account Number</span>
+                          <div className={styles.bankAccRow}>
+                            <span className={styles.bankDetailValAcc}>{activeBank.accountNumber}</span>
+                            <button
+                              type="button"
+                              onClick={() => handleCopyAccount(activeBank.accountNumber)}
+                              className={styles.bankCopyBtn}
+                              title="Copy account number"
+                            >
+                              <span className="material-icons-round" style={{ fontSize: "15px" }}>
+                                {copiedAccount ? "check" : "content_copy"}
+                              </span>
+                              {copiedAccount ? "Copied" : "Copy"}
+                            </button>
+                          </div>
+                        </div>
+                        <div className={styles.bankDetailItem}>
+                          <span className={styles.bankDetailLabel}>Account Name</span>
+                          <span className={styles.bankDetailVal}>{activeBank.accountName}</span>
+                        </div>
+                        <div className={styles.bankDetailItem}>
+                          <span className={styles.bankDetailLabel}>Amount to Transfer</span>
+                          <span className={styles.bankDetailVal} style={{ color: "#2563eb", fontSize: "15px" }}>
+                            {currency.format(placedOrder.pricing?.total || grandTotal)}
+                          </span>
+                        </div>
+                      </div>
+                      <div className={styles.bankTransferNote}>
+                        <span className="material-icons-round" style={{ fontSize: "16px", color: "#f59e0b" }}>
+                          info
+                        </span>
+                        <span>
+                          Payment Remark: <strong>#{placedOrder.orderNumber}</strong>
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Step 2 */}
+                    <div className={styles.guideStepItem}>
+                      <div className={styles.guideStepNum}>2</div>
+                      <div className={styles.guideStepBody}>
+                        <div className={styles.guideStepTitle}>
+                          Send Payment Receipt to Seller on WhatsApp
+                        </div>
+                        <p className={styles.guideStepDesc}>
+                          Tap the green button below to open WhatsApp with {activeStoreName}. Your order reference and amount are pre-filled automatically — simply attach your transfer screenshot so the seller can verify in their bank app and dispatch your package!
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 </div>
-                <div className={styles.bankTransferNote}>
-                  <span className="material-icons-round" style={{ fontSize: "16px", color: "#f59e0b" }}>
-                    info
-                  </span>
-                  <span>
-                    Use Order Reference <strong>#{placedOrder.orderNumber}</strong> as your payment narration.
-                  </span>
-                </div>
-              </div>
-            )}
 
-            {/* Pay on Delivery Notice */}
-            {!placedOrder.payment?.method?.includes("Transfer") && (
-              <div className={styles.podNoticeCard}>
-                <span className="material-icons-round" style={{ color: "#10b981", fontSize: "22px" }}>
-                  local_shipping
-                </span>
-                <div>
-                  <strong>Pay on Delivery Active</strong>
-                  <p>Please have cash or your ATM card ready for the dispatch rider when your parcel arrives from {activeStoreName}.</p>
+                {/* WhatsApp Order Confirmation Button directly to Store Owner */}
+                <div className={styles.whatsappActionWrap}>
+                  <a
+                    href={`https://wa.me/${activePhone.replace(/\D/g, "")}?text=${encodeURIComponent(
+                      `🛍️ *SELLORA ORDER PAYMENT NOTIFICATION*\n` +
+                      `----------------------------------------\n` +
+                      `🏪 *Store:* ${activeStoreName}\n` +
+                      `🔖 *Order Ref:* #${placedOrder.orderNumber}\n` +
+                      `📦 *Tracking ID:* ${placedOrder.trackingNumber || "Assigned"}\n\n` +
+                      `👤 *Customer Name:* ${placedOrder.shippingAddress?.fullName}\n` +
+                      `📞 *Customer Phone:* ${placedOrder.shippingAddress?.phone}\n` +
+                      `📍 *Delivery Address:* ${placedOrder.shippingAddress?.street}, ${placedOrder.shippingAddress?.city}, ${placedOrder.shippingAddress?.state}\n\n` +
+                      `💰 *Amount Transferred:* ${currency.format(placedOrder.pricing?.total || grandTotal)}\n` +
+                      `🏦 *Paid To:* ${activeBank.bankName} (${activeBank.accountNumber})\n` +
+                      `💳 *Payment Method:* Direct Bank Transfer\n\n` +
+                      `📎 *Proof of Payment:* (Please find my transfer receipt / screenshot attached below)\n` +
+                      `----------------------------------------\n` +
+                      `👋 Hello ${activeStoreName}! I have transferred ${currency.format(placedOrder.pricing?.total || grandTotal)} for Order #${placedOrder.orderNumber}. Kindly verify my payment and confirm dispatch. Thank you!`
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={styles.whatsappConfirmBtn}
+                    title={`Send payment receipt to ${activeStoreName} on WhatsApp`}
+                  >
+                    <span className="material-icons-round" style={{ fontSize: "22px" }}>
+                      chat
+                    </span>
+                    <div style={{ textAlign: "left", lineHeight: "1.2" }}>
+                      <div style={{ fontSize: "15px", fontWeight: 800 }}>Send Payment Receipt via WhatsApp</div>
+                      <div style={{ fontSize: "12px", opacity: 0.92, fontWeight: 500 }}>
+                        Tap to chat with {activeStoreName} ({activePhone})
+                      </div>
+                    </div>
+                  </a>
+                  <p className={styles.whatsappHelperText}>
+                    <span className="material-icons-round" style={{ fontSize: "15px", color: "#16a34a" }}>
+                      verified
+                    </span>
+                    Order details are pre-filled. Simply tap send and attach your bank receipt in the WhatsApp chat.
+                  </p>
                 </div>
-              </div>
+              </>
+            ) : (
+              /* Pay on Delivery Notice & WhatsApp */
+              <>
+                <div className={styles.podNoticeCard}>
+                  <span className="material-icons-round" style={{ color: "#10b981", fontSize: "24px" }}>
+                    local_shipping
+                  </span>
+                  <div>
+                    <strong>Pay on Delivery Active (Cash / POS on Arrival)</strong>
+                    <p>
+                      No advance payment needed! Please have <strong>{currency.format(placedOrder.pricing?.total || grandTotal)}</strong> ready for the courier when your parcel arrives from {activeStoreName}.
+                    </p>
+                  </div>
+                </div>
+
+                <div className={styles.whatsappActionWrap}>
+                  <a
+                    href={`https://wa.me/${activePhone.replace(/\D/g, "")}?text=${encodeURIComponent(
+                      `🛍️ *SELLORA ORDER CONFIRMATION (PAY ON DELIVERY)*\n` +
+                      `----------------------------------------\n` +
+                      `🏪 *Store:* ${activeStoreName}\n` +
+                      `🔖 *Order Ref:* #${placedOrder.orderNumber}\n` +
+                      `📦 *Tracking ID:* ${placedOrder.trackingNumber || "Assigned"}\n\n` +
+                      `👤 *Customer Name:* ${placedOrder.shippingAddress?.fullName}\n` +
+                      `📞 *Customer Phone:* ${placedOrder.shippingAddress?.phone}\n` +
+                      `📍 *Delivery Address:* ${placedOrder.shippingAddress?.street}, ${placedOrder.shippingAddress?.city}, ${placedOrder.shippingAddress?.state}\n\n` +
+                      `💰 *Total Amount on Arrival:* ${currency.format(placedOrder.pricing?.total || grandTotal)}\n` +
+                      `🚚 *Payment Method:* Cash / POS on Delivery\n` +
+                      `----------------------------------------\n` +
+                      `👋 Hello ${activeStoreName}! I just placed Order #${placedOrder.orderNumber} on Sellora with Pay on Delivery. Please confirm order preparation and delivery schedule. Thank you!`
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={styles.whatsappConfirmBtn}
+                    style={{ background: "linear-gradient(135deg, #0f766e 0%, #115e59 100%)" }}
+                    title={`Confirm Order with ${activeStoreName} on WhatsApp`}
+                  >
+                    <span className="material-icons-round" style={{ fontSize: "22px" }}>
+                      chat
+                    </span>
+                    <div style={{ textAlign: "left", lineHeight: "1.2" }}>
+                      <div style={{ fontSize: "15px", fontWeight: 800 }}>Confirm Delivery with {activeStoreName} on WhatsApp</div>
+                      <div style={{ fontSize: "12px", opacity: 0.92, fontWeight: 500 }}>
+                        Message seller to confirm dispatch schedule
+                      </div>
+                    </div>
+                  </a>
+                  <p className={styles.whatsappHelperText}>
+                    <span className="material-icons-round" style={{ fontSize: "15px", color: "#0f766e" }}>
+                      verified
+                    </span>
+                    Notifies {activeStoreName} directly so they can prioritize packaging and dispatch.
+                  </p>
+                </div>
+              </>
             )}
 
             <div className={styles.orderReceiptBox}>
@@ -532,33 +662,6 @@ export default function CheckoutClient() {
                   {currency.format(placedOrder.pricing?.total || grandTotal)}
                 </span>
               </div>
-            </div>
-
-            {/* WhatsApp Order Confirmation Button directly to Store Owner */}
-            <div className={styles.whatsappActionWrap}>
-              <a
-                href={`https://wa.me/${activePhone.replace(/\D/g, "")}?text=${encodeURIComponent(
-                  `*Sellora Order Confirmation*\n` +
-                  `Store: ${activeStoreName}\n` +
-                  `Order Ref: #${placedOrder.orderNumber}\n` +
-                  `Tracking ID: ${placedOrder.trackingNumber || "Assigned"}\n` +
-                  `Customer: ${placedOrder.shippingAddress?.fullName}\n` +
-                  `Phone: ${placedOrder.shippingAddress?.phone}\n` +
-                  `Address: ${placedOrder.shippingAddress?.street}, ${placedOrder.shippingAddress?.city}, ${placedOrder.shippingAddress?.state}\n` +
-                  `Amount: ${currency.format(placedOrder.pricing?.total || grandTotal)}\n` +
-                  `Payment: ${placedOrder.payment?.method || paymentMethod}\n\n` +
-                  `Hello ${activeStoreName}! I just placed an order on Sellora and would like to confirm it.`
-                )}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={styles.whatsappConfirmBtn}
-                title={`Send confirmation to ${activeStoreName} on WhatsApp`}
-              >
-                <span className="material-icons-round" style={{ fontSize: "20px" }}>
-                  chat
-                </span>
-                <span>Confirm Order via WhatsApp with {activeStoreName}</span>
-              </a>
             </div>
 
             <div className={styles.successActions}>
@@ -923,12 +1026,17 @@ export default function CheckoutClient() {
                 {/* Transfer Info Preview when selected */}
                 {paymentMethod === "transfer" && (
                   <div className={styles.paymentMethodPreviewNote}>
-                    <span className="material-icons-round" style={{ fontSize: "16px", color: "#2b6dff" }}>
-                      info
-                    </span>
-                    <span>
-                      You will pay directly to <strong>{activeStore?.name || "the seller"}</strong>&apos;s verified account ({storeBank.bankName}: <strong>{storeBank.accountNumber}</strong>) and confirm on WhatsApp.
-                    </span>
+                    <div style={{ display: "flex", alignItems: "center", gap: "6px", fontWeight: 700, color: "#1d4ed8", marginBottom: "6px" }}>
+                      <span className="material-icons-round" style={{ fontSize: "18px" }}>
+                        verified_user
+                      </span>
+                      How Direct Bank Transfer Works on Sellora:
+                    </div>
+                    <ol style={{ margin: "0 0 0 18px", padding: 0, fontSize: "12.5px", lineHeight: "1.6", color: "#334155" }}>
+                      <li>Click &ldquo;Place Order&rdquo; to lock in your items and receive the seller&apos;s verified bank account ({storeBank.bankName}: <strong>{storeBank.accountNumber}</strong>).</li>
+                      <li>Transfer the exact total from your Nigerian bank app using your Order Reference as narration.</li>
+                      <li>Click the 1-click WhatsApp button on the next screen to send your payment receipt directly to <strong>{activeStore?.name || "the seller"}</strong> for immediate dispatch!</li>
+                    </ol>
                   </div>
                 )}
               </div>

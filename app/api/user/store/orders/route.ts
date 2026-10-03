@@ -118,7 +118,7 @@ export async function PATCH(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { orderId, status, carrier, trackingNumber, reason } = body || {};
+    const { orderId, status, carrier, trackingNumber, reason, paymentStatus } = body || {};
 
     if (!orderId) {
       return NextResponse.json({ error: "Order ID is required" }, { status: 400 });
@@ -146,6 +146,13 @@ export async function PATCH(request: NextRequest) {
 
     if (carrier) updates.carrier = carrier;
     if (trackingNumber) updates.trackingNumber = trackingNumber;
+
+    if (paymentStatus) {
+      updates.payment = {
+        ...existingOrder.payment,
+        status: paymentStatus,
+      };
+    }
 
     if (status) {
       updates.status = status;

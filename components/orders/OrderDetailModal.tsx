@@ -245,6 +245,71 @@ export default function OrderDetailModal({
             </div>
           </div>
 
+          {/* Bank Transfer / WhatsApp Confirmation Box for Customer */}
+          {order.payment?.method?.toLowerCase().includes("transfer") && (
+            <div
+              style={{
+                marginTop: "16px",
+                padding: "14px 18px",
+                borderRadius: "14px",
+                background: order.payment?.status === "PAID" ? "#f0fdf4" : "#fffbeb",
+                border: `1.5px solid ${order.payment?.status === "PAID" ? "#bbf7d0" : "#fde68a"}`,
+                textAlign: "left",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px" }}>
+                <span
+                  className="material-icons-round"
+                  style={{
+                    fontSize: "20px",
+                    color: order.payment?.status === "PAID" ? "#16a34a" : "#d97706",
+                  }}
+                >
+                  {order.payment?.status === "PAID" ? "verified" : "account_balance"}
+                </span>
+                <strong style={{ fontSize: "14px", color: order.payment?.status === "PAID" ? "#166534" : "#92400e" }}>
+                  {order.payment?.status === "PAID"
+                    ? "Direct Bank Transfer — Verified"
+                    : "Direct Bank Transfer — Awaiting Verification"}
+                </strong>
+              </div>
+              <p style={{ margin: "4px 0 10px", fontSize: "12.5px", color: order.payment?.status === "PAID" ? "#15803d" : "#78350f", lineHeight: "1.4" }}>
+                {order.payment?.status === "PAID"
+                  ? `Your payment of ${currency.format(order.pricing.total)} has been verified by ${order.store?.name || "the seller"}.`
+                  : `Please ensure you transferred ${currency.format(order.pricing.total)} and sent your payment receipt to ${order.store?.name || "the seller"} on WhatsApp.`}
+              </p>
+              {order.payment?.status !== "PAID" && Boolean((order.store as any)?.phone) && (
+                <a
+                  href={`https://wa.me/${String((order.store as any).phone).replace(/\D/g, "")}?text=${encodeURIComponent(
+                    `🛍️ *SELLORA ORDER PAYMENT CONFIRMATION*\n` +
+                    `Store: ${order.store?.name || "Store"}\n` +
+                    `Order Ref: #${order.orderNumber}\n` +
+                    `Amount: ${currency.format(order.pricing.total)}\n` +
+                    `Customer: ${order.shippingAddress?.fullName}\n\n` +
+                    `Hello! Here is my bank transfer receipt for Sellora Order #${order.orderNumber}. Kindly confirm payment. Thank you!`
+                  )}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "6px",
+                    background: "#25d366",
+                    color: "#ffffff",
+                    padding: "8px 16px",
+                    borderRadius: "10px",
+                    fontSize: "13px",
+                    fontWeight: 700,
+                    textDecoration: "none",
+                  }}
+                >
+                  <span className="material-icons-round" style={{ fontSize: "16px" }}>chat</span>
+                  Send Receipt via WhatsApp to {order.store?.name || "Seller"}
+                </a>
+              )}
+            </div>
+          )}
+
           {/* Pricing Breakdown */}
           <div className={styles.invoiceCard}>
             <div className={styles.invoiceRow}>
