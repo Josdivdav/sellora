@@ -84,7 +84,7 @@ export default function OrdersPage() {
   useEffect(() => {
     if (!authLoading) {
       if (!user) {
-        router.replace("/");
+        router.replace("/login?redirect=/account/orders");
       } else {
         void fetchOrders();
       }
