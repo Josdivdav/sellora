@@ -354,7 +354,7 @@ export default function DeveloperConsoleClient() {
                 <input
                   type={showKey ? "text" : "password"}
                   className={styles.gateInput}
-                  placeholder="Enter passcode (e.g. sellora-dev-2026)"
+                  placeholder="Enter developer passcode"
                   value={inputKey}
                   onChange={(e) => {
                     setInputKey(e.target.value);
@@ -391,7 +391,6 @@ export default function DeveloperConsoleClient() {
                   type="button"
                   className={styles.gateAltBtn}
                   onClick={() => {
-                    setDevKey("sellora-dev-2026");
                     setIsUnlocked(true);
                   }}
                 >
