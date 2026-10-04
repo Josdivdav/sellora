@@ -32,22 +32,26 @@ export async function GET(request: NextRequest) {
     const buyerSnap = await db
       .collection("conversations")
       .where("buyerId", "==", uid)
-      .where("unreadCountBuyer", ">", 0)
       .get();
 
     buyerSnap.forEach((doc) => {
-      buyerUnread += doc.data()?.unreadCountBuyer || 0;
+      const count = doc.data()?.unreadCountBuyer;
+      if (typeof count === "number" && count > 0) {
+        buyerUnread += count;
+      }
     });
 
     // Merchant unread
     const merchantSnap = await db
       .collection("conversations")
       .where("storeOwnerId", "==", uid)
-      .where("unreadCountMerchant", ">", 0)
       .get();
 
     merchantSnap.forEach((doc) => {
-      merchantUnread += doc.data()?.unreadCountMerchant || 0;
+      const count = doc.data()?.unreadCountMerchant;
+      if (typeof count === "number" && count > 0) {
+        merchantUnread += count;
+      }
     });
 
     return NextResponse.json({

@@ -1,0 +1,183 @@
+/* ── Global Page Transition & Route Switch Loader ── */
+
+.progressBar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3.5px;
+  background: linear-gradient(90deg, #2563eb, #38bdf8, #6366f1);
+  box-shadow: 0 0 12px rgba(37, 99, 235, 0.7), 0 0 6px rgba(56, 189, 248, 0.5);
+  z-index: 999999;
+  transition: width 0.25s ease-out, opacity 0.3s ease-out;
+  pointer-events: none;
+  border-radius: 0 2px 2px 0;
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999990;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.2s ease;
+  pointer-events: none;
+}
+
+.overlayVisible {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: all;
+}
+
+.loaderCard {
+  background: #ffffff;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.14), 0 2px 8px rgba(0, 0, 0, 0.04);
+  border-radius: 20px;
+  padding: 22px 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  transform: scale(0.92);
+  transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+}
+
+.overlayVisible .loaderCard {
+  transform: scale(1);
+}
+
+.brandIconWrapper {
+  position: relative;
+  width: 58px;
+  height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pulseLogo {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  animation: selloraPulse 1.6s ease-in-out infinite;
+}
+
+.spinnerRing {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 3px solid rgba(37, 99, 235, 0.12);
+  border-top-color: #2563eb;
+  border-right-color: #38bdf8;
+  animation: selloraSpin 0.85s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+}
+
+.loadingInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  text-align: center;
+}
+
+.loadingTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: #0f172a;
+  letter-spacing: -0.2px;
+}
+
+.loadingSubtitle {
+  font-size: 12.5px;
+  color: #64748b;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+}
+
+.dots {
+  display: inline-block;
+  min-width: 14px;
+  text-align: left;
+  animation: selloraDots 1.4s infinite steps(4, jump-none);
+}
+
+/* ── Fallback Container for app/loading.tsx ── */
+.loadingRouteContainer {
+  min-height: calc(100vh - 120px);
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  box-sizing: border-box;
+}
+
+@keyframes selloraSpin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes selloraPulse {
+  0%, 100% {
+    transform: scale(0.94);
+    opacity: 0.88;
+  }
+  50% {
+    transform: scale(1.06);
+    opacity: 1;
+  }
+}
+
+@keyframes selloraDots {
+  0% {
+    content: "";
+  }
+  25% {
+    content: ".";
+  }
+  50% {
+    content: "..";
+  }
+  75%, 100% {
+    content: "...";
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .overlay {
+    background: rgba(15, 23, 42, 0.75);
+  }
+
+  .loaderCard {
+    background: #0f172a;
+    border-color: #334155;
+    box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.6);
+  }
+
+  .loadingTitle {
+    color: #f8fafc;
+  }
+
+  .loadingSubtitle {
+    color: #94a3b8;
+  }
+
+  .spinnerRing {
+    border-color: rgba(56, 189, 248, 0.15);
+    border-top-color: #38bdf8;
+    border-right-color: #818cf8;
+  }
+}

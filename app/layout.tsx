@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
+import { Suspense } from "react";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 import { CartProvider } from "@/context/CartContext";
 import { ChatProvider } from "@/context/ChatContext";
 import ChatWidget from "@/components/chat/ChatWidget";
+import PageTransitionLoader from "@/components/common/PageTransitionLoader";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -143,6 +145,9 @@ export default function RootLayout({ children }: React.PropsWithChildren) {
         />
       </head>
       <body>
+        <Suspense fallback={null}>
+          <PageTransitionLoader />
+        </Suspense>
         <AuthProvider>
           <ChatProvider>
             <CartProvider>
