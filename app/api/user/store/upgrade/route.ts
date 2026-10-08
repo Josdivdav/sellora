@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getAuth } from "firebase-admin/auth";
+import { getAuth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { invalidateStoreCache } from "@/lib/getStore";
 import { getStoreFullUrl } from "@/lib/storeUrl";

@@ -1,4 +1,4 @@
-import { getAuth } from "firebase-admin/auth";
+import { getAuth } from "@/lib/auth";
 import { NextResponse, NextRequest } from "next/server";
 import { db } from "@/lib/db";
 
