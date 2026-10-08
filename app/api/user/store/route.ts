@@ -1,6 +1,6 @@
 import { getAuth } from 'firebase-admin/auth';
 import { NextResponse, NextRequest } from 'next/server';
-import { db } from '@/lib/firebaseAdmin';
+import { db } from '@/lib/db';
 import { invalidateStoreCache } from '@/lib/getStore';
 import { sendStoreCreatedEmail } from '@/lib/email';
 import { getStoreFullUrl } from '@/lib/storeUrl';

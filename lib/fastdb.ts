@@ -810,7 +810,7 @@ export class FastDB {
   }
 
   settings(_settingsObj: Record<string, any>): void {
-    // No-op for Firestore compatibility
+    // No-op compatibility method
   }
 }
 

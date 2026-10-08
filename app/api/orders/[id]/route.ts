@@ -1,6 +1,6 @@
 import { getAuth } from "firebase-admin/auth";
 import { NextResponse, NextRequest } from "next/server";
-import { db } from "@/lib/firebaseAdmin";
+import { db } from "@/lib/db";
 import type { Order, TrackingEvent } from "@/types/order";
 import { sendOrderStatusUpdateEmail, sendMerchantOrderCancelledAlert } from "@/lib/email";
 
@@ -64,7 +64,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
 
 /**
  * PATCH /api/orders/[id]
- * Cancels or updates an order in Firestore database (accessible by buyer or merchant).
+ * Cancels or updates an order in FastDB database (accessible by buyer or merchant).
  */
 export async function PATCH(request: NextRequest, context: RouteContext) {
   const authorization = request.headers.get("authorization");

@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 dotenv.config();
 
-import { db, FieldValue } from "../lib/firebaseAdmin";
+import { db, FieldValue } from "../lib/db";
 
 async function test() {
   console.log("=== Testing FastDB Adapter through lib/firebaseAdmin ===");

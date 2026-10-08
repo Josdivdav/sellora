@@ -1,7 +1,6 @@
 import { getAuth } from 'firebase-admin/auth';
 import { NextResponse, NextRequest } from 'next/server';
-import { db } from '@/lib/firebaseAdmin';
-import { FieldValue } from 'firebase-admin/firestore';
+import { db, FieldValue } from '@/lib/db';
 import type { Product } from '@/types/product';
 import { invalidateProductsCache } from '@/lib/getProduct';
 import { invalidateStoreCache } from '@/lib/getStore';

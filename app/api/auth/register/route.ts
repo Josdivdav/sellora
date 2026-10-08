@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getAuth } from 'firebase-admin/auth';
 
-import { db } from '@/lib/firebaseAdmin';
+import { db } from '@/lib/db';
 import { sendWelcomeUserEmail } from '@/lib/email';
 
 // export async function GET() {

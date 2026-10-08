@@ -1,6 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
 import { getAuth } from "firebase-admin/auth";
-import { db } from "@/lib/firebaseAdmin";
+import { db } from "@/lib/db";
 import { invalidateStoreCache } from "@/lib/getStore";
 
 export const dynamic = "force-dynamic";

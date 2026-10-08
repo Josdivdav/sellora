@@ -1,7 +1,7 @@
 import { getAuth } from 'firebase-admin/auth';
 import { NextResponse } from 'next/server';
 
-import { db } from '@/lib/firebaseAdmin';
+import { db } from '@/lib/db';
 
 export async function POST(request: Request) {
   const authorization = request.headers.get('authorization');

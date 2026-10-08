@@ -1,6 +1,6 @@
 import { getAuth } from "firebase-admin/auth";
 import { NextResponse, NextRequest } from "next/server";
-import { db } from "@/lib/firebaseAdmin";
+import { db } from "@/lib/db";
 import type { Order, TrackingEvent } from "@/types/order";
 import { sendOrderStatusUpdateEmail } from "@/lib/email";
 
@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 
 /**
  * GET /api/user/store/orders
- * Returns all customer orders placed for the authenticated merchant's store from Firestore.
+ * Returns all customer orders placed for the authenticated merchant's store from FastDB.
  */
 export async function GET(request: NextRequest) {
   const authorization = request.headers.get("authorization");
@@ -90,7 +90,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ success: true, orders, total: orders.length }, { status: 200 });
   } catch (error) {
-    console.error("Error fetching merchant orders from Firestore:", error);
+    console.error("Error fetching merchant orders from FastDB:", error);
     return NextResponse.json({ error: "Failed to fetch customer orders from database" }, { status: 500 });
   }
 }

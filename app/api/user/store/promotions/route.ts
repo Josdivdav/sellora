@@ -1,6 +1,6 @@
 import { getAuth } from "firebase-admin/auth";
 import { NextResponse, NextRequest } from "next/server";
-import { db } from "@/lib/firebaseAdmin";
+import { db } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
@@ -17,7 +17,7 @@ export interface Promotion {
 
 /**
  * GET /api/user/store/promotions
- * Retrieves all active promotions for the merchant's store from Firestore.
+ * Retrieves all active promotions for the merchant's store from FastDB.
  */
 export async function GET(request: NextRequest) {
   const authorization = request.headers.get("authorization");
@@ -56,14 +56,14 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ success: true, promotions }, { status: 200 });
   } catch (error) {
-    console.error("Error fetching promotions from Firestore:", error);
+    console.error("Error fetching promotions from FastDB:", error);
     return NextResponse.json({ error: "Failed to fetch promotions from database" }, { status: 500 });
   }
 }
 
 /**
  * POST /api/user/store/promotions
- * Creates a new promo code for the merchant's store in Firestore.
+ * Creates a new promo code for the merchant's store in FastDB.
  */
 export async function POST(request: NextRequest) {
   const authorization = request.headers.get("authorization");
@@ -120,14 +120,14 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, promotion }, { status: 201 });
   } catch (error) {
-    console.error("Error creating promotion in Firestore:", error);
+    console.error("Error creating promotion in FastDB:", error);
     return NextResponse.json({ error: "Failed to create promo code in database" }, { status: 500 });
   }
 }
 
 /**
  * DELETE /api/user/store/promotions
- * Deletes a promo code from Firestore.
+ * Deletes a promo code from FastDB.
  */
 export async function DELETE(request: NextRequest) {
   const authorization = request.headers.get("authorization");
@@ -158,7 +158,7 @@ export async function DELETE(request: NextRequest) {
 
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (error) {
-    console.error("Error deleting promotion from Firestore:", error);
+    console.error("Error deleting promotion from FastDB:", error);
     return NextResponse.json({ error: "Failed to delete promotion" }, { status: 500 });
   }
 }

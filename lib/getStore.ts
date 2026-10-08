@@ -1,4 +1,4 @@
-import { db } from "@/lib/firebaseAdmin";
+import { db } from "@/lib/db";
 import { getAllProducts } from "@/lib/getProduct";
 import type { Store } from "@/types/store";
 import type { Product } from "@/types/product";
@@ -45,7 +45,7 @@ export async function getStoreBySlug(rawSlug: string): Promise<{
 
   let foundStore: Store | null = null;
 
-  // 2. Query Firestore stores collection
+  // 2. Query FastDB stores collection
   try {
     // Try matching slug directly
     const slugSnap = await db.collection("stores").where("slug", "==", cleanSlug).limit(1).get();
@@ -62,7 +62,7 @@ export async function getStoreBySlug(rawSlug: string): Promise<{
       }
     }
 
-    // If not found, scan all stores in Firestore for case-insensitive match on name or slug
+    // If not found, scan all stores in FastDB for case-insensitive match on name or slug
     if (!foundStore) {
       const allStoresSnap = await db.collection("stores").get();
       for (const doc of allStoresSnap.docs) {
@@ -77,7 +77,7 @@ export async function getStoreBySlug(rawSlug: string): Promise<{
       }
     }
   } catch (err) {
-    console.warn(`Firestore store lookup error for ${cleanSlug}:`, err);
+    console.warn(`FastDB store lookup error for ${cleanSlug}:`, err);
   }
 
   if (!foundStore) {

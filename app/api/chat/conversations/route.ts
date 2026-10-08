@@ -1,6 +1,6 @@
 import { getAuth } from "firebase-admin/auth";
 import { NextResponse, NextRequest } from "next/server";
-import { db } from "@/lib/firebaseAdmin";
+import { db } from "@/lib/db";
 import type { Conversation } from "@/types/chat";
 
 export const dynamic = "force-dynamic";

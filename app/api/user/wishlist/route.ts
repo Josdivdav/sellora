@@ -1,12 +1,12 @@
 import { getAuth } from "firebase-admin/auth";
 import { NextResponse, NextRequest } from "next/server";
-import { db } from "@/lib/firebaseAdmin";
+import { db } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
 /**
  * GET /api/user/wishlist
- * Returns the authenticated user's wishlist product IDs from Firestore.
+ * Returns the authenticated user's wishlist product IDs from FastDB.
  */
 export async function GET(request: NextRequest) {
   const authorization = request.headers.get("authorization");
@@ -38,14 +38,14 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ success: true, wishlist }, { status: 200 });
   } catch (error) {
-    console.error("Error fetching wishlist from Firestore:", error);
+    console.error("Error fetching wishlist from FastDB:", error);
     return NextResponse.json({ error: "Failed to fetch wishlist from database" }, { status: 500 });
   }
 }
 
 /**
  * POST /api/user/wishlist
- * Toggles or updates a product in the user's wishlist in Firestore.
+ * Toggles or updates a product in the user's wishlist in FastDB.
  */
 export async function POST(request: NextRequest) {
   const authorization = request.headers.get("authorization");
@@ -106,7 +106,7 @@ export async function POST(request: NextRequest) {
       isWishlisted: currentWishlist.includes(productId),
     }, { status: 200 });
   } catch (error) {
-    console.error("Error updating wishlist in Firestore:", error);
+    console.error("Error updating wishlist in FastDB:", error);
     return NextResponse.json({ error: "Failed to update wishlist in database" }, { status: 500 });
   }
 }

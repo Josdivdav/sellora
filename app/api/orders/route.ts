@@ -1,6 +1,6 @@
 import { getAuth } from "firebase-admin/auth";
 import { NextResponse, NextRequest } from "next/server";
-import { db } from "@/lib/firebaseAdmin";
+import { db } from "@/lib/db";
 import type { Order, OrderItem, ShippingAddress, PaymentDetails } from "@/types/order";
 import {
   sendOrderConfirmationEmail,
@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 
 /**
  * GET /api/orders
- * Returns all orders belonging to the authenticated user from Firestore.
+ * Returns all orders belonging to the authenticated user from FastDB.
  */
 export async function GET(request: NextRequest) {
   const authorization = request.headers.get("authorization");
@@ -51,14 +51,14 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ success: true, orders, total: orders.length }, { status: 200 });
   } catch (error) {
-    console.error("Error fetching orders from Firestore:", error);
+    console.error("Error fetching orders from FastDB:", error);
     return NextResponse.json({ error: "Failed to fetch orders from database" }, { status: 500 });
   }
 }
 
 /**
  * POST /api/orders
- * Creates a new order in Firestore database with full validation and sanitation.
+ * Creates a new order in FastDB database with full validation and sanitation.
  */
 export async function POST(request: NextRequest) {
   const authorization = request.headers.get("authorization");
@@ -316,7 +316,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, order: orderDocData }, { status: 201 });
   } catch (error: any) {
-    console.error("Error creating order in Firestore:", error?.message || error, error?.stack);
+    console.error("Error creating order in FastDB:", error?.message || error, error?.stack);
     return NextResponse.json(
       { error: error?.message || "Failed to place order in database" },
       { status: 500 }

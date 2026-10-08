@@ -1,6 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
 import { getAuth } from "firebase-admin/auth";
-import { db } from "@/lib/firebaseAdmin";
+import { db } from "@/lib/db";
 import { getAllProducts } from "@/lib/getProduct";
 import { isEmailConfigured } from "@/lib/email";
 
@@ -93,7 +93,7 @@ export async function GET(request: NextRequest) {
       return tB - tA;
     });
 
-    // 2. Fetch Stores (Directly from Firestore)
+    // 2. Fetch Stores (Directly from FastDB)
     const storesMap = new Map<string, any>();
     try {
       const storesSnap = await db.collection("stores").get();
@@ -119,7 +119,7 @@ export async function GET(request: NextRequest) {
           reviewCount: d.reviewCount || 0,
           joinedDate: d.joinedDate || d.createdAt || d.updatedAt || new Date().toISOString(),
           productCount: Array.isArray(d.products) ? d.products.length : (d.productsCount || 0),
-          source: "Firestore Registered",
+          source: "FastDB Registered",
         });
       });
     } catch (err) {
@@ -132,7 +132,7 @@ export async function GET(request: NextRequest) {
       return tB - tA;
     });
 
-    // 3. Fetch Orders (Directly from Firestore)
+    // 3. Fetch Orders (Directly from FastDB)
     const ordersMap = new Map<string, any>();
     try {
       const ordersSnap = await db.collection("orders").get();
@@ -154,7 +154,7 @@ export async function GET(request: NextRequest) {
           paymentMethod: d.payment?.method || "WHATSAPP_CONFIRMATION",
           itemCount: Array.isArray(d.items) ? d.items.reduce((acc: number, it: any) => acc + (it.quantity || 1), 0) : 1,
           createdAt: d.createdAt || new Date().toISOString(),
-          source: "Firestore Order",
+          source: "FastDB Order",
         });
       });
     } catch (err) {

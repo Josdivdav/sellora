@@ -1,6 +1,6 @@
 import type { MetadataRoute } from 'next';
 import { headers } from 'next/headers';
-import { db } from '@/lib/firebaseAdmin';
+import { db } from '@/lib/db';
 import { getBaseUrlFromHeaders } from '@/lib/siteUrl';
 
 import { getStoreFullUrl } from '@/lib/storeUrl';
@@ -57,7 +57,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ];
 
-  // Dynamic product routes — fetched live from Firestore
+  // Dynamic product routes — fetched live from FastDB
   let productRoutes: MetadataRoute.Sitemap = [];
   try {
     const snapshot = await db.collection('products').select('slug', 'updatedAt', 'createdAt').get();
@@ -73,7 +73,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       };
     });
   } catch (err) {
-    console.warn('sitemap: failed to fetch products from Firestore', err);
+    console.warn('sitemap: failed to fetch products from FastDB', err);
   }
 
   // Dynamic store storefront routes
@@ -97,7 +97,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       };
     });
   } catch (err) {
-    console.warn('sitemap: failed to fetch stores from Firestore', err);
+    console.warn('sitemap: failed to fetch stores from FastDB', err);
   }
 
   return [...staticRoutes, ...storeRoutes, ...productRoutes];

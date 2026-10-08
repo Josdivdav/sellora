@@ -1,4 +1,4 @@
-import { db } from "@/lib/firebaseAdmin";
+import { db } from "@/lib/db";
 import type { Product } from "@/types/product";
 import type { Store } from "@/types/store";
 import { shuffleArray } from "@/lib/shuffle";
@@ -36,7 +36,7 @@ function setInCache(product: Product) {
 /**
  * High-performance server-side product resolver.
  * 1. Checks memory cache (0.05ms)
- * 2. Checks Firestore database (root products or store subcollections)
+ * 2. Checks FastDB database (root products or store subcollections)
  */
 export async function getProductById(idOrSlug: string): Promise<Product | null> {
   if (!idOrSlug) return null;
@@ -48,7 +48,7 @@ export async function getProductById(idOrSlug: string): Promise<Product | null> 
   const cached = getFromCache(lowerKey);
   if (cached) return cached;
 
-  // 2. Query Firestore
+  // 2. Query FastDB
   try {
     const prodDocRef = db.collection("products").doc(key);
     const docSnap = await prodDocRef.get();
@@ -150,7 +150,7 @@ export async function getProductById(idOrSlug: string): Promise<Product | null> 
     setInCache(resolvedProduct);
     return resolvedProduct;
   } catch (err) {
-    console.warn(`Could not fetch product ${key} from Firestore:`, err);
+    console.warn(`Could not fetch product ${key} from FastDB:`, err);
     return null;
   }
 }
@@ -172,7 +172,7 @@ export function invalidateProductsCache() {
 
 /**
  * High-performance server-side resolver for all live products.
- * Queries live Firestore database and uses an in-memory cache to serve in < 1ms.
+ * Queries live FastDB database and uses an in-memory cache to serve in < 1ms.
  */
 export async function getAllProducts(): Promise<{
   products: Product[];
@@ -189,7 +189,7 @@ export async function getAllProducts(): Promise<{
   }
 
   try {
-    // Query all live products in Firestore
+    // Query all live products in FastDB
     const snapshot = await db.collectionGroup("products").get();
 
     const dbProductsMap = new Map<string, Product>();
@@ -246,7 +246,7 @@ export async function getAllProducts(): Promise<{
 
     const dbProducts = Array.from(dbProductsMap.values());
 
-    // Fetch registered stores from Firestore
+    // Fetch registered stores from FastDB
     const storesSnap = await db.collection("stores").get();
     const dbStores: Store[] = [];
     storesSnap.forEach((doc) => {
@@ -301,7 +301,7 @@ export async function getAllProducts(): Promise<{
 
     return { products: shuffleArray(dbProducts), categories, stores: dbStores };
   } catch (err) {
-    console.error("Could not fetch products from Firestore:", err);
+    console.error("Could not fetch products from FastDB:", err);
     return { products: [], categories: ["All"], stores: [] };
   }
 }

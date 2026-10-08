@@ -1,7 +1,6 @@
 import { getAuth } from 'firebase-admin/auth';
 import { NextResponse, NextRequest } from 'next/server';
-import { db } from '@/lib/firebaseAdmin';
-import { FieldValue } from 'firebase-admin/firestore';
+import { db, FieldValue } from '@/lib/db';
 import { getStoreBySlug, invalidateStoreCache } from '@/lib/getStore';
 
 interface RouteContext {
@@ -57,7 +56,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
     return NextResponse.json({ error: 'Store not found' }, { status: 404 });
   }
 
-  // Read latest live followersCount directly from Firestore
+  // Read latest live followersCount directly from FastDB
   let liveCount = store.followersCount;
   try {
     const docSnap = await db.collection('stores').doc(store.id).get();
@@ -170,7 +169,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
       willFollow = !currentlyFollowing;
     }
 
-    // Ensure store doc exists in Firestore so increment works reliably
+    // Ensure store doc exists in FastDB so increment works reliably
     const storeSnap = await storeRef.get();
     if (!storeSnap.exists) {
       await storeRef.set(

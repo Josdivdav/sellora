@@ -43,7 +43,7 @@ export default function OrdersPage() {
   const [detailOrder, setDetailOrder] = useState<Order | null>(null);
   const [cancellingOrder, setCancellingOrder] = useState<Order | null>(null);
 
-  // Fetch orders from Firestore DB
+  // Fetch orders from FastDB DB
   const fetchOrders = useCallback(async () => {
     if (!user) {
       setOrders([]);
@@ -74,7 +74,7 @@ export default function OrdersPage() {
         setOrders([]);
       }
     } catch (err) {
-      console.error("Error fetching user orders from Firestore:", err);
+      console.error("Error fetching user orders from FastDB:", err);
       setOrders([]);
     } finally {
       setOrdersLoading(false);

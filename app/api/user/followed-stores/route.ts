@@ -1,6 +1,6 @@
 import { getAuth } from 'firebase-admin/auth';
 import { NextResponse, NextRequest } from 'next/server';
-import { db } from '@/lib/firebaseAdmin';
+import { db } from '@/lib/db';
 import type { Store } from '@/types/store';
 import { getAllProducts } from '@/lib/getProduct';
 
@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
     // Fetch all products to match new arrivals & populate store topProducts
     const { products: allProducts } = await getAllProducts();
 
-    // Fetch all real registered stores from Firestore
+    // Fetch all real registered stores from FastDB
     const storesSnap = await db.collection('stores').get();
     const allStoresList: Store[] = [];
 

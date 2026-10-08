@@ -1,6 +1,6 @@
 import { getAuth } from 'firebase-admin/auth';
 import { NextResponse, NextRequest } from 'next/server';
-import { db } from '@/lib/firebaseAdmin';
+import { db } from '@/lib/db';
 import { invalidateStoreCache } from '@/lib/getStore';
 import type { ReferralRecord, Store } from '@/types/store';
 

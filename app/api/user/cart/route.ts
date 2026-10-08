@@ -1,12 +1,12 @@
 import { getAuth } from "firebase-admin/auth";
 import { NextResponse, NextRequest } from "next/server";
-import { db } from "@/lib/firebaseAdmin";
+import { db } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
 /**
  * GET /api/user/cart
- * Retrieves the user's cart from Firestore database.
+ * Retrieves the user's cart from FastDB database.
  */
 export async function GET(request: NextRequest) {
   const authorization = request.headers.get("authorization");
@@ -38,14 +38,14 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ success: true, cart }, { status: 200 });
   } catch (error) {
-    console.error("Error fetching cart from Firestore:", error);
+    console.error("Error fetching cart from FastDB:", error);
     return NextResponse.json({ error: "Failed to fetch cart from database" }, { status: 500 });
   }
 }
 
 /**
  * POST /api/user/cart
- * Updates the user's cart in Firestore database.
+ * Updates the user's cart in FastDB database.
  */
 export async function POST(request: NextRequest) {
   const authorization = request.headers.get("authorization");
@@ -105,14 +105,14 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, cart: updatedCart }, { status: 200 });
   } catch (error) {
-    console.error("Error updating cart in Firestore:", error);
+    console.error("Error updating cart in FastDB:", error);
     return NextResponse.json({ error: "Failed to update cart in database" }, { status: 500 });
   }
 }
 
 /**
  * DELETE /api/user/cart
- * Clears the user's cart in Firestore database.
+ * Clears the user's cart in FastDB database.
  */
 export async function DELETE(request: NextRequest) {
   const authorization = request.headers.get("authorization");
@@ -137,7 +137,7 @@ export async function DELETE(request: NextRequest) {
 
     return NextResponse.json({ success: true, cart: {} }, { status: 200 });
   } catch (error) {
-    console.error("Error clearing cart in Firestore:", error);
+    console.error("Error clearing cart in FastDB:", error);
     return NextResponse.json({ error: "Failed to clear cart in database" }, { status: 500 });
   }
 }

@@ -1,5 +1,5 @@
 import { NextResponse, NextRequest } from 'next/server';
-import { db } from '@/lib/firebaseAdmin';
+import { db } from '@/lib/db';
 import type { Product } from '@/types/product';
 
 export const dynamic = 'force-dynamic';
